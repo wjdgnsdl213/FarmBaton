@@ -1,0 +1,43 @@
+# ── 비밀 / 환경변수 ──────────────────────────────
+.env
+.env.local
+*.key
+*.pem
+
+# ── 수집 원본 데이터 (용량 큼, 커밋 금지) ──────────
+data/
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.gpkg
+
+# ── Python ───────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# ── Node / React ─────────────────────────────────
+node_modules/
+dist/
+build/
+.vite/
+*.local
+
+# ── 에디터 / OS ──────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ── 로그 / 임시 ──────────────────────────────────
+*.log
+tmp/
+.cache/
