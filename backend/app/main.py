@@ -22,9 +22,13 @@ app = FastAPI(
     version="0.1.0",
 )
 
+_default_origins = ["http://localhost:5173", "http://localhost:3000"]
+_extra = os.getenv("ALLOWED_ORIGINS", "")  # 콤마 구분, 예: https://farmbaton.vercel.app
+_origins = _default_origins + [o.strip() for o in _extra.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

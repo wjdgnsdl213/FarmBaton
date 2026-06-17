@@ -1,6 +1,10 @@
 import axios from 'axios'
 
-const client = axios.create({ baseURL: '/api' })
+// 개발: Vite 프록시(/api → localhost:8000)
+// 배포: VITE_API_BASE_URL=https://your-backend.railway.app/api
+const client = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
+})
 
 export interface FarmCreatePayload {
   address: string
