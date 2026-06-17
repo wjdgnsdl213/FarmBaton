@@ -10,9 +10,10 @@ import os
 import urllib.parse
 import urllib.request
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.app.db import get_db
 from backend.app.routers import farms, young_farmers
 
 app = FastAPI(
@@ -39,12 +40,19 @@ def health():
 
 
 @app.get("/api/geocode")
-def geocode(address: str):
-    """주소 → WGS84 좌표 (V-World 프록시). PARCEL → ROAD 순 재시도."""
+def geocode(address: str, crop_code: str = "APPLE", conn=Depends(get_db)):
+    """주소 → 좌표 + 필지 면적 자동 취득.
+
+    1. V-World 지오코딩 (PARCEL → ROAD 재시도)
+    2. fn_farm_card → KNN 폴백으로 가장 가까운 과수원 필지 면적 취득
+    반환: {lon, lat, area_m2?, sido?, sigungu?}
+    """
     key = os.getenv("VWORLD_API_KEY", "")
     if not key:
         raise HTTPException(503, "VWORLD_API_KEY not configured")
 
+    # ── 1. 지오코딩 ──────────────────────────────────────────────────
+    lon = lat = None
     for addr_type in ("PARCEL", "ROAD"):
         params = urllib.parse.urlencode({
             "service": "address", "request": "getcoord",
@@ -59,8 +67,63 @@ def geocode(address: str):
                 data = json.loads(resp.read())
             if data["response"]["status"] == "OK":
                 pt = data["response"]["result"]["point"]
-                return {"lon": float(pt["x"]), "lat": float(pt["y"])}
+                lon, lat = float(pt["x"]), float(pt["y"])
+                break
         except Exception:
             continue
 
-    raise HTTPException(404, "주소를 찾을 수 없습니다.")
+    if lon is None:
+        raise HTTPException(404, "주소를 찾을 수 없습니다.")
+
+    result: dict = {"lon": lon, "lat": lat}
+
+    # ── 2. 필지 KNN 탐색 → 면적 자동 취득 ───────────────────────────
+    try:
+        with conn.cursor() as cur:
+            # fn_farm_card (ST_Contains) 우선 시도
+            cur.execute(
+                "SELECT parcel_id, sido, sigungu, bjd_cd, area_m2 "
+                "FROM fn_farm_card(%s, %s, %s::crop_code_t)",
+                (lon, lat, crop_code),
+            )
+            row = cur.fetchone()
+
+            if not row:
+                # KNN 폴백
+                sido_hint = _extract_sido_from_address(address)
+                if sido_hint:
+                    cur.execute("""
+                        SELECT p.id, p.sido, p.sigungu, p.bjd_cd, p.area_m2
+                        FROM parcel p WHERE p.sido = %s
+                        ORDER BY p.geom <-> ST_SetSRID(ST_MakePoint(%s,%s),4326)
+                        LIMIT 1
+                    """, (sido_hint, lon, lat))
+                    row = cur.fetchone()
+                if not row:
+                    cur.execute("""
+                        SELECT p.id, p.sido, p.sigungu, p.bjd_cd, p.area_m2
+                        FROM parcel p
+                        ORDER BY p.geom <-> ST_SetSRID(ST_MakePoint(%s,%s),4326)
+                        LIMIT 1
+                    """, (lon, lat))
+                    row = cur.fetchone()
+
+        if row:
+            _, sido, sigungu, _, area_m2 = row
+            result["area_m2"] = float(area_m2)
+            result["sido"] = sido or ""
+            result["sigungu"] = sigungu or ""
+    except Exception:
+        conn.rollback()  # 필지 취득 실패해도 좌표는 반환
+
+    return result
+
+
+def _extract_sido_from_address(address: str) -> str | None:
+    mapping = {"충북": "충북", "충청북도": "충북",
+                "경북": "경북", "경상북도": "경북",
+                "충남": "충남", "충청남도": "충남"}
+    for k, v in mapping.items():
+        if k in address:
+            return v
+    return None

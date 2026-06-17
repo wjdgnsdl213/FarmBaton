@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
-import axios from 'axios'
 import { api, type ValuationResult } from '../api'
 
 delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -32,6 +31,7 @@ export default function FarmerPage() {
   const [mapPos, setMapPos] = useState<[number, number] | null>(null)
   const [geocoding, setGeocoding] = useState(false)
   const [geocodeError, setGeocodeError] = useState<string | null>(null)
+  const [parcelInfo, setParcelInfo] = useState<{ area_m2?: number; sigungu?: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ValuationResult | null>(null)
@@ -44,11 +44,15 @@ export default function FarmerPage() {
     if (!form.address.trim()) return
     setGeocoding(true)
     setGeocodeError(null)
+    setParcelInfo(null)
     try {
-      const res = await axios.get('/api/geocode', {
-        params: { address: form.address },
-      })
-      setMapPos([res.data.lat, res.data.lon])
+      const res = await api.geocode(form.address, form.crop_code)
+      setMapPos([res.lat, res.lon])
+      // 면적 자동 취득
+      if (res.area_m2) {
+        setForm(f => ({ ...f, area_m2: String(Math.round(res.area_m2!)) }))
+        setParcelInfo({ area_m2: res.area_m2, sigungu: res.sigungu })
+      }
     } catch {
       setGeocodeError('주소를 찾을 수 없습니다. 지번 또는 도로명 주소로 다시 입력해보세요.')
     } finally {
@@ -132,7 +136,11 @@ export default function FarmerPage() {
           )}
           {mapPos && !geocodeError && (
             <p style={{ fontSize: '.78rem', color: 'var(--green)', marginTop: '.3rem' }}>
-              위치 확인됨 — 아래 지도에서 핀을 확인하세요.
+              위치 확인됨
+              {parcelInfo?.sigungu ? ` — ${parcelInfo.sigungu}` : ''}
+              {parcelInfo?.area_m2
+                ? ` · 필지 면적 ${parcelInfo.area_m2.toLocaleString('ko-KR')}㎡ 자동 적용`
+                : ' — 면적을 직접 입력해주세요'}
             </p>
           )}
         </div>
@@ -180,10 +188,15 @@ export default function FarmerPage() {
             </select>
           </div>
           <div className="form-group">
-            <label>면적 ㎡ (위치 검색 안될 때)</label>
+            <label>
+              면적 ㎡
+              {parcelInfo?.area_m2
+                ? <span style={{ color: 'var(--green)', fontWeight: 400 }}> (자동 취득)</span>
+                : <span style={{ color: 'var(--gray)', fontWeight: 400 }}> (검색 후 자동 입력)</span>}
+            </label>
             <input
               type="number" min="0" value={form.area_m2}
-              onChange={set('area_m2')} placeholder="예: 3000"
+              onChange={set('area_m2')} placeholder="위치 검색 시 자동 입력"
             />
           </div>
         </div>

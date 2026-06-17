@@ -71,7 +71,18 @@ export interface YoungFarmerPayload {
   pref_succession: string
 }
 
+export interface GeocodeResult {
+  lon: number
+  lat: number
+  area_m2?: number
+  sido?: string
+  sigungu?: string
+}
+
 export const api = {
+  geocode: (address: string, crop_code = 'APPLE') =>
+    client.get<GeocodeResult>('/geocode', { params: { address, crop_code } }).then(r => r.data),
+
   createFarm: (data: FarmCreatePayload) =>
     client.post<FarmCreateResult>('/farms', data).then(r => r.data),
 
