@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react'
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import { useState, useEffect, useRef } from 'react'
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
+import axios from 'axios'
 import { api, type ValuationResult } from '../api'
 
-// Leaflet 기본 마커 아이콘 경로 수정 (Vite 번들러 이슈)
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -11,15 +11,17 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 
-const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
-const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
 const GRADE_DESC: Record<string, string> = {
-  A: '실사 기반 추정', B: '농가 제출자료 기반', C: '사전 검토용 추정', D: '참고용 자동 추정'
+  A: '실사 기반 추정', B: '농가 제출자료 기반', C: '사전 검토용 추정', D: '참고용 자동 추정',
 }
 
-function MapPicker({ position, onChange }: { position: [number, number] | null; onChange: (p: [number, number]) => void }) {
-  useMapEvents({ click: e => onChange([e.latlng.lat, e.latlng.lng]) })
-  return position ? <Marker position={position} /> : null
+// 지오코딩 결과로 지도 이동
+function MapFlyTo({ position }: { position: [number, number] | null }) {
+  const map = useMap()
+  useEffect(() => {
+    if (position) map.flyTo(position, 16, { duration: 1 })
+  }, [position, map])
+  return null
 }
 
 export default function FarmerPage() {
@@ -28,6 +30,8 @@ export default function FarmerPage() {
     succession_type: 'SALE', area_m2: '',
   })
   const [mapPos, setMapPos] = useState<[number, number] | null>(null)
+  const [geocoding, setGeocoding] = useState(false)
+  const [geocodeError, setGeocodeError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ValuationResult | null>(null)
@@ -36,20 +40,45 @@ export default function FarmerPage() {
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
+  const handleGeocode = async () => {
+    if (!form.address.trim()) return
+    setGeocoding(true)
+    setGeocodeError(null)
+    try {
+      const res = await axios.get('/api/geocode', {
+        params: { address: form.address },
+      })
+      setMapPos([res.data.lat, res.data.lon])
+    } catch {
+      setGeocodeError('주소를 찾을 수 없습니다. 지번 또는 도로명 주소로 다시 입력해보세요.')
+    } finally {
+      setGeocoding(false)
+    }
+  }
+
+  const handleAddressKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') { e.preventDefault(); handleGeocode() }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.address.trim()) { setError('주소를 입력하세요.'); return }
+    if (!mapPos && !form.area_m2) {
+      setError('주소 검색으로 위치를 확인하거나, 면적을 직접 입력하세요.')
+      return
+    }
     setError(null)
     setLoading(true)
     try {
-      const payload: any = {
+      const payload = {
         address: form.address,
         crop_code: form.crop_code,
         tree_age: parseInt(form.tree_age) || 0,
         succession_type: form.succession_type,
+        lat: mapPos?.[0],
+        lon: mapPos?.[1],
+        area_m2: form.area_m2 ? parseFloat(form.area_m2) : undefined,
       }
-      if (mapPos) { payload.lat = mapPos[0]; payload.lon = mapPos[1] }
-      if (form.area_m2) payload.area_m2 = parseFloat(form.area_m2)
 
       const res = await api.createFarm(payload)
       if (res.valuation) {
@@ -58,8 +87,9 @@ export default function FarmerPage() {
       } else {
         setError(res.warning || '가치평가를 산출하지 못했습니다.')
       }
-    } catch (err: any) {
-      setError(err.response?.data?.detail || '서버 오류가 발생했습니다.')
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { detail?: string } } }
+      setError(e.response?.data?.detail || '서버 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
@@ -71,38 +101,57 @@ export default function FarmerPage() {
     <div>
       <p className="section-title">농가 등록 &amp; 인수 검토 리포트</p>
 
-      <div className="card">
-        <div className="card-title">농장 위치를 지도에서 선택하세요 (선택)</div>
-        <div className="map-wrap">
-          <MapContainer
-            center={[36.5, 127.8]}
-            zoom={7}
-            style={{ height: '220px', width: '100%' }}
-            scrollWheelZoom={false}
-          >
-            <TileLayer
-              url="https://api.vworld.kr/req/wmts/1.0.0/40635DD8-06B0-30B5-ACA9-E406704465E8/Base/{z}/{y}/{x}.png"
-              attribution="V-World"
-              errorTileUrl="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <MapPicker position={mapPos} onChange={setMapPos} />
-          </MapContainer>
-        </div>
-        {mapPos && (
-          <p style={{ fontSize: '.78rem', color: 'var(--gray)' }}>
-            선택 좌표: {mapPos[0].toFixed(5)}, {mapPos[1].toFixed(5)}
-          </p>
-        )}
-      </div>
-
       <form className="card" onSubmit={handleSubmit}>
         <div className="card-title">농장 정보 입력</div>
 
         {error && <div className="error-box">{error}</div>}
 
+        {/* 주소 + 검색 버튼 */}
         <div className="form-group">
           <label>주소 *</label>
-          <input value={form.address} onChange={set('address')} placeholder="예: 충청북도 충주시 가주동 483" />
+          <div style={{ display: 'flex', gap: '.5rem' }}>
+            <input
+              value={form.address}
+              onChange={set('address')}
+              onKeyDown={handleAddressKeyDown}
+              placeholder="예: 충청북도 충주시 가주동 483"
+              style={{ flex: 1 }}
+            />
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ width: 'auto', padding: '.6rem 1rem', whiteSpace: 'nowrap' }}
+              onClick={handleGeocode}
+              disabled={geocoding || !form.address.trim()}
+            >
+              {geocoding ? <span className="spinner" /> : '위치 검색'}
+            </button>
+          </div>
+          {geocodeError && (
+            <p style={{ fontSize: '.78rem', color: '#b91c1c', marginTop: '.3rem' }}>{geocodeError}</p>
+          )}
+          {mapPos && !geocodeError && (
+            <p style={{ fontSize: '.78rem', color: 'var(--green)', marginTop: '.3rem' }}>
+              위치 확인됨 — 아래 지도에서 핀을 확인하세요.
+            </p>
+          )}
+        </div>
+
+        {/* 지도 (위치 확인용) */}
+        <div className="map-wrap">
+          <MapContainer
+            center={[36.5, 127.8]}
+            zoom={7}
+            style={{ height: '200px', width: '100%' }}
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution="OpenStreetMap"
+            />
+            <MapFlyTo position={mapPos} />
+            {mapPos && <Marker position={mapPos} />}
+          </MapContainer>
         </div>
 
         <div className="form-row">
@@ -131,8 +180,11 @@ export default function FarmerPage() {
             </select>
           </div>
           <div className="form-group">
-            <label>면적 ㎡ (지도 선택 없을 때)</label>
-            <input type="number" min="0" value={form.area_m2} onChange={set('area_m2')} placeholder="예: 3000" />
+            <label>면적 ㎡ (위치 검색 안될 때)</label>
+            <input
+              type="number" min="0" value={form.area_m2}
+              onChange={set('area_m2')} placeholder="예: 3000"
+            />
           </div>
         </div>
 
@@ -145,7 +197,9 @@ export default function FarmerPage() {
         <div className="card" ref={resultRef}>
           <div className="card-title">
             인수 검토가 범위(참고용 추정)&nbsp;
-            <span className="grade-badge">등급 {result.confidence_grade} — {GRADE_DESC[result.confidence_grade]}</span>
+            <span className="grade-badge">
+              {result.confidence_grade}등급 — {GRADE_DESC[result.confidence_grade]}
+            </span>
           </div>
 
           <div className="valuation-header">
@@ -158,7 +212,9 @@ export default function FarmerPage() {
           <div className="valuation-grid">
             <div className="val-item">
               <div className="val-item-label">예상 연소득</div>
-              <div className="val-item-value">{fmt(result.est_income_min)} ~ {fmt(result.est_income_max)}만원</div>
+              <div className="val-item-value">
+                {fmt(result.est_income_min)} ~ {fmt(result.est_income_max)}만원
+              </div>
             </div>
             <div className="val-item">
               <div className="val-item-label">토지 기준가</div>
@@ -171,7 +227,9 @@ export default function FarmerPage() {
             <div className="val-item">
               <div className="val-item-label">영업권</div>
               <div className="val-item-value">
-                {result.goodwill_min === 0 ? '해당 없음' : `${fmt(result.goodwill_min)} ~ ${fmt(result.goodwill_max)}만원`}
+                {result.goodwill_min === 0
+                  ? '해당 없음'
+                  : `${fmt(result.goodwill_min)} ~ ${fmt(result.goodwill_max)}만원`}
               </div>
             </div>
           </div>
