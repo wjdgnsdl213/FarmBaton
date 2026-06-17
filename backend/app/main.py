@@ -8,7 +8,7 @@ load_dotenv(override=True)  # .env 우선 (외부 환경변수 따옴표 오염 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.routers import farms
+from backend.app.routers import farms, young_farmers
 
 app = FastAPI(
     title="팜바톤 API",
@@ -25,6 +25,7 @@ app.add_middleware(
 )
 
 app.include_router(farms.router)
+app.include_router(young_farmers.router)
 
 
 @app.get("/health")

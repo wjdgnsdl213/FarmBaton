@@ -79,3 +79,47 @@ class FarmCreateResponse(BaseModel):
     farm_id: int
     valuation: Optional[ValuationResponse] = None
     warning: Optional[str] = None
+
+
+# ── 청년농 등록 요청 ──────────────────────────────────────────────────────────
+
+class YoungFarmerCreate(BaseModel):
+    pref_sido: str
+    pref_crop: str = Field(pattern="^(APPLE|PEACH|GRAPE)$")
+    available_capital: float = Field(ge=0)
+    experience_years: int = Field(ge=0)
+    policy_fund: bool = False
+    pref_succession: str = Field(pattern="^(SALE|LEASE|JOINT|MENTORING)$")
+
+
+class YoungFarmerCreateResponse(BaseModel):
+    young_farmer_id: int
+
+
+# ── 매칭 결과 응답 ────────────────────────────────────────────────────────────
+
+class MatchItem(BaseModel):
+    farm_id: int
+    address: str
+    sido: str
+    crop_code: str
+    tree_age: Optional[int]
+    area_m2: float
+    succession_type: Optional[str]
+    est_value_min: int   # 만원
+    est_value_max: int
+    total_score: float
+    region_score: float
+    crop_score: float
+    capital_score: float
+    experience_score: float
+    succession_score: float
+    policy_score: float
+    risk_penalty: float
+    label: str = "인수 검토가 범위(참고용 추정)"
+    disclaimer: str = DISCLAIMER
+
+
+class MatchListResponse(BaseModel):
+    young_farmer_id: int
+    matches: list[MatchItem]
