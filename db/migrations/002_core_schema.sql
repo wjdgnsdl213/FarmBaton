@@ -229,8 +229,17 @@ RETURNS TABLE (
         ROUND(p.area_m2 * COALESCE(lp.deal_price_m2, lp.official_price_m2)),
         ic.avg_income_10a
     FROM parcel p
-    LEFT JOIN land_price lp
-           ON lp.bjd_cd = p.bjd_cd AND lp.jimok = '과수원'
+    LEFT JOIN (
+        -- parcel.bjd_cd는 8자리(읍면동), land_price.bjd_cd는 10자리(리).
+        -- LEFT(bjd_cd,8)로 읍면동 수준에서 평균 지가 집계.
+        SELECT
+            LEFT(bjd_cd, 8)        AS bjd8,
+            AVG(official_price_m2) AS official_price_m2,
+            AVG(deal_price_m2)     AS deal_price_m2
+        FROM land_price
+        WHERE jimok = '과수원'
+        GROUP BY 1
+    ) lp ON lp.bjd8 = p.bjd_cd
     LEFT JOIN income_coef ic
            ON ic.crop_code = p_crop
     WHERE ST_Contains(p.geom, ST_SetSRID(ST_MakePoint(p_lon, p_lat), 4326))

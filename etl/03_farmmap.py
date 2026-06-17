@@ -351,7 +351,7 @@ def main() -> int:
                             f"parcel 기존 {existing:,}행 → TRUNCATE 후 재적재.",
                             file=sys.stderr,
                         )
-                    cur.execute("TRUNCATE TABLE parcel RESTART IDENTITY")
+                    cur.execute("TRUNCATE TABLE parcel RESTART IDENTITY CASCADE")
 
                 chunk: list[dict] = []
                 inserted = 0
