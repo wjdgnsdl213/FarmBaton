@@ -620,22 +620,19 @@ def connect(database_url: str):
             ) from exc
 
 
+UPSERT_CHUNK = 200
+
+
 def upsert_rows(rows: list[LandPriceRow], database_url: str) -> tuple[int, list[tuple]]:
-    sql = """
-        INSERT INTO land_price (
-            bjd_cd,
-            jimok,
-            official_price_m2,
-            deal_price_m2,
-            deal_sample_cnt,
-            base_year
-        )
-        VALUES (%s, %s, %s, %s, %s, %s)
-        ON CONFLICT (bjd_cd, jimok, base_year) DO UPDATE SET
-            official_price_m2 = EXCLUDED.official_price_m2,
-            deal_price_m2 = EXCLUDED.deal_price_m2,
-            deal_sample_cnt = EXCLUDED.deal_sample_cnt
-    """
+    upsert_tmpl = (
+        "INSERT INTO land_price "
+        "(bjd_cd, jimok, official_price_m2, deal_price_m2, deal_sample_cnt, base_year) "
+        "VALUES {placeholders} "
+        "ON CONFLICT (bjd_cd, jimok, base_year) DO UPDATE SET "
+        "official_price_m2 = EXCLUDED.official_price_m2, "
+        "deal_price_m2 = EXCLUDED.deal_price_m2, "
+        "deal_sample_cnt = EXCLUDED.deal_sample_cnt"
+    )
     count_sql = "SELECT COUNT(*) FROM land_price WHERE base_year = %s"
     sample_sql = """
         SELECT bjd_cd, jimok, official_price_m2, deal_price_m2, deal_sample_cnt, base_year
@@ -649,18 +646,22 @@ def upsert_rows(rows: list[LandPriceRow], database_url: str) -> tuple[int, list[
     try:
         with conn:
             with conn.cursor() as cur:
-                for row in rows:
-                    cur.execute(
-                        sql,
-                        (
-                            row.bjd_cd,
-                            row.jimok,
-                            row.official_price_m2,
-                            row.deal_price_m2,
-                            row.deal_sample_cnt,
-                            row.base_year,
-                        ),
-                    )
+                for i in range(0, len(rows), UPSERT_CHUNK):
+                    chunk = rows[i : i + UPSERT_CHUNK]
+                    placeholders = ",".join(["(%s,%s,%s,%s,%s,%s)"] * len(chunk))
+                    params: list = []
+                    for row in chunk:
+                        params.extend(
+                            [
+                                row.bjd_cd,
+                                row.jimok,
+                                row.official_price_m2,
+                                row.deal_price_m2,
+                                row.deal_sample_cnt,
+                                row.base_year,
+                            ]
+                        )
+                    cur.execute(upsert_tmpl.format(placeholders=placeholders), params)
                 cur.execute(count_sql, (rows[0].base_year,))
                 loaded_count = cur.fetchone()[0]
                 cur.execute(sample_sql, (rows[0].base_year,))
