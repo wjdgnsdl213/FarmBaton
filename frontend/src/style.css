@@ -1,0 +1,89 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #2d7a40;
+  --green-light: #e8f5ec;
+  --green-mid: #4a9e5c;
+  --gray: #6b7280;
+  --gray-light: #f3f4f6;
+  --border: #e5e7eb;
+  --text: #111827;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(0,0,0,.08);
+}
+
+body { font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; color: var(--text); background: #fafaf8; font-size: 15px; line-height: 1.6; }
+
+/* ── 네비게이션 ── */
+.nav { position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 1px solid var(--border); padding: 0 1rem; display: flex; align-items: center; gap: 1rem; height: 52px; }
+.nav-logo { font-weight: 700; font-size: 1.1rem; color: var(--green); flex: 1; }
+.nav-links { display: flex; gap: .25rem; }
+.nav-link { padding: .4rem .9rem; border-radius: 20px; text-decoration: none; color: var(--gray); font-size: .88rem; font-weight: 500; transition: background .15s, color .15s; }
+.nav-link:hover { background: var(--green-light); color: var(--green); }
+.nav-link.active { background: var(--green); color: #fff; }
+
+/* ── 레이아웃 ── */
+.main { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+/* ── 공통 카드 ── */
+.card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); margin-bottom: 1rem; }
+.card-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 1rem; }
+
+/* ── 폼 요소 ── */
+.form-group { margin-bottom: .85rem; }
+label { display: block; font-size: .82rem; font-weight: 600; color: var(--gray); margin-bottom: .3rem; }
+input, select { width: 100%; padding: .6rem .75rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: .95rem; outline: none; background: #fff; transition: border-color .15s; }
+input:focus, select:focus { border-color: var(--green-mid); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+/* ── 버튼 ── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .7rem 1.5rem; border-radius: 8px; font-size: .95rem; font-weight: 600; cursor: pointer; border: none; transition: background .15s, opacity .15s; width: 100%; }
+.btn-primary { background: var(--green); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--green-mid); }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── 가치평가 결과 ── */
+.valuation-header { text-align: center; margin-bottom: 1rem; }
+.valuation-range { font-size: 1.7rem; font-weight: 800; color: var(--green); }
+.valuation-sublabel { font-size: .78rem; color: var(--gray); margin-top: .2rem; }
+.valuation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: 1rem 0; }
+.val-item { background: var(--green-light); border-radius: 8px; padding: .7rem .9rem; }
+.val-item-label { font-size: .72rem; color: var(--gray); }
+.val-item-value { font-size: 1rem; font-weight: 700; color: var(--green); }
+.grade-badge { display: inline-flex; align-items: center; gap: .3rem; background: var(--green); color: #fff; font-size: .78rem; font-weight: 700; padding: .25rem .7rem; border-radius: 12px; }
+.disclaimer { font-size: .72rem; color: var(--gray); background: var(--gray-light); border-radius: 8px; padding: .6rem .8rem; line-height: 1.5; margin-top: .8rem; }
+
+/* ── 지도 ── */
+.map-wrap { border-radius: 10px; overflow: hidden; border: 1.5px solid var(--border); margin-bottom: 1rem; }
+.map-wrap .leaflet-container { height: 220px; width: 100%; }
+
+/* ── 매칭 아이템 ── */
+.match-item { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: .75rem; cursor: default; transition: border-color .15s; }
+.match-item:hover { border-color: var(--green-mid); }
+.match-header { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; margin-bottom: .6rem; }
+.match-info { flex: 1; }
+.match-score-circle { width: 52px; height: 52px; border-radius: 50%; background: var(--green); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.match-score-num { font-size: 1.05rem; font-weight: 800; line-height: 1; }
+.match-score-unit { font-size: .56rem; opacity: .85; }
+.match-farm-name { font-weight: 700; font-size: .95rem; }
+.match-farm-meta { font-size: .8rem; color: var(--gray); margin-top: .15rem; }
+.score-bars { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem .75rem; margin-top: .6rem; }
+.score-bar { display: flex; align-items: center; gap: .4rem; font-size: .74rem; }
+.score-bar-label { color: var(--gray); width: 40px; flex-shrink: 0; }
+.score-bar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.score-bar-fill { height: 100%; background: var(--green-mid); border-radius: 3px; }
+.score-bar-val { width: 26px; text-align: right; font-weight: 600; color: var(--text); }
+.penalty-badge { background: #fee2e2; color: #b91c1c; font-size: .72rem; font-weight: 700; padding: .15rem .5rem; border-radius: 8px; display: inline-block; margin-top: .4rem; }
+.value-range-small { font-size: .78rem; color: var(--gray); margin-top: .3rem; }
+.tag { display: inline-block; font-size: .72rem; font-weight: 600; padding: .18rem .55rem; border-radius: 6px; background: var(--green-light); color: var(--green); margin-right: .3rem; }
+
+/* ── 섹션 제목 ── */
+.section-title { font-size: 1.1rem; font-weight: 800; margin: 1.25rem 0 .75rem; }
+
+/* ── 빈 상태 / 에러 ── */
+.empty { text-align: center; padding: 3rem 1rem; color: var(--gray); }
+.error-box { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: .7rem 1rem; font-size: .85rem; color: #b91c1c; margin-bottom: 1rem; }
+
+/* ── 스피너 ── */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
