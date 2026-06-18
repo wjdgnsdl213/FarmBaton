@@ -125,16 +125,18 @@ def geocode(address: str, crop_code: str = "APPLE", conn=Depends(get_db)):
                 if row:
                     dist_km = row[5]
 
-        if row:
+        # 거리 임계값 초과 KNN 매칭은 신뢰하지 않음 — 필지 매칭 실패로 취급
+        # (자동 면적 채움 없이 사용자가 직접 입력하도록 유도)
+        if row and dist_km is not None and dist_km > KNN_DISTANCE_WARN_KM:
+            result["warning"] = (
+                f"입력 좌표 근처 {KNN_DISTANCE_WARN_KM:.0f}km 이내에 일치하는 과수원 필지가 "
+                "없습니다. 면적을 직접 입력해주세요."
+            )
+        elif row:
             sido, sigungu, area_m2 = row[1], row[2], row[4]
             result["area_m2"] = float(area_m2)
             result["sido"] = sido or ""
             result["sigungu"] = sigungu or ""
-            if dist_km is not None and dist_km > KNN_DISTANCE_WARN_KM:
-                result["warning"] = (
-                    f"입력 좌표와 가장 가까운 과수원 필지가 {dist_km:.1f}km 떨어져 있습니다. "
-                    "면적·지가가 실제 필지와 다를 수 있습니다."
-                )
     except Exception:
         conn.rollback()  # 필지 취득 실패해도 좌표는 반환
 
