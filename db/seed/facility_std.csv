@@ -1,9 +1,10 @@
-facility_code,facility_name,unit,std_unit_cost_krw,useful_life_years,salvage_rate,note
-GH_SINGLE,단동 비닐하우스(기본형),m2,30000,10,0.05,"파이프 골조+피복 기준, 자동화 미포함. 시장 시공가 평당 8~11만원(㎡ 2.4~3.3만)의 중간값"
-GH_MULTI,연동 비닐하우스(자동개폐 포함),m2,60000,15,0.05,"연동·자동개폐·커튼 포함 기준. 단동 대비 약 2배"
-RAIN_SHELTER,과수 비가림 시설,m2,25000,10,0.05,"포도 비가림 등. 간이 골조+피복"
-TRELLIS_GRAPE,포도 덕(평덕) 시설,m2,4000,15,0.05,"10a당 약 300~500만원 환산"
-TRELLIS_APPLE,사과 밀식 지주시설,m2,2000,15,0.05,"M9 밀식재배 지주·와이어. 10a당 약 150~250만원 환산"
-COLD_STORAGE,저온저장고,m2,600000,15,0.10,"판넬+냉동유닛 포함. 10평(33㎡)당 약 2,000만원 환산"
-WAREHOUSE,농기계창고·관리사(판넬조),m2,350000,20,0.10,"샌드위치판넬 단층 기준"
-IRRIGATION,관수시설(점적·스프링클러),m2,5000,8,0.00,"10a당 약 50만원 환산. 관정 비용 별도"
+facility_code,facility_name,facility_variant,cost_model,base_cost_krw,unit_cost_krw,cost_unit,useful_life_years,salvage_rate,standard_year,confidence,source_refs,notes
+VINYL_HOUSE_SINGLE,비닐하우스,내재해형 단동 기본형,area_m2 * unit,0.00,33000.00,KRW_PER_M2,10.0,0.05,2026,HIGH,SRC_GUNSAN_2026_VINYL;SRC_RDA_ECON_2025,관수·자동개폐기 포함 신축 지원 기준
+VINYL_HOUSE_MULTI,비닐하우스,연동,area_m2 * unit,0.00,130000.00,KRW_PER_M2,15.0,0.05,2026,HIGH,SRC_GUNSAN_2026_VINYL;SRC_RDA_ECON_2025,군산시 연동 기준단가
+COLD_STORAGE_SMALL,저온저장고,농가형,area_pyeong * unit,0.00,2800000.00,KRW_PER_PYEONG,10.0,0.10,2026,MEDIUM,SRC_GIMCHEON_2026_COLD,"약 846,807원/㎡ 상당. 정밀평가 시 건물/냉동설비 분리 권장"
+FARM_WAREHOUSE_PANEL,창고,판넬·경량철골 (농가 일반),area_m2 * unit,0.00,350000.00,KRW_PER_M2,20.0,0.10,2026,LOW,SRC_MARKET_EST_2026;SRC_RDA_ECON_2025,농가 창고 기본값. 부동산원 경량철골 값 확인 후 갱신할 것
+FARM_WAREHOUSE_GENERAL,창고,일반 구조 평균 (RC 포함),area_m2 * unit,0.00,860857.00,KRW_PER_M2,20.0,0.10,2025,MEDIUM,SRC_REB_2025_WAREHOUSE,"부동산원 창고 용도 평균. RC 포함 평균이라 판넬 창고에 적용 시 과대평가 — 위저드에서 구조 미상일 때만 사용"
+IRRIGATION_DRIP_AUTO,관수시설,하우스 자동 점적관수,base + area_m2 * unit,4297000.00,830.20,KRW_PER_M2,8.0,0.00,2025,HIGH,SRC_JEJU_2025_IRRIGATION;SRC_RDA_ECON_2025,"수동 점적: 1,337,520 + 810.2/㎡, 자동 관수관비: 6,909,000 + 1,026.2/㎡"
+RAIN_SHELTER,비가림 시설,과수 비가림 (포도 등),area_m2 * unit,0.00,25000.00,KRW_PER_M2,10.0,0.05,2026,LOW,SRC_MARKET_EST_2026;SRC_AGRIX_FRUIT_MODERNIZATION,AgriX 지원항목 존재. 지자체 고시 단가 확인 시 갱신
+TRELLIS_GRAPE,덕 시설,포도 평덕,area_m2 * unit,0.00,4000.00,KRW_PER_M2,15.0,0.05,2026,LOW,SRC_MARKET_EST_2026,10a당 약 300~500만원 환산
+TRELLIS_APPLE,지주 시설,사과 밀식 지주·와이어,area_m2 * unit,0.00,2000.00,KRW_PER_M2,15.0,0.05,2026,LOW,SRC_MARKET_EST_2026,10a당 약 150~250만원 환산

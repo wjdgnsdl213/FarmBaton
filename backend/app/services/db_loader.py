@@ -7,6 +7,9 @@ from __future__ import annotations
 
 from backend.app.services.valuation import AssetData, FarmInput, LandData
 
+# bjd_cd 첫 2자리 → 시도 (etl/02_landprice.py의 PROVINCE_BY_PREFIX와 동일 매핑)
+_SIDO_TO_BJD_PREFIX = {"충북": "43", "충남": "44", "경북": "47"}
+
 
 def load_farm_input(farm_id: int, conn) -> FarmInput:
     """farm_id 기반 DB 조회 → FarmInput 반환.
@@ -17,7 +20,7 @@ def load_farm_input(farm_id: int, conn) -> FarmInput:
     with conn.cursor() as cur:
         # ── 1. 농장 기본 행 ──────────────────────────────────────────
         cur.execute("""
-            SELECT crop_code::TEXT, tree_age, area_m2, bjd_cd,
+            SELECT crop_code::TEXT, tree_age, area_m2, bjd_cd, sido,
                    annual_revenue, sales_channel
             FROM farm
             WHERE id = %s
@@ -25,7 +28,7 @@ def load_farm_input(farm_id: int, conn) -> FarmInput:
         row = cur.fetchone()
         if row is None:
             raise ValueError(f"farm id={farm_id} not found")
-        crop_code, tree_age, area_m2, bjd_cd, annual_revenue, sales_channel = row
+        crop_code, tree_age, area_m2, bjd_cd, sido, annual_revenue, sales_channel = row
 
         # ── 2. 10a당 소득 ─────────────────────────────────────────────
         cur.execute(
@@ -52,7 +55,7 @@ def load_farm_input(farm_id: int, conn) -> FarmInput:
         trend_index = float(pt[0]) if pt else 1.0
 
         # ── 5. 토지 지가 ──────────────────────────────────────────────
-        land = _load_land(cur, bjd_cd, float(area_m2))
+        land = _load_land(cur, bjd_cd, float(area_m2), sido)
 
         # ── 6. 시설 자산 ──────────────────────────────────────────────
         assets = _load_assets(cur, farm_id)
@@ -78,30 +81,49 @@ def load_farm_input(farm_id: int, conn) -> FarmInput:
         )
 
 
-def _load_land(cur, bjd_cd: str | None, area_m2: float) -> LandData:
-    if not bjd_cd:
-        return LandData(area_m2=area_m2, official_price_m2=0.0)
+def _load_land(cur, bjd_cd: str | None, area_m2: float, sido: str | None = None) -> LandData:
+    """동(8자리 bjd_cd) 단위 지가 조회. 좌표 미확보 시 시도 단위 평균으로 폴백.
 
-    cur.execute("""
-        SELECT
-            AVG(official_price_m2),
-            AVG(CASE WHEN deal_price_m2 IS NOT NULL THEN deal_price_m2 END),
-            COALESCE(SUM(deal_sample_cnt), 0)::INTEGER
-        FROM land_price
-        WHERE LEFT(bjd_cd, 8) = %s
-          AND jimok = '과수원'
-    """, (bjd_cd,))
-    row = cur.fetchone()
+    bjd_cd가 없으면(위치검색 미사용/V-World 장애로 면적만 수동 입력한 경로)
+    official_price_m2=0이 되어 인수 검토가가 0원으로 표시되는 문제가 있었음.
+    실거래/공시지가 모두 실데이터이므로, 시도 단위로 넓혀서라도 0보다는
+    의미 있는 근사값을 반환한다. deal_price_m2를 None으로 남겨 두면
+    grade_confidence()가 자동으로 신뢰도를 한 단계 낮춘다.
+    """
+    if bjd_cd:
+        cur.execute("""
+            SELECT
+                AVG(official_price_m2),
+                AVG(CASE WHEN deal_price_m2 IS NOT NULL THEN deal_price_m2 END),
+                COALESCE(SUM(deal_sample_cnt), 0)::INTEGER
+            FROM land_price
+            WHERE LEFT(bjd_cd, 8) = %s
+              AND jimok = '과수원'
+        """, (bjd_cd,))
+        row = cur.fetchone()
 
-    if not row or row[0] is None:
-        return LandData(area_m2=area_m2, official_price_m2=0.0)
+        if row and row[0] is not None:
+            return LandData(
+                area_m2=area_m2,
+                official_price_m2=float(row[0]),
+                deal_price_m2=float(row[1]) if row[1] is not None else None,
+                deal_sample_cnt=int(row[2]) if row[2] else 0,
+            )
 
-    return LandData(
-        area_m2=area_m2,
-        official_price_m2=float(row[0]),
-        deal_price_m2=float(row[1]) if row[1] is not None else None,
-        deal_sample_cnt=int(row[2]) if row[2] else 0,
-    )
+    # 폴백: 시도 단위 평균 (bjd_cd 미확보 또는 동 단위 데이터 없음)
+    bjd_prefix = _SIDO_TO_BJD_PREFIX.get(sido or "")
+    if bjd_prefix:
+        cur.execute("""
+            SELECT AVG(official_price_m2)
+            FROM land_price
+            WHERE LEFT(bjd_cd, 2) = %s
+              AND jimok = '과수원'
+        """, (bjd_prefix,))
+        row = cur.fetchone()
+        if row and row[0] is not None:
+            return LandData(area_m2=area_m2, official_price_m2=float(row[0]))
+
+    return LandData(area_m2=area_m2, official_price_m2=0.0)
 
 
 def _load_assets(cur, farm_id: int) -> list[AssetData]:

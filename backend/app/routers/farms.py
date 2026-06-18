@@ -130,11 +130,17 @@ def _extract_sido(address: str) -> str:
     return address.split()[0] if address else ""
 
 
-def _call_farm_card(lon: float, lat: float, crop_code: str, conn):
-    """필지 매칭: ST_Contains 우선, 없으면 KNN 폴백.
+KNN_DISTANCE_WARN_KM = 20.0  # 이 거리를 넘는 KNN 매칭은 사용자에게 경고
 
-    Returns (parcel_id, sido, sigungu, bjd_cd, area_m2) or None.
+
+def _call_farm_card(lon: float, lat: float, crop_code: str, address_sido: str | None, conn):
+    """필지 매칭: ST_Contains 우선, 없으면 같은 시도 내 KNN, 최후엔 전역 KNN.
+
+    Returns (parcel_id, sido, sigungu, bjd_cd, area_m2, distance_warning) or None.
     마을 중심좌표는 개별 필지 안에 들어오지 않는 경우가 많아 KNN 폴백 필수.
+    시도 스코프 없이 전역 KNN만 쓰면 주소 오인식 시 수십km 떨어진 엉뚱한
+    필지가 경고 없이 붙을 수 있어(검증 중 서울 좌표 → 67km 거리 천안시 필지
+    매칭 확인), 같은 시도로 먼저 좁히고 거리 임계값을 넘으면 경고를 반환한다.
     """
     try:
         with conn.cursor() as cur:
@@ -146,16 +152,49 @@ def _call_farm_card(lon: float, lat: float, crop_code: str, conn):
             )
             row = cur.fetchone()
             if row:
-                return row
+                return (*row, None)
 
-            # 2차: KNN — 가장 가까운 과수원 필지 (폴백)
-            cur.execute("""
-                SELECT p.id, p.sido, p.sigungu, p.bjd_cd, p.area_m2
-                FROM parcel p
-                ORDER BY p.geom <-> ST_SetSRID(ST_MakePoint(%s, %s), 4326)
-                LIMIT 1
-            """, (lon, lat))
-            return cur.fetchone()
+            # 2차: 같은 시도 내 KNN (스코프를 좁혀 오매칭 방지)
+            row = None
+            if address_sido:
+                cur.execute("""
+                    SELECT p.id, p.sido, p.sigungu, p.bjd_cd, p.area_m2,
+                           ST_Distance(
+                               p.geom::geography,
+                               ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography
+                           ) / 1000.0 AS dist_km
+                    FROM parcel p
+                    WHERE p.sido = %s
+                    ORDER BY p.geom <-> ST_SetSRID(ST_MakePoint(%s, %s), 4326)
+                    LIMIT 1
+                """, (lon, lat, address_sido, lon, lat))
+                row = cur.fetchone()
+
+            # 3차: 전역 KNN (시도 추정조차 안 된 경우의 최후 폴백)
+            if not row:
+                cur.execute("""
+                    SELECT p.id, p.sido, p.sigungu, p.bjd_cd, p.area_m2,
+                           ST_Distance(
+                               p.geom::geography,
+                               ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography
+                           ) / 1000.0 AS dist_km
+                    FROM parcel p
+                    ORDER BY p.geom <-> ST_SetSRID(ST_MakePoint(%s, %s), 4326)
+                    LIMIT 1
+                """, (lon, lat, lon, lat))
+                row = cur.fetchone()
+
+            if not row:
+                return None
+
+            parcel_id, sido, sigungu, bjd_cd, area_m2, dist_km = row
+            warning = None
+            if dist_km is not None and dist_km > KNN_DISTANCE_WARN_KM:
+                warning = (
+                    f"입력 좌표와 가장 가까운 과수원 필지가 {dist_km:.1f}km 떨어져 있습니다. "
+                    "면적·지가가 실제 필지와 다를 수 있습니다."
+                )
+            return (parcel_id, sido, sigungu, bjd_cd, area_m2, warning)
     except Exception:
         conn.rollback()
         return None
@@ -180,10 +219,11 @@ def create_farm(data: FarmCreate, conn=Depends(get_db)):
     area_m2 = data.area_m2
 
     if data.lon is not None and data.lat is not None:
-        card = _call_farm_card(data.lon, data.lat, data.crop_code, conn)
+        card = _call_farm_card(data.lon, data.lat, data.crop_code, sido, conn)
         if card:
-            parcel_id, sido, sigungu, bjd_cd, area_m2 = card
+            parcel_id, sido, sigungu, bjd_cd, area_m2, distance_warning = card
             area_m2 = float(area_m2)
+            warning = distance_warning
         else:
             warning = "좌표로 일치하는 과수원 필지를 찾지 못했습니다. 입력 면적으로 등록합니다."
 

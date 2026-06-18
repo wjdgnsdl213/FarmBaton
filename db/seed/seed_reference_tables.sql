@@ -12,17 +12,34 @@
 --   구간 계수로 변환한 자체 설계값. 발표 시 "농진청 재배기술
 --   자료 기반 자체 산정 계수"로 표기.
 -- ============================================================
+--
+-- [2026-06-18 동기화 메모]
+-- facility_std는 db/migrations/001_reference_tables.sql에서 보강(시설
+-- variant 분리, source_refs 등)되어 그쪽이 현재 운영 DB의 실제 스키마다.
+-- 아래 정의·db/seed/facility_std.csv는 그 스키마에 맞춰 동기화했다.
+-- orchard_age_coef(아래)는 더 나아가 같은 마이그레이션 파일의
+-- orchard_age_curve_std 테이블 + fn_orchard_age_coef() 함수(파라메트릭
+-- 곡선)로 완전히 대체되었다 — 이 파일의 orchard_age_coef 정의·CSV는
+-- 더 이상 어디서도 import되지 않는 구버전이니 참고만 할 것.
+-- ============================================================
 
 CREATE TABLE IF NOT EXISTS facility_std (
-    facility_code      VARCHAR(20) PRIMARY KEY,
-    facility_name      VARCHAR(60)  NOT NULL,
-    unit               VARCHAR(10)  NOT NULL DEFAULT 'm2',
-    std_unit_cost_krw  INTEGER      NOT NULL,   -- 표준 설치단가(원/㎡)
-    useful_life_years  SMALLINT     NOT NULL,   -- 내용연수
-    salvage_rate       NUMERIC(3,2) NOT NULL DEFAULT 0.05, -- 잔존가율
-    note               TEXT
+    facility_code           TEXT PRIMARY KEY,
+    facility_name           TEXT NOT NULL,
+    facility_variant        TEXT NOT NULL,
+    cost_model              TEXT NOT NULL,           -- 계산식 설명용
+    base_cost_krw           NUMERIC(14,2) NOT NULL DEFAULT 0,  -- 개소당 고정비
+    unit_cost_krw           NUMERIC(14,2) NOT NULL,            -- 단위당 단가
+    cost_unit               TEXT NOT NULL,           -- KRW_PER_M2 | KRW_PER_PYEONG
+    useful_life_years       NUMERIC(5,1) NOT NULL,
+    salvage_rate            NUMERIC(3,2) NOT NULL DEFAULT 0.05,
+    standard_year           INTEGER NOT NULL,
+    confidence              TEXT NOT NULL,           -- HIGH | MEDIUM | LOW
+    source_refs             TEXT NOT NULL,
+    notes                   TEXT
 );
 
+-- 구버전 (참고용, import 안 됨) ↓
 CREATE TABLE IF NOT EXISTS orchard_age_coef (
     crop_code   VARCHAR(10) NOT NULL,
     crop_name   VARCHAR(20) NOT NULL,
@@ -45,7 +62,7 @@ ON CONFLICT (grade) DO NOTHING;
 -- CSV 적재 (Supabase SQL Editor에서는 Table Editor 임포트 권장,
 -- 로컬 psql 기준):
 -- \copy facility_std     FROM 'facility_std.csv'     CSV HEADER;
--- \copy orchard_age_coef FROM 'orchard_age_coef.csv' CSV HEADER;
+-- orchard_age_coef.csv는 위 메모대로 구버전이라 import 대상 아님 (참고용).
 
 -- ============================================================
 -- 활용 예시 1: 시설 잔존가 계산
