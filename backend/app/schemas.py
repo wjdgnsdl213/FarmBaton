@@ -116,6 +116,7 @@ class MatchItem(BaseModel):
     succession_score: float
     policy_score: float
     risk_penalty: float
+    explanation: Optional[str] = None
     label: str = "인수 검토가 범위(참고용 추정)"
     disclaimer: str = DISCLAIMER
 

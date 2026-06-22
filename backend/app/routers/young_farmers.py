@@ -17,6 +17,7 @@ from backend.app.schemas import (
     YoungFarmerCreate,
     YoungFarmerCreateResponse,
 )
+from backend.app.services.report_ai import MatchContext, generate_match_explanation
 from backend.app.services.valuation import (
     FarmProfileForMatch,
     YoungFarmerInput,
@@ -39,14 +40,15 @@ def _to_만원(value: float) -> int:
     return round(value / 10_000)
 
 
-def _upsert_match_score(farm_id: int, yf_id: int, result, conn) -> None:
+def _upsert_match_score(farm_id: int, yf_id: int, result, explanation: Optional[str], conn) -> None:
     with conn.cursor() as cur:
         cur.execute("""
             INSERT INTO match_score (
                 farm_id, young_farmer_id, total_score,
                 region_score, crop_score, capital_score,
-                experience_score, succession_score, policy_score, risk_penalty
-            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                experience_score, succession_score, policy_score, risk_penalty,
+                explanation
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             ON CONFLICT (farm_id, young_farmer_id) DO UPDATE SET
                 total_score      = EXCLUDED.total_score,
                 region_score     = EXCLUDED.region_score,
@@ -56,13 +58,26 @@ def _upsert_match_score(farm_id: int, yf_id: int, result, conn) -> None:
                 succession_score = EXCLUDED.succession_score,
                 policy_score     = EXCLUDED.policy_score,
                 risk_penalty     = EXCLUDED.risk_penalty,
+                explanation      = EXCLUDED.explanation,
                 computed_at      = now()
         """, (
             farm_id, yf_id, result.total_score,
             result.region_score, result.crop_score, result.capital_score,
             result.experience_score, result.succession_score,
-            result.policy_score, result.risk_penalty,
+            result.policy_score, result.risk_penalty, explanation,
         ))
+
+
+def _fetch_cached_explanations(farm_ids: list[int], yf_id: int, conn) -> dict[int, str]:
+    """이미 생성된 매칭 설명문 캐시 조회 (LLM 재호출 방지)."""
+    if not farm_ids:
+        return {}
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT farm_id, explanation FROM match_score
+            WHERE young_farmer_id = %s AND farm_id = ANY(%s) AND explanation IS NOT NULL
+        """, (yf_id, farm_ids))
+        return dict(cur.fetchall())
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -184,7 +199,30 @@ def get_matches(yf_id: int, conn=Depends(get_db)):
     items.sort(key=lambda x: x[0], reverse=True)
     top_items = [item for _, item in items[:TOP_N]]
 
-    # ── 5. match_score 테이블 UPSERT ────────────────────────────────
+    # ── 5. 매칭 설명문 (캐시 우선, 없으면 생성) — 실제 반환되는 TOP_N만 ──
+    cached = _fetch_cached_explanations([item.farm_id for item in top_items], yf_id, conn)
+    for item in top_items:
+        if item.farm_id in cached:
+            item.explanation = cached[item.farm_id]
+        else:
+            item.explanation = generate_match_explanation(MatchContext(
+                pref_sido=young.pref_sido,
+                pref_crop=young.pref_crop,
+                farm_sido=item.sido,
+                farm_crop=item.crop_code,
+                pref_succession=young.pref_succession,
+                succession_type=item.succession_type or "SALE",
+                total_score=item.total_score,
+                region_score=item.region_score,
+                crop_score=item.crop_score,
+                capital_score=item.capital_score,
+                experience_score=item.experience_score,
+                succession_score=item.succession_score,
+                policy_score=item.policy_score,
+                risk_penalty=item.risk_penalty,
+            ))
+
+    # ── 6. match_score 테이블 UPSERT ────────────────────────────────
     with conn.cursor() as cur:
         for score, item in items[:TOP_N]:
             farm_profile = FarmProfileForMatch(
@@ -195,7 +233,7 @@ def get_matches(yf_id: int, conn=Depends(get_db)):
                 crop_difficulty_high=(item.crop_code in _HIGH_DIFFICULTY_CROPS),
             )
             result = calc_match_score(young, farm_profile)
-            _upsert_match_score(item.farm_id, yf_id, result, conn)
+            _upsert_match_score(item.farm_id, yf_id, result, item.explanation, conn)
     conn.commit()
 
     return MatchListResponse(young_farmer_id=yf_id, matches=top_items)
