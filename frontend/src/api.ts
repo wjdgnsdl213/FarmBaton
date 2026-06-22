@@ -60,6 +60,7 @@ export interface MatchItem {
   succession_score: number
   policy_score: number
   risk_penalty: number
+  explanation: string | null
   disclaimer: string
 }
 

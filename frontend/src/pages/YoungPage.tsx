@@ -62,6 +62,12 @@ function MatchCard({ item, rank }: { item: MatchItem; rank: number }) {
         <ScoreBar label="승계" value={item.succession_score} max={15} />
         <ScoreBar label="정책금" value={item.policy_score} max={10} />
       </div>
+
+      {item.explanation && (
+        <p style={{ fontSize: '.8rem', color: 'var(--gray)', margin: '.6rem 0 0', fontStyle: 'italic' }}>
+          “{item.explanation}”
+        </p>
+      )}
     </div>
   )
 }
