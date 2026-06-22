@@ -3,7 +3,33 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
+
+# ── 농가 인증 ────────────────────────────────────────────────────────────────
+
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8)
+    name: str
+    phone: Optional[str] = None
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class AuthResponse(BaseModel):
+    token: str
+    user_id: int
+    name: str
+
+
+class MeResponse(BaseModel):
+    user_id: int
+    name: str
+    email: str
+
 
 # ── 농가 등록 요청 ────────────────────────────────────────────────────────────
 

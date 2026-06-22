@@ -14,7 +14,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.db import get_db
-from backend.app.routers import farms, young_farmers
+from backend.app.routers import auth, farms, young_farmers
 from backend.app.routers.farms import KNN_DISTANCE_WARN_KM
 
 app = FastAPI(
@@ -35,6 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(farms.router)
 app.include_router(young_farmers.router)
 
