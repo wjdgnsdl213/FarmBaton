@@ -17,6 +17,9 @@ from backend.app.db import get_db
 from backend.app.schemas import (
     DISCLAIMER,
     AssetCreate,
+    AssetSummary,
+    ConsultRequestCreate,
+    ConsultRequestResponse,
     FarmCreate,
     FarmCreateResponse,
     FarmDetail,
@@ -270,6 +273,13 @@ def get_farm(farm_id: int, conn=Depends(get_db)):
     (id_, address, sido, crop_code, tree_age, area_m2,
      succession_type, val_min, val_max, grade, status, is_demo) = row
 
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT facility_code, area_m2, installed_year, condition_grade
+            FROM farm_asset WHERE farm_id = %s ORDER BY id
+        """, (farm_id,))
+        asset_rows = cur.fetchall()
+
     return FarmDetail(
         id=id_,
         address=address,
@@ -283,7 +293,37 @@ def get_farm(farm_id: int, conn=Depends(get_db)):
         confidence_grade=grade,
         status=status,
         is_demo=is_demo,
+        assets=[
+            AssetSummary(
+                facility_code=fc, area_m2=float(a_m2),
+                installed_year=iy, condition_grade=cg,
+            )
+            for fc, a_m2, iy, cg in asset_rows
+        ],
     )
+
+
+@router.post("/{farm_id}/consult-requests", response_model=ConsultRequestResponse, status_code=201)
+def create_consult_request(farm_id: int, data: ConsultRequestCreate, conn=Depends(get_db)):
+    """청년농 → 농장 상담 신청."""
+    with conn.cursor() as cur:
+        cur.execute("SELECT 1 FROM farm WHERE id = %s", (farm_id,))
+        if cur.fetchone() is None:
+            raise HTTPException(status_code=404, detail="farm not found")
+
+        cur.execute("SELECT 1 FROM young_farmer_profile WHERE id = %s", (data.young_farmer_id,))
+        if cur.fetchone() is None:
+            raise HTTPException(status_code=404, detail="young_farmer not found")
+
+        cur.execute("""
+            INSERT INTO consult_request (farm_id, young_farmer_id, message)
+            VALUES (%s, %s, %s)
+            RETURNING id, status
+        """, (farm_id, data.young_farmer_id, data.message))
+        req_id, status = cur.fetchone()
+    conn.commit()
+
+    return ConsultRequestResponse(id=req_id, status=status)
 
 
 @router.get("/{farm_id}/valuation", response_model=ValuationResponse)

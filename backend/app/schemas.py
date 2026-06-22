@@ -60,6 +60,13 @@ class ValuationResponse(BaseModel):
 
 # ── 농장 상세 응답 ────────────────────────────────────────────────────────────
 
+class AssetSummary(BaseModel):
+    facility_code: str
+    area_m2: float
+    installed_year: Optional[int]
+    condition_grade: str
+
+
 class FarmDetail(BaseModel):
     id: int
     address: str
@@ -73,6 +80,19 @@ class FarmDetail(BaseModel):
     confidence_grade: Optional[str]
     status: str
     is_demo: bool
+    assets: list[AssetSummary] = []
+
+
+# ── 상담 신청 ────────────────────────────────────────────────────────────────
+
+class ConsultRequestCreate(BaseModel):
+    young_farmer_id: int
+    message: Optional[str] = None
+
+
+class ConsultRequestResponse(BaseModel):
+    id: int
+    status: str
 
 
 class FarmCreateResponse(BaseModel):
