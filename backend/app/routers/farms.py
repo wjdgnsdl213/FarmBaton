@@ -14,6 +14,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Response
 
 from backend.app.db import get_db
+from backend.app.routers.auth import get_current_farmer
 from backend.app.schemas import (
     DISCLAIMER,
     AssetCreate,
@@ -23,6 +24,7 @@ from backend.app.schemas import (
     FarmCreate,
     FarmCreateResponse,
     FarmDetail,
+    FarmSummary,
     ValuationResponse,
 )
 from backend.app.services.db_loader import load_farm_input
@@ -87,14 +89,14 @@ def _cache_valuation(farm_id: int, result, conn) -> None:
 
 def _insert_farm(data: FarmCreate, parcel_id: Optional[int],
                  bjd_cd: Optional[str], area_m2: float,
-                 sido: Optional[str], sigungu: Optional[str], conn) -> int:
+                 sido: Optional[str], sigungu: Optional[str], owner_id: int, conn) -> int:
     with conn.cursor() as cur:
         cur.execute("""
             INSERT INTO farm (
                 address, sido, sigungu, bjd_cd, area_m2, crop_code,
                 tree_age, succession_type, timing, annual_revenue,
-                sales_channel, parcel_id, status, is_demo
-            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'DRAFT',%s)
+                sales_channel, parcel_id, owner_id, status, is_demo
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'DRAFT',%s)
             RETURNING id
         """, (
             data.address,
@@ -109,6 +111,7 @@ def _insert_farm(data: FarmCreate, parcel_id: Optional[int],
             data.annual_revenue,
             data.sales_channel,
             parcel_id,
+            owner_id,
             data.is_demo,
         ))
         farm_id = cur.fetchone()[0]
@@ -210,8 +213,8 @@ def _call_farm_card(lon: float, lat: float, crop_code: str, address_sido: str | 
 # ─────────────────────────────────────────────────────────────────────────────
 
 @router.post("", response_model=FarmCreateResponse, status_code=201)
-def create_farm(data: FarmCreate, conn=Depends(get_db)):
-    """농가 등록 + 자동 가치평가.
+def create_farm(data: FarmCreate, conn=Depends(get_db), owner_id: int = Depends(get_current_farmer)):
+    """농가 등록 + 자동 가치평가 (로그인 필요 — 상담 신청을 받으려면 소유 식별 필수).
 
     lon/lat 제공 시 fn_farm_card로 필지 매칭 → bjd_cd·area_m2 자동 취득.
     미제공 시 area_m2 필수 (주소만으로 등록, 신뢰도 D).
@@ -250,7 +253,7 @@ def create_farm(data: FarmCreate, conn=Depends(get_db)):
         )
 
     # ── 2. farm 행 삽입 ──────────────────────────────────────────────
-    farm_id = _insert_farm(data, parcel_id, bjd_cd, area_m2, sido, sigungu, conn)
+    farm_id = _insert_farm(data, parcel_id, bjd_cd, area_m2, sido, sigungu, owner_id, conn)
     _insert_assets(farm_id, data.assets, conn)
     conn.commit()
 
@@ -265,6 +268,28 @@ def create_farm(data: FarmCreate, conn=Depends(get_db)):
         warning = (warning or "") + f" 가치평가 산출 실패: {exc}"
 
     return FarmCreateResponse(farm_id=farm_id, valuation=valuation, warning=warning)
+
+
+@router.get("/mine", response_model=list[FarmSummary])
+def get_my_farms(conn=Depends(get_db), owner_id: int = Depends(get_current_farmer)):
+    """로그인한 농가가 등록한 농장 목록."""
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT id, address, sido, crop_code::TEXT, area_m2,
+                   status::TEXT, est_value_min, est_value_max
+            FROM farm WHERE owner_id = %s ORDER BY created_at DESC
+        """, (owner_id,))
+        rows = cur.fetchall()
+
+    return [
+        FarmSummary(
+            id=id_, address=address, sido=sido, crop_code=crop_code,
+            area_m2=float(area_m2), status=status,
+            est_value_min=_to_만원(float(val_min)) if val_min else None,
+            est_value_max=_to_만원(float(val_max)) if val_max else None,
+        )
+        for id_, address, sido, crop_code, area_m2, status, val_min, val_max in rows
+    ]
 
 
 @router.get("/{farm_id}", response_model=FarmDetail)

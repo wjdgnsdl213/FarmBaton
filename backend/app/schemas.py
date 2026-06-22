@@ -110,6 +110,17 @@ class FarmDetail(BaseModel):
     assets: list[AssetSummary] = []
 
 
+class FarmSummary(BaseModel):
+    id: int
+    address: str
+    sido: str
+    crop_code: str
+    area_m2: float
+    status: str
+    est_value_min: Optional[int]
+    est_value_max: Optional[int]
+
+
 # ── 상담 신청 ────────────────────────────────────────────────────────────────
 
 class ConsultRequestCreate(BaseModel):
