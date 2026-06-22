@@ -126,11 +126,27 @@ class FarmSummary(BaseModel):
 class ConsultRequestCreate(BaseModel):
     young_farmer_id: int
     message: Optional[str] = None
+    contact_name: Optional[str] = None
+    contact_phone: Optional[str] = None
 
 
 class ConsultRequestResponse(BaseModel):
     id: int
     status: str
+
+
+class ConsultRequestDetail(BaseModel):
+    id: int
+    farm_id: int
+    contact_name: Optional[str]
+    contact_phone: Optional[str]
+    message: Optional[str]
+    status: str
+    created_at: str
+
+
+class ConsultRequestStatusUpdate(BaseModel):
+    status: str = Field(pattern="^(ACCEPTED|DECLINED)$")
 
 
 class FarmCreateResponse(BaseModel):

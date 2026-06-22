@@ -20,7 +20,9 @@ from backend.app.schemas import (
     AssetCreate,
     AssetSummary,
     ConsultRequestCreate,
+    ConsultRequestDetail,
     ConsultRequestResponse,
+    ConsultRequestStatusUpdate,
     FarmCreate,
     FarmCreateResponse,
     FarmDetail,
@@ -356,14 +358,67 @@ def create_consult_request(farm_id: int, data: ConsultRequestCreate, conn=Depend
             raise HTTPException(status_code=404, detail="young_farmer not found")
 
         cur.execute("""
-            INSERT INTO consult_request (farm_id, young_farmer_id, message)
-            VALUES (%s, %s, %s)
+            INSERT INTO consult_request (farm_id, young_farmer_id, message, contact_name, contact_phone)
+            VALUES (%s, %s, %s, %s, %s)
             RETURNING id, status
-        """, (farm_id, data.young_farmer_id, data.message))
+        """, (farm_id, data.young_farmer_id, data.message, data.contact_name, data.contact_phone))
         req_id, status = cur.fetchone()
     conn.commit()
 
     return ConsultRequestResponse(id=req_id, status=status)
+
+
+@router.get("/{farm_id}/consult-requests", response_model=list[ConsultRequestDetail])
+def list_consult_requests(farm_id: int, conn=Depends(get_db), owner_id: int = Depends(get_current_farmer)):
+    """농가 상담함 — 본인 농장으로 들어온 상담 신청 목록."""
+    with conn.cursor() as cur:
+        cur.execute("SELECT owner_id FROM farm WHERE id = %s", (farm_id,))
+        row = cur.fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="farm not found")
+        if row[0] != owner_id:
+            raise HTTPException(status_code=403, detail="본인 농장만 조회할 수 있습니다.")
+
+        cur.execute("""
+            SELECT id, farm_id, contact_name, contact_phone, message, status, created_at
+            FROM consult_request WHERE farm_id = %s ORDER BY created_at DESC
+        """, (farm_id,))
+        rows = cur.fetchall()
+
+    return [
+        ConsultRequestDetail(
+            id=r[0], farm_id=r[1], contact_name=r[2], contact_phone=r[3],
+            message=r[4], status=r[5], created_at=r[6].isoformat(),
+        )
+        for r in rows
+    ]
+
+
+@router.patch("/{farm_id}/consult-requests/{req_id}", response_model=ConsultRequestResponse)
+def update_consult_request_status(
+    farm_id: int, req_id: int, data: ConsultRequestStatusUpdate,
+    conn=Depends(get_db), owner_id: int = Depends(get_current_farmer),
+):
+    """상담 신청 수락/거절 — 본인 농장의 신청만 변경 가능."""
+    with conn.cursor() as cur:
+        cur.execute("SELECT owner_id FROM farm WHERE id = %s", (farm_id,))
+        row = cur.fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="farm not found")
+        if row[0] != owner_id:
+            raise HTTPException(status_code=403, detail="본인 농장만 변경할 수 있습니다.")
+
+        cur.execute("""
+            UPDATE consult_request SET status = %s
+            WHERE id = %s AND farm_id = %s
+            RETURNING id, status
+        """, (data.status, req_id, farm_id))
+        updated = cur.fetchone()
+        if updated is None:
+            raise HTTPException(status_code=404, detail="consult_request not found")
+    conn.commit()
+
+    return ConsultRequestResponse(id=updated[0], status=updated[1])
 
 
 @router.get("/{farm_id}/valuation", response_model=ValuationResponse)
