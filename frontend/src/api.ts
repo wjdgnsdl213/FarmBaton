@@ -70,8 +70,8 @@ export interface MatchListResult {
 }
 
 export interface YoungFarmerPayload {
-  pref_sido: string
-  pref_crop: string
+  pref_sido?: string | null
+  pref_crop?: string | null
   available_capital: number
   experience_years: number
   policy_fund: boolean

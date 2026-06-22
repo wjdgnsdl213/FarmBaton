@@ -76,9 +76,9 @@ class FarmInput:
 
 @dataclass
 class YoungFarmerInput:
-    """매칭 청년농 입력."""
-    pref_sido: str
-    pref_crop: str
+    """매칭 청년농 입력. pref_sido/pref_crop이 None이면 "상관없음"으로 간주."""
+    pref_sido: Optional[str]
+    pref_crop: Optional[str]
     available_capital: float
     experience_years: float
     policy_fund: bool
@@ -344,10 +344,10 @@ def calc_match_score(
 
     양방향 사용: 농가 화면(후보 추천)·청년농 화면(농장 추천) 동일 점수.
     """
-    region_score = 20.0 if young.pref_sido == farm.sido else 0.0
+    region_score = 20.0 if (young.pref_sido is None or young.pref_sido == farm.sido) else 0.0
     # TODO 7월: 인접 도 부분점수(10점) — RAG 기반 행정구역 인접성
 
-    crop_score = 20.0 if young.pref_crop == farm.crop_code else 0.0
+    crop_score = 20.0 if (young.pref_crop is None or young.pref_crop == farm.crop_code) else 0.0
 
     capital_ratio = _clamp(
         young.available_capital / farm.est_value_min if farm.est_value_min > 0 else 0.0,

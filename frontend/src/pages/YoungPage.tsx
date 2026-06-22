@@ -96,8 +96,8 @@ export default function YoungPage() {
     setLoading(true)
     try {
       const reg = await api.createYoungFarmer({
-        pref_sido: form.pref_sido,
-        pref_crop: form.pref_crop,
+        pref_sido: form.pref_sido || null,
+        pref_crop: form.pref_crop || null,
         available_capital: parseFloat(form.available_capital) * 10_000,
         experience_years: parseInt(form.experience_years) || 0,
         policy_fund: form.policy_fund,
@@ -127,12 +127,14 @@ export default function YoungPage() {
           <div className="form-group">
             <label>희망 지역</label>
             <select value={form.pref_sido} onChange={set('pref_sido')}>
+              <option value="">상관없음</option>
               {SIDO_LIST.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           <div className="form-group">
             <label>희망 작목</label>
             <select value={form.pref_crop} onChange={set('pref_crop')}>
+              <option value="">상관없음</option>
               <option value="APPLE">사과</option>
               <option value="PEACH">복숭아</option>
               <option value="GRAPE">포도</option>

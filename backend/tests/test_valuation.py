@@ -496,6 +496,46 @@ def test_T10_insufficient_capital_penalty():
     assert result.total_score >= 0
 
 
+def test_T10_pref_sido_none_means_any_region():
+    """pref_sido=None(상관없음) → farm.sido와 무관하게 region_score=20"""
+    farm = FarmProfileForMatch(
+        sido="경북",  # young의 다른 선호와 불일치해도 무방
+        crop_code="APPLE",
+        succession_type="SALE",
+        est_value_min=90_000_000.0,
+    )
+    young = YoungFarmerInput(
+        pref_sido=None,
+        pref_crop="APPLE",
+        available_capital=100_000_000.0,
+        experience_years=5,
+        policy_fund=True,
+        pref_succession="SALE",
+    )
+    result = calc_match_score(young, farm)
+    assert result.region_score == 20
+
+
+def test_T10_pref_crop_none_means_any_crop():
+    """pref_crop=None(상관없음) → farm.crop_code와 무관하게 crop_score=20"""
+    farm = FarmProfileForMatch(
+        sido="충북",
+        crop_code="GRAPE",
+        succession_type="SALE",
+        est_value_min=90_000_000.0,
+    )
+    young = YoungFarmerInput(
+        pref_sido="충북",
+        pref_crop=None,
+        available_capital=100_000_000.0,
+        experience_years=5,
+        policy_fund=True,
+        pref_succession="SALE",
+    )
+    result = calc_match_score(young, farm)
+    assert result.crop_score == 20
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 상수 검증
 # ─────────────────────────────────────────────────────────────────────────────

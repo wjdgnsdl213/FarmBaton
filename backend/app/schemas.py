@@ -84,8 +84,8 @@ class FarmCreateResponse(BaseModel):
 # ── 청년농 등록 요청 ──────────────────────────────────────────────────────────
 
 class YoungFarmerCreate(BaseModel):
-    pref_sido: str
-    pref_crop: str = Field(pattern="^(APPLE|PEACH|GRAPE)$")
+    pref_sido: Optional[str] = None    # None = 지역 상관없음
+    pref_crop: Optional[str] = Field(default=None, pattern="^(APPLE|PEACH|GRAPE)$")  # None = 작목 상관없음
     available_capital: float = Field(ge=0)
     experience_years: int = Field(ge=0)
     policy_fund: bool = False
