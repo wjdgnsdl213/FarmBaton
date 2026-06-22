@@ -226,8 +226,20 @@ def create_farm(data: FarmCreate, conn=Depends(get_db)):
     if data.lon is not None and data.lat is not None:
         card = _call_farm_card(data.lon, data.lat, data.crop_code, sido, conn)
         if card:
-            parcel_id, sido, sigungu, bjd_cd, area_m2 = card
-            area_m2 = float(area_m2)
+            parcel_id, sido, sigungu, bjd_cd, card_area_m2 = card
+            card_area_m2 = float(card_area_m2)
+            if data.area_m2 is not None and data.area_m2 > card_area_m2:
+                # 좌표가 속한 필지 하나보다 사용자가 입력한 면적이 더 크면
+                # 여러 필지로 구성된 농장일 가능성이 높음 — 단일 필지 면적으로
+                # 덮어써 면적을 과소산정(→ 가치평가 축소)하지 않도록 입력값 우선.
+                area_m2 = data.area_m2
+                warning = (
+                    f"입력 면적({data.area_m2:,.0f}㎡)이 좌표가 속한 필지 면적"
+                    f"({card_area_m2:,.0f}㎡)보다 큽니다. 여러 필지로 구성된 농장으로 "
+                    f"보고 입력 면적을 그대로 적용합니다."
+                )
+            else:
+                area_m2 = card_area_m2
         else:
             warning = "좌표로 일치하는 과수원 필지를 찾지 못했습니다. 입력 면적으로 등록합니다."
 
