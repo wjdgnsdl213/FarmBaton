@@ -9,10 +9,12 @@ import pytest
 
 from backend.app.services.report_ai import (
     MatchContext,
+    ProgramPitchContext,
     ReportContext,
     _strip_code_fence,
     generate_match_explanation,
     generate_narrative,
+    generate_program_pitch,
 )
 
 
@@ -116,3 +118,14 @@ def test_generate_narrative_parses_fenced_json_response(report_ctx, monkeypatch)
     assert result.is_ai_generated is True
     assert result.summary == "AI 생성 요약"
     assert result.risk_notes == "AI 생성 리스크"
+
+
+def test_generate_program_pitch_falls_back_without_key():
+    ctx = ProgramPitchContext(
+        program_name="청년창업형 후계농 영농정착지원사업",
+        program_description="월 정착지원금 지급",
+        amount_text="월 100만원, 최대 3년",
+        pref_sido="충북", pref_crop="APPLE", policy_fund=True,
+    )
+    text = generate_program_pitch(ctx)
+    assert isinstance(text, str) and len(text) > 0

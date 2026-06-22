@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
+from typing import Optional
 
 CROP_NAMES = {"APPLE": "사과", "PEACH": "복숭아", "GRAPE": "포도"}
 GRADE_DESC = {
@@ -203,3 +204,58 @@ def generate_match_explanation(ctx: MatchContext) -> str:
         return text
     except Exception:
         return _fallback_match_explanation(ctx)
+
+
+# ── 지원사업 추천 사유 ────────────────────────────────────────────────────────
+
+@dataclass
+class ProgramPitchContext:
+    """지원사업 추천 사유용 입력. 사업의 사실 정보(이름·내용·금액)는 CSV 원문
+    그대로이며 LLM은 절대 바꾸지 않는다 — 청년농 프로필에 맞춰 왜 추천되는지
+    한 문장만 덧붙인다."""
+    program_name: str
+    program_description: str
+    amount_text: str
+    pref_sido: Optional[str]
+    pref_crop: Optional[str]
+    policy_fund: bool
+
+
+def _fallback_program_pitch(ctx: ProgramPitchContext) -> str:
+    return "지역·작목 조건에 부합하는 지원사업입니다."
+
+
+def generate_program_pitch(ctx: ProgramPitchContext) -> str:
+    """지원사업 추천 사유 1문장 생성. 실패 시 결정론적 폴백."""
+    client = _get_client()
+    if client is None:
+        return _fallback_program_pitch(ctx)
+
+    sido_text = ctx.pref_sido or "지역 무관"
+    crop_text = CROP_NAMES.get(ctx.pref_crop, ctx.pref_crop) if ctx.pref_crop else "작목 무관"
+
+    prompt = f"""다음은 이미 필터링되어 추천 대상으로 확정된 지원사업이다.
+아래 사업명·내용·금액은 그대로 인용하되 **절대 바꾸거나 새로운 숫자를
+만들지 마라**. 이 청년농 프로필에 왜 이 사업이 맞는지 1문장으로만 설명하라.
+
+- 사업명: {ctx.program_name}
+- 지원 내용: {ctx.program_description}
+- 지원 금액: {ctx.amount_text}
+- 청년농 희망 지역: {sido_text}
+- 청년농 희망 작목: {crop_text}
+- 정책자금 신청 예정 여부: {"예" if ctx.policy_fund else "아니오"}
+
+순수 텍스트로만 응답하라 (JSON이나 다른 포맷 없이, 1문장)."""
+
+    try:
+        resp = client.messages.create(
+            model=MODEL,
+            max_tokens=150,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = resp.content[0].text.strip()
+        if not text:
+            raise ValueError("empty AI output")
+        return text
+    except Exception:
+        return _fallback_program_pitch(ctx)

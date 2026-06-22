@@ -198,3 +198,19 @@ class MatchItem(BaseModel):
 class MatchListResponse(BaseModel):
     young_farmer_id: int
     matches: list[MatchItem]
+
+
+# ── 지원사업 추천 ─────────────────────────────────────────────────────────────
+
+class SupportProgramItem(BaseModel):
+    program_code: str
+    name: str
+    description: str
+    amount_text: str
+    apply_url: Optional[str]
+    pitch: Optional[str] = None   # AI 생성 추천 사유 1문장 (사실 정보는 위 필드 그대로)
+
+
+class SupportProgramListResponse(BaseModel):
+    young_farmer_id: int
+    programs: list[SupportProgramItem]

@@ -14,10 +14,17 @@ from backend.app.db import get_db
 from backend.app.schemas import (
     MatchItem,
     MatchListResponse,
+    SupportProgramItem,
+    SupportProgramListResponse,
     YoungFarmerCreate,
     YoungFarmerCreateResponse,
 )
-from backend.app.services.report_ai import MatchContext, generate_match_explanation
+from backend.app.services.report_ai import (
+    MatchContext,
+    ProgramPitchContext,
+    generate_match_explanation,
+    generate_program_pitch,
+)
 from backend.app.services.valuation import (
     FarmProfileForMatch,
     YoungFarmerInput,
@@ -237,3 +244,51 @@ def get_matches(yf_id: int, conn=Depends(get_db)):
     conn.commit()
 
     return MatchListResponse(young_farmer_id=yf_id, matches=top_items)
+
+
+@router.get("/{yf_id}/support-programs", response_model=SupportProgramListResponse)
+def get_support_programs(yf_id: int, conn=Depends(get_db)):
+    """청년농 프로필에 맞는 지원사업 추천.
+
+    자격·금액 등 사실 정보는 support_program 테이블 원문 그대로 반환(필터링만
+    결정론적 SQL). pitch는 generate_program_pitch가 "왜 추천되는지" 한 문장만
+    덧붙인 것 — 절대 사업명/금액을 새로 만들지 않는다.
+    """
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT pref_sido, pref_crop::TEXT, policy_fund
+            FROM young_farmer_profile WHERE id = %s
+        """, (yf_id,))
+        row = cur.fetchone()
+
+    if row is None:
+        raise HTTPException(status_code=404, detail="young_farmer not found")
+    pref_sido, pref_crop, policy_fund = row
+
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT program_code, name, description, amount_text, apply_url
+            FROM support_program
+            WHERE (target_sido IS NULL OR %s IS NULL OR target_sido = %s)
+              AND (target_crop IS NULL OR %s IS NULL OR target_crop = %s)
+              AND target_role IN ('YOUNG', 'ANY')
+            ORDER BY program_code
+        """, (pref_sido, pref_sido, pref_crop, pref_crop))
+        rows = cur.fetchall()
+
+    programs = []
+    for program_code, name, description, amount_text, apply_url in rows:
+        pitch = generate_program_pitch(ProgramPitchContext(
+            program_name=name,
+            program_description=description,
+            amount_text=amount_text,
+            pref_sido=pref_sido,
+            pref_crop=pref_crop,
+            policy_fund=bool(policy_fund),
+        ))
+        programs.append(SupportProgramItem(
+            program_code=program_code, name=name, description=description,
+            amount_text=amount_text, apply_url=apply_url, pitch=pitch,
+        ))
+
+    return SupportProgramListResponse(young_farmer_id=yf_id, programs=programs)
