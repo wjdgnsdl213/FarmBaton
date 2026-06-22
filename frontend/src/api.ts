@@ -178,6 +178,20 @@ export interface MeResult {
   email: string
 }
 
+export interface SupportProgramItem {
+  program_code: string
+  name: string
+  description: string
+  amount_text: string
+  apply_url: string | null
+  pitch: string | null
+}
+
+export interface SupportProgramListResult {
+  young_farmer_id: number
+  programs: SupportProgramItem[]
+}
+
 export const api = {
   geocode: (address: string, crop_code = 'APPLE') =>
     client.get<GeocodeResult>('/geocode', { params: { address, crop_code } }).then(r => r.data),
@@ -195,6 +209,9 @@ export const api = {
 
   getMatches: (yfId: number) =>
     client.get<MatchListResult>(`/young-farmers/${yfId}/matches`).then(r => r.data),
+
+  getSupportPrograms: (yfId: number) =>
+    client.get<SupportProgramListResult>(`/young-farmers/${yfId}/support-programs`).then(r => r.data),
 
   getFarmDetail: (farmId: number) =>
     client.get<FarmDetail>(`/farms/${farmId}`).then(r => r.data),

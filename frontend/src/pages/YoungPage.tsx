@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { api, type FarmDetail, type MatchItem } from '../api'
+import { api, type FarmDetail, type MatchItem, type SupportProgramItem } from '../api'
 
 const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
 const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
@@ -174,6 +174,32 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
   )
 }
 
+function SupportProgramPanel({ programs }: { programs: SupportProgramItem[] }) {
+  if (programs.length === 0) return null
+  return (
+    <div className="card">
+      <div className="card-title">추천 지원사업</div>
+      {programs.map(p => (
+        <div key={p.program_code} className="match-item" style={{ cursor: 'default' }}>
+          <div className="match-farm-name">{p.name}</div>
+          <div className="match-farm-meta">{p.description}</div>
+          <div className="value-range-small">{p.amount_text}</div>
+          {p.pitch && (
+            <p style={{ fontSize: '.8rem', color: 'var(--gray)', margin: '.5rem 0 0', fontStyle: 'italic' }}>
+              “{p.pitch}”
+            </p>
+          )}
+          {p.apply_url && (
+            <a href={p.apply_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.8rem', display: 'inline-block', marginTop: '.4rem' }}>
+              신청 안내 보기 →
+            </a>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function YoungPage() {
   const [form, setForm] = useState({
     pref_sido: '충북',
@@ -186,6 +212,7 @@ export default function YoungPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [matches, setMatches] = useState<MatchItem[] | null>(null)
+  const [programs, setPrograms] = useState<SupportProgramItem[]>([])
   const [yfId, setYfId] = useState<number | null>(null)
   const resultRef = useRef<HTMLDivElement>(null)
 
@@ -209,6 +236,12 @@ export default function YoungPage() {
       const res = await api.getMatches(reg.young_farmer_id)
       setMatches(res.matches)
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
+      try {
+        const sp = await api.getSupportPrograms(reg.young_farmer_id)
+        setPrograms(sp.programs)
+      } catch {
+        // 지원사업 조회 실패해도 매칭 결과는 그대로 표시 (부수 정보)
+      }
     } catch (err: any) {
       setError(err.response?.data?.detail || '서버 오류가 발생했습니다.')
     } finally {
@@ -304,6 +337,8 @@ export default function YoungPage() {
               {matches[0].disclaimer}
             </div>
           )}
+
+          <SupportProgramPanel programs={programs} />
         </div>
       )}
     </div>
