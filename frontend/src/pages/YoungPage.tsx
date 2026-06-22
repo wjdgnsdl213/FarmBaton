@@ -28,6 +28,8 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
   const [detail, setDetail] = useState<FarmDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [contactName, setContactName] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
   const [consultState, setConsultState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
   const toggle = async () => {
@@ -50,7 +52,12 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
     e.preventDefault()
     setConsultState('sending')
     try {
-      await api.createConsultRequest(item.farm_id, { young_farmer_id: yfId, message: message || null })
+      await api.createConsultRequest(item.farm_id, {
+        young_farmer_id: yfId,
+        message: message || null,
+        contact_name: contactName || null,
+        contact_phone: contactPhone || null,
+      })
       setConsultState('sent')
     } catch {
       setConsultState('error')
@@ -132,6 +139,23 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
             <div className="consult-success">상담 신청이 접수되었습니다.</div>
           ) : (
             <form className="consult-form" onSubmit={submitConsult}>
+              <input
+                type="text"
+                required
+                placeholder="이름"
+                value={contactName}
+                onChange={e => setContactName(e.target.value)}
+                disabled={consultState === 'sending'}
+                style={{ marginBottom: '.5rem' }}
+              />
+              <input
+                type="text"
+                placeholder="연락처 (선택)"
+                value={contactPhone}
+                onChange={e => setContactPhone(e.target.value)}
+                disabled={consultState === 'sending'}
+                style={{ marginBottom: '.5rem' }}
+              />
               <textarea
                 placeholder="농가에 전달할 메시지 (선택)"
                 value={message}

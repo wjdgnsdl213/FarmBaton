@@ -287,8 +287,8 @@ def get_my_farms(conn=Depends(get_db), owner_id: int = Depends(get_current_farme
         FarmSummary(
             id=id_, address=address, sido=sido, crop_code=crop_code,
             area_m2=float(area_m2), status=status,
-            est_value_min=_to_만원(float(val_min)) if val_min else None,
-            est_value_max=_to_만원(float(val_max)) if val_max else None,
+            est_value_min=_to_만원(float(val_min)) if val_min is not None else None,
+            est_value_max=_to_만원(float(val_max)) if val_max is not None else None,
         )
         for id_, address, sido, crop_code, area_m2, status, val_min, val_max in rows
     ]
@@ -330,8 +330,8 @@ def get_farm(farm_id: int, conn=Depends(get_db)):
         tree_age=tree_age,
         area_m2=float(area_m2),
         succession_type=succession_type,
-        est_value_min=_to_만원(float(val_min)) if val_min else None,
-        est_value_max=_to_만원(float(val_max)) if val_max else None,
+        est_value_min=_to_만원(float(val_min)) if val_min is not None else None,
+        est_value_max=_to_만원(float(val_max)) if val_max is not None else None,
         confidence_grade=grade,
         status=status,
         is_demo=is_demo,

@@ -8,6 +8,17 @@ const client = axios.create({
   baseURL: API_BASE_URL,
 })
 
+const TOKEN_KEY = 'farmbaton_token'
+export const getToken = () => localStorage.getItem(TOKEN_KEY)
+export const setToken = (token: string) => localStorage.setItem(TOKEN_KEY, token)
+export const clearToken = () => localStorage.removeItem(TOKEN_KEY)
+
+client.interceptors.request.use(config => {
+  const token = getToken()
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
 export interface FarmCreatePayload {
   address: string
   lon?: number
@@ -113,11 +124,58 @@ export interface FarmDetail {
 export interface ConsultRequestPayload {
   young_farmer_id: number
   message?: string | null
+  contact_name?: string | null
+  contact_phone?: string | null
 }
 
 export interface ConsultRequestResult {
   id: number
   status: string
+}
+
+export interface ConsultRequestDetail {
+  id: number
+  farm_id: number
+  contact_name: string | null
+  contact_phone: string | null
+  message: string | null
+  status: string
+  created_at: string
+}
+
+export interface FarmSummary {
+  id: number
+  address: string
+  sido: string
+  crop_code: string
+  area_m2: number
+  status: string
+  est_value_min: number | null
+  est_value_max: number | null
+}
+
+export interface RegisterPayload {
+  email: string
+  password: string
+  name: string
+  phone?: string
+}
+
+export interface LoginPayload {
+  email: string
+  password: string
+}
+
+export interface AuthResult {
+  token: string
+  user_id: number
+  name: string
+}
+
+export interface MeResult {
+  user_id: number
+  name: string
+  email: string
 }
 
 export const api = {
@@ -143,4 +201,22 @@ export const api = {
 
   createConsultRequest: (farmId: number, data: ConsultRequestPayload) =>
     client.post<ConsultRequestResult>(`/farms/${farmId}/consult-requests`, data).then(r => r.data),
+
+  register: (data: RegisterPayload) =>
+    client.post<AuthResult>('/auth/register', data).then(r => r.data),
+
+  login: (data: LoginPayload) =>
+    client.post<AuthResult>('/auth/login', data).then(r => r.data),
+
+  getMe: () =>
+    client.get<MeResult>('/auth/me').then(r => r.data),
+
+  getMyFarms: () =>
+    client.get<FarmSummary[]>('/farms/mine').then(r => r.data),
+
+  getConsultRequests: (farmId: number) =>
+    client.get<ConsultRequestDetail[]>(`/farms/${farmId}/consult-requests`).then(r => r.data),
+
+  updateConsultRequestStatus: (farmId: number, reqId: number, status: 'ACCEPTED' | 'DECLINED') =>
+    client.patch<ConsultRequestResult>(`/farms/${farmId}/consult-requests/${reqId}`, { status }).then(r => r.data),
 }
