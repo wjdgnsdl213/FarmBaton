@@ -62,6 +62,7 @@ class ValuationResponse(BaseModel):
 
 class AssetSummary(BaseModel):
     facility_code: str
+    facility_name: str
     area_m2: float
     installed_year: Optional[int]
     condition_grade: str

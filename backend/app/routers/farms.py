@@ -275,8 +275,11 @@ def get_farm(farm_id: int, conn=Depends(get_db)):
 
     with conn.cursor() as cur:
         cur.execute("""
-            SELECT facility_code, area_m2, installed_year, condition_grade
-            FROM farm_asset WHERE farm_id = %s ORDER BY id
+            SELECT a.facility_code, COALESCE(f.facility_name, a.facility_code),
+                   a.area_m2, a.installed_year, a.condition_grade
+            FROM farm_asset a
+            LEFT JOIN facility_std f ON f.facility_code = a.facility_code
+            WHERE a.farm_id = %s ORDER BY a.id
         """, (farm_id,))
         asset_rows = cur.fetchall()
 
@@ -295,10 +298,10 @@ def get_farm(farm_id: int, conn=Depends(get_db)):
         is_demo=is_demo,
         assets=[
             AssetSummary(
-                facility_code=fc, area_m2=float(a_m2),
+                facility_code=fc, facility_name=fname, area_m2=float(a_m2),
                 installed_year=iy, condition_grade=cg,
             )
-            for fc, a_m2, iy, cg in asset_rows
+            for fc, fname, a_m2, iy, cg in asset_rows
         ],
     )
 

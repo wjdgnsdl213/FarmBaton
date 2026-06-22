@@ -60,6 +60,13 @@ input:focus, select:focus { border-color: var(--green-mid); }
 /* ── 매칭 아이템 ── */
 .match-item { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: .75rem; cursor: default; transition: border-color .15s; }
 .match-item:hover { border-color: var(--green-mid); }
+.match-item.clickable { cursor: pointer; }
+.match-detail { margin-top: .9rem; padding-top: .9rem; border-top: 1px solid var(--border); cursor: default; }
+.match-detail-assets { margin-bottom: .4rem; }
+.consult-form { margin-top: .6rem; }
+.consult-form textarea { width: 100%; padding: .6rem .75rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: .85rem; outline: none; resize: vertical; min-height: 60px; font-family: inherit; margin-bottom: .5rem; }
+.consult-form textarea:focus { border-color: var(--green-mid); }
+.consult-success { margin-top: .6rem; background: var(--green-light); color: var(--green); font-size: .85rem; font-weight: 600; padding: .6rem .8rem; border-radius: 8px; text-align: center; }
 .match-header { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; margin-bottom: .6rem; }
 .match-info { flex: 1; }
 .match-score-circle { width: 52px; height: 52px; border-radius: 50%; background: var(--green); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }

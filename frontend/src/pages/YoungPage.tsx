@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { api, type MatchItem } from '../api'
+import { api, type FarmDetail, type MatchItem } from '../api'
 
 const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
 const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
@@ -19,13 +19,46 @@ function ScoreBar({ label, value, max }: ScoreBarProps) {
   )
 }
 
-function MatchCard({ item, rank }: { item: MatchItem; rank: number }) {
+function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: number }) {
   const fmt = (n: number) => n.toLocaleString('ko-KR')
   const score = Math.round(item.total_score)
   const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
 
+  const [expanded, setExpanded] = useState(false)
+  const [detail, setDetail] = useState<FarmDetail | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  const [consultState, setConsultState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  const toggle = async () => {
+    const next = !expanded
+    setExpanded(next)
+    if (next && detail === null) {
+      setDetailLoading(true)
+      try {
+        const d = await api.getFarmDetail(item.farm_id)
+        setDetail(d)
+      } catch {
+        // 상세 조회 실패해도 카드 자체는 펼쳐진 상태 유지 (PDF·상담신청은 그대로 가능)
+      } finally {
+        setDetailLoading(false)
+      }
+    }
+  }
+
+  const submitConsult = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setConsultState('sending')
+    try {
+      await api.createConsultRequest(item.farm_id, { young_farmer_id: yfId, message: message || null })
+      setConsultState('sent')
+    } catch {
+      setConsultState('error')
+    }
+  }
+
   return (
-    <div className="match-item">
+    <div className="match-item clickable" onClick={toggle}>
       <div className="match-header">
         <div className="match-info">
           <div className="match-farm-name">
@@ -67,6 +100,51 @@ function MatchCard({ item, rank }: { item: MatchItem; rank: number }) {
         <p style={{ fontSize: '.8rem', color: 'var(--gray)', margin: '.6rem 0 0', fontStyle: 'italic' }}>
           “{item.explanation}”
         </p>
+      )}
+
+      {expanded && (
+        <div className="match-detail" onClick={e => e.stopPropagation()}>
+          {detailLoading && <div className="match-farm-meta">상세 정보 불러오는 중...</div>}
+
+          {detail && detail.assets.length > 0 && (
+            <div className="match-detail-assets">
+              <div className="card-title" style={{ fontSize: '.85rem', marginBottom: '.4rem' }}>시설 현황</div>
+              {detail.assets.map((a, i) => (
+                <div key={i} className="match-farm-meta">
+                  {a.facility_name} · {a.area_m2.toLocaleString('ko-KR')}㎡
+                  {a.installed_year ? ` · ${a.installed_year}년 설치` : ''} · {a.condition_grade}등급
+                </div>
+              ))}
+            </div>
+          )}
+
+          <a
+            href={api.reportPdfUrl(item.farm_id)}
+            className="btn btn-primary"
+            style={{ display: 'block', textAlign: 'center', marginTop: '.8rem', textDecoration: 'none' }}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            PDF 리포트 다운로드
+          </a>
+
+          {consultState === 'sent' ? (
+            <div className="consult-success">상담 신청이 접수되었습니다.</div>
+          ) : (
+            <form className="consult-form" onSubmit={submitConsult}>
+              <textarea
+                placeholder="농가에 전달할 메시지 (선택)"
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                disabled={consultState === 'sending'}
+              />
+              {consultState === 'error' && <div className="error-box">상담 신청에 실패했습니다. 다시 시도해주세요.</div>}
+              <button type="submit" className="btn btn-primary" disabled={consultState === 'sending'}>
+                {consultState === 'sending' ? <span className="spinner" /> : '상담 신청'}
+              </button>
+            </form>
+          )}
+        </div>
       )}
     </div>
   )
@@ -194,7 +272,7 @@ export default function YoungPage() {
               조건에 맞는 농장이 없습니다.
             </div>
           ) : (
-            matches.map((m, i) => <MatchCard key={m.farm_id} item={m} rank={i + 1} />)
+            matches.map((m, i) => <MatchCard key={m.farm_id} item={m} rank={i + 1} yfId={yfId!} />)
           )}
 
           {matches.length > 0 && (

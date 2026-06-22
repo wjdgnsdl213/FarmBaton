@@ -86,6 +86,40 @@ export interface GeocodeResult {
   sigungu?: string
 }
 
+export interface AssetSummary {
+  facility_code: string
+  facility_name: string
+  area_m2: number
+  installed_year: number | null
+  condition_grade: string
+}
+
+export interface FarmDetail {
+  id: number
+  address: string
+  sido: string
+  crop_code: string
+  tree_age: number | null
+  area_m2: number
+  succession_type: string | null
+  est_value_min: number | null
+  est_value_max: number | null
+  confidence_grade: string | null
+  status: string
+  is_demo: boolean
+  assets: AssetSummary[]
+}
+
+export interface ConsultRequestPayload {
+  young_farmer_id: number
+  message?: string | null
+}
+
+export interface ConsultRequestResult {
+  id: number
+  status: string
+}
+
 export const api = {
   geocode: (address: string, crop_code = 'APPLE') =>
     client.get<GeocodeResult>('/geocode', { params: { address, crop_code } }).then(r => r.data),
@@ -103,4 +137,10 @@ export const api = {
 
   getMatches: (yfId: number) =>
     client.get<MatchListResult>(`/young-farmers/${yfId}/matches`).then(r => r.data),
+
+  getFarmDetail: (farmId: number) =>
+    client.get<FarmDetail>(`/farms/${farmId}`).then(r => r.data),
+
+  createConsultRequest: (farmId: number, data: ConsultRequestPayload) =>
+    client.post<ConsultRequestResult>(`/farms/${farmId}/consult-requests`, data).then(r => r.data),
 }
