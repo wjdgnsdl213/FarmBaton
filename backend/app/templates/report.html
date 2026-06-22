@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: 'Noto Sans KR';
+    font-weight: 400;
+    src: url('{{ font_regular_uri }}') format('truetype');
+  }
+  @font-face {
+    font-family: 'Noto Sans KR';
+    font-weight: 700;
+    src: url('{{ font_bold_uri }}') format('truetype');
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #1f2937;
+    margin: 0;
+    padding: 28px 36px;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  h1 { font-size: 18px; margin: 0 0 2px; }
+  .sub { color: #6b7280; font-size: 11px; margin-bottom: 16px; }
+  .grade-badge {
+    display: inline-block;
+    background: #ecfdf5; color: #047857;
+    border: 1px solid #a7f3d0; border-radius: 4px;
+    padding: 2px 8px; font-weight: 700; font-size: 11px;
+  }
+  section { margin-bottom: 14px; }
+  .section-title {
+    font-weight: 700; font-size: 13px; margin: 0 0 6px;
+    border-bottom: 2px solid #111827; padding-bottom: 3px;
+  }
+  .value-range {
+    font-size: 22px; font-weight: 700; color: #111827; margin: 4px 0;
+  }
+  .ai-box {
+    background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 10px 12px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid #e5e7eb; }
+  th { color: #6b7280; font-weight: 700; width: 38%; }
+  ul.risk-list { margin: 4px 0 0; padding-left: 18px; }
+  ul.risk-list li { margin-bottom: 2px; }
+  .disclaimer {
+    font-size: 10px; color: #9ca3af; border-top: 1px solid #e5e7eb;
+    padding-top: 8px; margin-top: 10px;
+  }
+  .footer { font-size: 9.5px; color: #9ca3af; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+  <h1>인수 검토가 범위(참고용 추정)</h1>
+  <div class="sub">
+    {{ sido }} · {{ crop_name }} {{ tree_age }}년생 · 작성일 {{ generated_date }}
+    &nbsp;<span class="grade-badge">{{ confidence_grade }}등급 — {{ grade_desc }}</span>
+  </div>
+
+  <section>
+    <div class="section-title">핵심 요약</div>
+    <div class="ai-box">{{ ai_summary }}</div>
+  </section>
+
+  <section>
+    <div class="section-title">핵심 수치</div>
+    <div class="value-range">{{ est_value_min }}만원 ~ {{ est_value_max }}만원</div>
+    <table>
+      <tr><th>예상 연소득</th><td>{{ est_income_min }} ~ {{ est_income_max }}만원</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="section-title">가치평가 구성</div>
+    <table>
+      <tr><th>토지 기준가</th><td>{{ land_value_point }}만원</td></tr>
+      <tr><th>시설 잔존가</th><td>{{ facility_value }}만원</td></tr>
+      <tr><th>영업권</th><td>{{ goodwill_text }}</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="section-title">리스크 요인</div>
+    <div class="ai-box">
+      {{ ai_risk_notes }}
+      {% if risk_flags %}
+      <ul class="risk-list">
+        {% for flag in risk_flags %}<li>{{ flag }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">농장 개요</div>
+    <table>
+      <tr><th>주소</th><td>{{ address }}</td></tr>
+      <tr><th>면적</th><td>{{ area_m2 }}㎡</td></tr>
+      <tr><th>승계 방식</th><td>{{ succession_name }}</td></tr>
+    </table>
+  </section>
+
+  <div class="disclaimer">{{ disclaimer }}</div>
+  <div class="footer">팜바톤(FarmBaton) · 본 리포트의 요약·리스크 설명문 일부는 AI(Claude)가 생성했으며, 모든 수치는 결정론적 계산 결과입니다.</div>
+
+</body>
+</html>

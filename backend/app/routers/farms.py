@@ -11,7 +11,7 @@ import datetime
 import math
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 
 from backend.app.db import get_db
 from backend.app.schemas import (
@@ -23,11 +23,15 @@ from backend.app.schemas import (
     ValuationResponse,
 )
 from backend.app.services.db_loader import load_farm_input
-from backend.app.services.valuation import calc_total_value
+from backend.app.services.pdf_render import render_report_pdf
+from backend.app.services.report_ai import CROP_NAMES, GRADE_DESC, ReportContext, generate_narrative
+from backend.app.services.valuation import calc_total_value, derive_risk_flags
 
 router = APIRouter(prefix="/api/farms", tags=["farms"])
 
 CURRENT_YEAR = datetime.date.today().year
+
+SUCC_NAMES = {"SALE": "매도", "LEASE": "임대", "JOINT": "공동경영", "MENTORING": "멘토후독립"}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -315,3 +319,91 @@ def get_valuation(farm_id: int, conn=Depends(get_db)):
     farm_input = load_farm_input(farm_id, conn)
     result = calc_total_value(farm_input, CURRENT_YEAR)
     return _build_valuation_response(farm_id, result)
+
+
+@router.get("/{farm_id}/report.pdf")
+def get_report_pdf(farm_id: int, conn=Depends(get_db)):
+    """인수 검토 리포트 PDF (AI 요약/리스크 설명문 + 결정론적 가치평가 breakdown).
+
+    ai_summary가 캐시돼 있으면 재사용(LLM 재호출 없음), 없으면 1회 생성 후 캐시.
+    """
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT address, sido, succession_type::TEXT, ai_summary, ai_risk_notes
+            FROM farm WHERE id = %s
+        """, (farm_id,))
+        row = cur.fetchone()
+    if row is None:
+        raise HTTPException(status_code=404, detail="farm not found")
+    address, sido, succession_type, cached_summary, cached_risk_notes = row
+
+    try:
+        farm_input = load_farm_input(farm_id, conn)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="farm not found")
+
+    result = calc_total_value(farm_input, CURRENT_YEAR)
+    risk_flags = derive_risk_flags(farm_input)
+
+    if cached_summary is None:
+        narrative = generate_narrative(ReportContext(
+            crop_code=farm_input.crop_code,
+            tree_age=farm_input.tree_age,
+            area_m2=farm_input.area_m2,
+            sido=sido or "",
+            confidence_grade=result.confidence_grade,
+            est_income_min=_to_만원(result.est_income_min),
+            est_income_max=_to_만원(result.est_income_max),
+            est_value_min=_to_만원(result.est_value_min),
+            est_value_max=_to_만원(result.est_value_max),
+            land_value_point=_to_만원(result.land_value_point),
+            facility_value=_to_만원(result.facility_value),
+            goodwill_min=_to_만원(result.goodwill_min),
+            goodwill_max=_to_만원(result.goodwill_max),
+            risk_flags=risk_flags,
+        ))
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE farm SET ai_summary = %s, ai_risk_notes = %s, ai_generated_at = now()
+                WHERE id = %s
+            """, (narrative.summary, narrative.risk_notes, farm_id))
+        conn.commit()
+        ai_summary, ai_risk_notes = narrative.summary, narrative.risk_notes
+    else:
+        ai_summary, ai_risk_notes = cached_summary, cached_risk_notes
+
+    goodwill_min_w = _to_만원(result.goodwill_min)
+    goodwill_max_w = _to_만원(result.goodwill_max)
+    goodwill_text = (
+        "해당 없음" if goodwill_min_w == 0
+        else f"{goodwill_min_w:,} ~ {goodwill_max_w:,}만원"
+    )
+
+    pdf_bytes = render_report_pdf({
+        "sido": sido or "",
+        "crop_name": CROP_NAMES.get(farm_input.crop_code, farm_input.crop_code),
+        "tree_age": farm_input.tree_age,
+        "generated_date": datetime.date.today().isoformat(),
+        "confidence_grade": result.confidence_grade,
+        "grade_desc": GRADE_DESC.get(result.confidence_grade, ""),
+        "ai_summary": ai_summary,
+        "ai_risk_notes": ai_risk_notes,
+        "est_value_min": f"{_to_만원(result.est_value_min):,}",
+        "est_value_max": f"{_to_만원(result.est_value_max):,}",
+        "est_income_min": f"{_to_만원(result.est_income_min):,}",
+        "est_income_max": f"{_to_만원(result.est_income_max):,}",
+        "land_value_point": f"{_to_만원(result.land_value_point):,}",
+        "facility_value": f"{_to_만원(result.facility_value):,}",
+        "goodwill_text": goodwill_text,
+        "risk_flags": risk_flags,
+        "address": address,
+        "area_m2": f"{farm_input.area_m2:,.0f}",
+        "succession_name": SUCC_NAMES.get(succession_type, succession_type or "-"),
+        "disclaimer": DISCLAIMER,
+    })
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="farmbaton_report_{farm_id}.pdf"'},
+    )
