@@ -248,6 +248,16 @@ export default function FarmerPage() {
           </div>
 
           <div className="disclaimer">{result.disclaimer}</div>
+
+          <a
+            href={api.reportPdfUrl(result.farm_id)}
+            className="btn btn-primary"
+            style={{ display: 'block', textAlign: 'center', marginTop: '.8rem', textDecoration: 'none' }}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            PDF 리포트 다운로드
+          </a>
         </div>
       )}
     </div>

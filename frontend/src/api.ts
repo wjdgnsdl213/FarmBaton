@@ -2,8 +2,10 @@ import axios from 'axios'
 
 // 개발: Vite 프록시(/api → localhost:8000)
 // 배포: VITE_API_BASE_URL=https://your-backend.railway.app/api
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api'
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
+  baseURL: API_BASE_URL,
 })
 
 export interface FarmCreatePayload {
@@ -86,6 +88,8 @@ export interface GeocodeResult {
 export const api = {
   geocode: (address: string, crop_code = 'APPLE') =>
     client.get<GeocodeResult>('/geocode', { params: { address, crop_code } }).then(r => r.data),
+
+  reportPdfUrl: (farmId: number) => `${API_BASE_URL}/farms/${farmId}/report.pdf`,
 
   createFarm: (data: FarmCreatePayload) =>
     client.post<FarmCreateResult>('/farms', data).then(r => r.data),
