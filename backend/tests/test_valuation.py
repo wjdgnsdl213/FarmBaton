@@ -42,6 +42,7 @@ from backend.app.services.valuation import (
     calc_land_value,
     calc_match_score,
     calc_total_value,
+    derive_risk_flags,
     grade_confidence,
 )
 
@@ -507,3 +508,55 @@ def test_income_band_values():
 def test_official_to_market_value():
     """formula.md §2: official_to_market = 0.65"""
     assert OFFICIAL_TO_MARKET == pytest.approx(0.65)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# derive_risk_flags — AI 리포트용 리스크 플래그 추출 (판단은 결정론적)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_risk_flags_empty_for_clean_farm(apple_7y):
+    """실거래 있음 + 시설 없음 + 경제수령 이내 → 플래그 없음"""
+    assert derive_risk_flags(apple_7y) == []
+
+
+def test_risk_flags_missing_installed_year(asset_no_year):
+    farm = FarmInput(
+        crop_code="APPLE", tree_age=7, area_m2=3_000.0,
+        income_10a=APPLE_INCOME_10A, age_coef=APPLE_7Y_COEF, trend_index=1.0,
+        land=LandData(area_m2=3_000.0, official_price_m2=30_000.0,
+                      deal_price_m2=55_000.0, deal_sample_cnt=5),
+        assets=[asset_no_year],
+    )
+    flags = derive_risk_flags(farm)
+    assert len(flags) == 1
+    assert "설치연도" in flags[0]
+
+
+def test_risk_flags_official_only_land(land_official_only):
+    farm = FarmInput(
+        crop_code="APPLE", tree_age=7, area_m2=5_000.0,
+        income_10a=APPLE_INCOME_10A, age_coef=APPLE_7Y_COEF, trend_index=1.0,
+        land=land_official_only,
+        assets=[],
+    )
+    flags = derive_risk_flags(farm)
+    assert len(flags) == 1
+    assert "실거래" in flags[0]
+
+
+def test_risk_flags_economic_life_exceeded(grape_25y):
+    """포도 25년생 > 경제수령 18 → 경제수령 초과 플래그"""
+    flags = derive_risk_flags(grape_25y)
+    assert any("경제수령" in f for f in flags)
+
+
+def test_risk_flags_all_three_triggers(asset_no_year):
+    """실거래 표본 부족 + 설치연도 결측 + 경제수령 초과가 모두 겹치면 3개"""
+    farm = FarmInput(
+        crop_code="GRAPE", tree_age=25, area_m2=4_000.0,
+        income_10a=GRAPE_INCOME_10A, age_coef=GRAPE_25Y_COEF, trend_index=1.0,
+        land=LandData(area_m2=4_000.0, official_price_m2=40_000.0,
+                      deal_price_m2=None, deal_sample_cnt=0),
+        assets=[asset_no_year],
+    )
+    assert len(derive_risk_flags(farm)) == 3

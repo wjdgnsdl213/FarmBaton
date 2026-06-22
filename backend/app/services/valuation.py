@@ -164,6 +164,28 @@ def grade_confidence(farm: FarmInput) -> str:
     return _GRADES[min(idx, 3)]
 
 
+def derive_risk_flags(farm: FarmInput) -> list[str]:
+    """리스크 플래그 (사람이 읽을 한국어 문구).
+
+    calc_total_value의 신뢰도 하향·리스크 할인 트리거와 동일한 조건을
+    재사용해 추출한다 — 판단은 100% 결정론적이며, LLM은 이 리스트를
+    문장으로 풀어쓰는 데만 쓴다 (report_ai.generate_narrative).
+    """
+    flags: list[str] = []
+
+    if farm.land.deal_price_m2 is None or (farm.land.deal_sample_cnt or 0) < 3:
+        flags.append("실거래 표본 부족 — 공시지가 기반 추정")
+
+    if any(a.installed_year is None for a in farm.assets):
+        flags.append("일부 시설 설치연도 미상 — 잔존가 보수적 추정")
+
+    eco_life = _ECONOMIC_LIFE.get(farm.crop_code, 20)
+    if farm.tree_age > eco_life:
+        flags.append("경제수령 초과 — 갱신 비용 고려 필요")
+
+    return flags
+
+
 def calc_income(farm: FarmInput) -> IncomeResult:
     """예상 연소득 점추정·범위 (formula.md §1).
 
