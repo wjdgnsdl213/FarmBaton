@@ -10,6 +10,7 @@ import pytest
 from backend.app.services.report_ai import (
     MatchContext,
     ReportContext,
+    _strip_code_fence,
     generate_match_explanation,
     generate_narrative,
 )
@@ -70,3 +71,48 @@ def test_generate_match_explanation_with_risk_penalty(match_ctx):
     match_ctx.capital_score = 0.0
     text = generate_match_explanation(match_ctx)
     assert "감점" in text
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# _strip_code_fence — Claude가 JSON 응답을 ```json ... ``` 로 감싸는 경우 대응
+# (실제 키로 확인된 회귀: 펜스 미제거 시 json.loads가 실패해 항상 폴백으로 빠짐)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_strip_code_fence_removes_json_fence():
+    raw = '```json\n{"summary": "a", "risk_notes": "b"}\n```'
+    assert _strip_code_fence(raw) == '{"summary": "a", "risk_notes": "b"}'
+
+
+def test_strip_code_fence_removes_bare_fence():
+    raw = '```\n{"a": 1}\n```'
+    assert _strip_code_fence(raw) == '{"a": 1}'
+
+
+def test_strip_code_fence_passthrough_when_unfenced():
+    raw = '{"a": 1}'
+    assert _strip_code_fence(raw) == '{"a": 1}'
+
+
+def test_generate_narrative_parses_fenced_json_response(report_ctx, monkeypatch):
+    """실제 Claude 응답이 ```json 펜스로 감싸여 와도 is_ai_generated=True로 파싱돼야 함."""
+    fenced = '```json\n{"summary": "AI 생성 요약", "risk_notes": "AI 생성 리스크"}\n```'
+
+    class _FakeBlock:
+        text = fenced
+
+    class _FakeResponse:
+        content = [_FakeBlock()]
+
+    class _FakeMessages:
+        def create(self, **kwargs):
+            return _FakeResponse()
+
+    class _FakeClient:
+        messages = _FakeMessages()
+
+    monkeypatch.setattr("backend.app.services.report_ai._get_client", lambda: _FakeClient())
+
+    result = generate_narrative(report_ctx)
+    assert result.is_ai_generated is True
+    assert result.summary == "AI 생성 요약"
+    assert result.risk_notes == "AI 생성 리스크"

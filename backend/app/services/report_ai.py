@@ -52,6 +52,16 @@ class NarrativeResult:
     is_ai_generated: bool  # False면 폴백 템플릿 문장
 
 
+def _strip_code_fence(text: str) -> str:
+    """Claude가 JSON 응답을 ```json ... ``` 코드펜스로 감싸는 경우가 있어 제거."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+        if text.rstrip().endswith("```"):
+            text = text.rstrip()[:-3]
+    return text.strip()
+
+
 def _get_client():
     api_key = os.getenv("ANTHROPIC_API_KEY", "")
     if not api_key:
@@ -113,7 +123,7 @@ def generate_narrative(ctx: ReportContext) -> NarrativeResult:
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
-        data = json.loads(resp.content[0].text)
+        data = json.loads(_strip_code_fence(resp.content[0].text))
         summary = str(data["summary"]).strip()
         risk_notes = str(data["risk_notes"]).strip()
         if not summary or not risk_notes:
