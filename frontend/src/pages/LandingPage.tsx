@@ -63,17 +63,6 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* ── 통계 ── */}
-      <section className="lp-stats">
-        <div className="lp-wrap">
-          <div className="lp-stats-grid reveal">
-            <div className="lp-stat"><div className="num"><b>3</b>분</div><div className="lab">평균 리포트 산출 시간</div></div>
-            <div className="lp-stat"><div className="num"><b>3</b>종</div><div className="lab">지원 작목 (과수 중심)</div></div>
-            <div className="lp-stat"><div className="num">참고용 <b>추정</b></div><div className="lab">공개 통계 기반 산출</div></div>
-          </div>
-        </div>
-      </section>
-
       {/* ════════ FEATURES ════════ */}
       <section className="lp-features" id="features">
         <div className="lp-wrap">
