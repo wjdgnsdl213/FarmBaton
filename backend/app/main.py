@@ -7,6 +7,7 @@ load_dotenv(override=True)  # .env 우선 (외부 환경변수 따옴표 오염 
 
 import json
 import os
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -71,12 +72,17 @@ def geocode(address: str, crop_code: str = "APPLE", conn=Depends(get_db)):
                 f"https://api.vworld.kr/req/address?{params}", timeout=8
             ) as resp:
                 data = json.loads(resp.read())
-            if data["response"]["status"] == "OK":
+            status = data["response"]["status"]
+            if status == "OK":
                 pt = data["response"]["result"]["point"]
                 lon, lat = float(pt["x"]), float(pt["y"])
                 break
-        except Exception:
-            continue
+            else:
+                print(f"[geocode] V-World status={status} addr_type={addr_type}")
+        except urllib.error.HTTPError as e:
+            print(f"[geocode] V-World HTTPError {e.code} addr_type={addr_type} body={e.read()[:300]!r}")
+        except Exception as e:
+            print(f"[geocode] V-World call failed addr_type={addr_type} err={e!r}")
 
     if lon is None:
         raise HTTPException(404, "주소를 찾을 수 없습니다.")
