@@ -1,27 +1,54 @@
 import { Link } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
 import heroFarm from '../assets/hero-farm.jpg'
 
+function useScrollReveal() {
+  const rootRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const els = rootRef.current?.querySelectorAll<HTMLElement>('.reveal')
+    if (!els || els.length === 0) return
+    const obs = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in')
+            obs.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    )
+    els.forEach(el => obs.observe(el))
+    return () => obs.disconnect()
+  }, [])
+  return rootRef
+}
+
 export default function LandingPage() {
+  const rootRef = useScrollReveal()
   return (
-    <div>
+    <div ref={rootRef}>
+      {/* ════════ NAV (sticky) ════════ */}
+      <nav className="lp-nav">
+        <div className="lp-wrap lp-nav-inner">
+          <span className="lp-logo" style={{ color: '#fff' }}>
+            <span className="mark"><i></i></span>팜바톤
+          </span>
+          <div className="lp-nav-links">
+            <a href="#features">서비스 소개</a>
+            <a href="#steps">작동 방식</a>
+            <Link to="/farmer">농가 등록</Link>
+            <Link to="/young">청년농 매칭</Link>
+          </div>
+          <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
+        </div>
+      </nav>
+
       {/* ════════ HERO ════════ */}
       <header className="lp-hero">
         <img src={heroFarm} alt="" className="lp-hero-photo" />
         <div className="lp-hero-overlay" />
         <div className="lp-wrap lp-hero-inner">
-          <nav className="lp-nav">
-            <span className="lp-logo" style={{ color: '#fff' }}>
-              <span className="mark"><i></i></span>팜바톤
-            </span>
-            <div className="lp-nav-links">
-              <a href="#features">서비스 소개</a>
-              <a href="#steps">작동 방식</a>
-              <Link to="/farmer">농가 등록</Link>
-              <Link to="/young">청년농 매칭</Link>
-            </div>
-            <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
-          </nav>
-
           <div className="lp-hero-content">
             <div className="lp-hero-text">
               <span className="lp-eyebrow" style={{ background: 'rgba(199,239,77,.18)', color: 'var(--lime)' }}>
@@ -45,7 +72,7 @@ export default function LandingPage() {
       {/* ── 통계 ── */}
       <section className="lp-stats">
         <div className="lp-wrap">
-          <div className="lp-stats-grid">
+          <div className="lp-stats-grid reveal">
             <div className="lp-stat"><div className="num"><b>3</b>분</div><div className="lab">평균 리포트 산출 시간</div></div>
             <div className="lp-stat"><div className="num"><b>3</b>종</div><div className="lab">지원 작목 (과수 중심)</div></div>
             <div className="lp-stat"><div className="num">참고용 <b>추정</b></div><div className="lab">공개 통계 기반 산출</div></div>
@@ -61,17 +88,17 @@ export default function LandingPage() {
             <h2>팜바톤이 하는 일</h2>
           </div>
           <div className="lp-feat-cards">
-            <div className="lp-feat-card">
+            <div className="lp-feat-card reveal">
               <div className="ic"><i></i></div>
               <h3>주소 한 줄로 진단</h3>
               <p>지번·도로명 주소만 입력하면 필지 면적을 자동으로 가져와 평가에 반영합니다.</p>
             </div>
-            <div className="lp-feat-card lime">
+            <div className="lp-feat-card lime reveal" style={{ transitionDelay: '.1s' }}>
               <div className="ic"><i></i></div>
               <h3>인수 검토가 범위</h3>
               <p>예상 소득·토지·시설 가치를 범위로 정리한 참고용 추정 리포트를 받습니다.</p>
             </div>
-            <div className="lp-feat-card">
+            <div className="lp-feat-card reveal" style={{ transitionDelay: '.2s' }}>
               <div className="ic"><i></i></div>
               <h3>청년농 매칭</h3>
               <p>지역·작목·자본 조건에 맞춰 승계 가능한 농장을 점수순으로 추천합니다.</p>
@@ -89,7 +116,7 @@ export default function LandingPage() {
           </div>
 
           <div className="lp-step-list">
-            <div className="lp-step">
+            <div className="lp-step reveal">
               <div className="lp-step-copy">
                 <div className="idx">01</div>
                 <h3>주소·작목을 입력합니다</h3>
@@ -99,7 +126,7 @@ export default function LandingPage() {
               <div className="lp-step-vis"><span>입력 화면 / 농장 사진</span></div>
             </div>
 
-            <div className="lp-step flip">
+            <div className="lp-step flip reveal">
               <div className="lp-step-copy">
                 <div className="idx">02</div>
                 <h3>인수 검토 리포트를 받습니다</h3>
@@ -109,7 +136,7 @@ export default function LandingPage() {
               <div className="lp-step-vis"><span>리포트 결과 화면 / 사진</span></div>
             </div>
 
-            <div className="lp-step">
+            <div className="lp-step reveal">
               <div className="lp-step-copy">
                 <div className="idx">03</div>
                 <h3>청년농과 매칭됩니다</h3>
@@ -125,7 +152,7 @@ export default function LandingPage() {
       {/* ════════ CTA ════════ */}
       <section className="lp-cta">
         <div className="lp-wrap">
-          <div className="lp-cta-band">
+          <div className="lp-cta-band reveal">
             <div>
               <h2>지금 내 농장부터 진단해 보세요</h2>
               <p>3분이면 충분합니다. 등록비 없이 시작할 수 있습니다.</p>

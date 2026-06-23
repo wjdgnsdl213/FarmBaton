@@ -1,5 +1,10 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 :root {
   /* ── 브랜드: 깊은 숲 그린 + 라임 악센트 ── */
   --green: #1f6b3a;          /* primary */
@@ -72,7 +77,7 @@ a { color: var(--green); }
 
 /* ════════ 레이아웃 ════════ */
 .main { max-width: 720px; margin: 0 auto; padding: 0 1rem 5rem; }
-.main.main-wide { max-width: 1080px; padding: 0; }
+.main.main-wide { max-width: none; padding: 0; }
 .page { padding-top: 1.25rem; }
 
 /* ════════ 히어로 헤더 (FarmerPage / YoungPage 상단) ════════ */
@@ -277,6 +282,8 @@ textarea { resize: vertical; min-height: 60px; }
   transition: transform .12s, background .15s, opacity .15s;
 }
 .lp-pill:active { transform: translateY(1px); }
+.lp-pill-lime, .lp-pill-dark { box-shadow: 0 1px 2px rgba(21,53,31,.06); }
+.lp-pill-lime:hover, .lp-pill-dark:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(21,53,31,.18); }
 .lp-pill-lime { background: var(--lime); color: var(--green-deep); }
 .lp-pill-lime:hover { background: #d3f562; }
 .lp-pill-dark { background: var(--green-deep); color: #fff; }
@@ -299,7 +306,13 @@ textarea { resize: vertical; min-height: 60px; }
     linear-gradient(to right, rgba(11,28,17,.5) 0%, rgba(11,28,17,0) 60%);
 }
 .lp-hero-inner { position: relative; z-index: 2; display: flex; flex-direction: column; width: 100%; margin-top: auto; }
-.lp-nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+.lp-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(11,28,17,.6);
+  backdrop-filter: saturate(1.3) blur(14px);
+  transition: background .2s;
+}
+.lp-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; }
 .lp-nav-links { display: none; align-items: center; gap: 26px; }
 .lp-nav-links a { font-size: 15px; font-weight: 600; color: rgba(255,255,255,.85); text-decoration: none; white-space: nowrap; }
 .lp-nav-links a:hover { color: #fff; }
@@ -307,6 +320,17 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-hero h1 { font-size: clamp(38px, 8.5vw, 60px); line-height: 1.08; letter-spacing: -.035em; font-weight: 800; margin: 18px 0; text-wrap: balance; }
 .lp-hero-lead { font-size: clamp(16px, 2.2vw, 18px); line-height: 1.65; color: rgba(255,255,255,.86); max-width: 30em; margin-bottom: 28px; }
 .lp-hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+@keyframes lp-fade-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+.lp-hero-text > * { opacity: 0; animation: lp-fade-up .7s ease forwards; }
+.lp-hero-text > *:nth-child(1) { animation-delay: .05s; }
+.lp-hero-text > *:nth-child(2) { animation-delay: .15s; }
+.lp-hero-text > *:nth-child(3) { animation-delay: .27s; }
+.lp-hero-text > *:nth-child(4) { animation-delay: .4s; }
+.lp-glass { opacity: 0; animation: lp-fade-up .7s ease forwards; animation-delay: .5s; }
+@media (prefers-reduced-motion: reduce) {
+  .lp-hero-text > *, .lp-glass { opacity: 1; animation: none; }
+}
 .lp-glass {
   background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
   border-radius: 18px; padding: 20px 22px; backdrop-filter: blur(12px); max-width: 320px;
@@ -315,19 +339,34 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-glass h4 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); display: inline-block; flex: none; }
 .lp-glass p { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,.88); }
 
-.lp-stats { background: var(--green-deep); color: #fff; border-top: 1px solid rgba(255,255,255,.1); }
-.lp-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 36px 0 48px; }
-.lp-stat .num { font-size: clamp(28px, 5vw, 40px); font-weight: 800; letter-spacing: -.02em; line-height: 1; }
-.lp-stat .num b { color: var(--lime); }
-.lp-stat .lab { font-size: 13.5px; color: rgba(255,255,255,.62); margin-top: 8px; }
+.lp-stats { position: relative; z-index: 5; margin-top: -44px; padding-bottom: 4px; }
+.lp-stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  max-width: 760px; margin: 0 auto;
+  background: #fff; border-radius: var(--radius);
+  box-shadow: 0 16px 40px rgba(21,53,31,.14);
+  padding: 22px 8px;
+}
+.lp-stat { position: relative; text-align: center; padding: 0 8px; }
+.lp-stat:not(:last-child)::after {
+  content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 30px; background: var(--border);
+}
+.lp-stat .num { font-size: clamp(20px, 4vw, 28px); font-weight: 800; letter-spacing: -.02em; line-height: 1; color: var(--green-deep); }
+.lp-stat .num b { color: var(--green); }
+.lp-stat .lab { font-size: 12px; color: var(--gray); margin-top: 6px; }
 
-.lp-features { padding: clamp(48px, 8vw, 84px) 0; }
+.lp-features { padding: clamp(48px, 8vw, 84px) 0; scroll-margin-top: 64px; }
+.lp-steps { scroll-margin-top: 64px; }
 .lp-sec-head { margin-bottom: 32px; }
 .lp-sec-head .lp-eyebrow { background: var(--green-light); color: var(--green); margin-bottom: 14px; }
 .lp-sec-head .lp-eyebrow .dot { background: var(--green); }
 .lp-sec-head h2 { font-size: clamp(26px, 4.5vw, 36px); font-weight: 800; letter-spacing: -.025em; color: var(--green-deep); text-wrap: balance; }
 .lp-feat-cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
-.lp-feat-card { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; min-height: 180px; }
+.lp-feat-card { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; min-height: 180px; transition: transform .25s ease, box-shadow .25s ease; }
+.lp-feat-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(21,53,31,.1); }
+.lp-feat-card .ic { transition: transform .25s ease; }
+.lp-feat-card:hover .ic { transform: scale(1.08) rotate(-4deg); }
 .lp-feat-card.lime { background: var(--lime); border-color: var(--lime); }
 .lp-feat-card .ic { width: 46px; height: 46px; border-radius: 13px; background: var(--green-light); display: flex; align-items: center; justify-content: center; margin-bottom: auto; }
 .lp-feat-card.lime .ic { background: rgba(21,53,31,.12); }
@@ -342,7 +381,8 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-steps .lp-sec-head .lp-eyebrow { background: var(--lime-soft); }
 .lp-steps .lp-sec-head h2 { max-width: 16em; margin: 0 auto; }
 .lp-step-list { display: flex; flex-direction: column; gap: 18px; margin-top: 36px; }
-.lp-step { display: grid; grid-template-columns: 1fr; gap: 22px; background: #fff; border: 1px solid var(--border); border-radius: 22px; padding: 26px; align-items: center; }
+.lp-step { display: grid; grid-template-columns: 1fr; gap: 22px; background: #fff; border: 1px solid var(--border); border-radius: 22px; padding: 26px; align-items: center; transition: box-shadow .25s ease, transform .25s ease; }
+.lp-step:hover { box-shadow: 0 16px 32px rgba(21,53,31,.08); transform: translateY(-3px); }
 .lp-step-copy .idx { font-size: 52px; font-weight: 800; color: var(--lime); -webkit-text-stroke: 1.5px var(--green); line-height: 1; margin-bottom: 14px; }
 .lp-step-copy h3 { font-size: clamp(20px, 3.5vw, 26px); font-weight: 800; color: var(--green-deep); letter-spacing: -.02em; margin-bottom: 10px; }
 .lp-step-copy p { font-size: 15.5px; line-height: 1.65; color: var(--gray); }
@@ -355,6 +395,13 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-step-vis span { font: 600 12px/1 ui-monospace, 'SF Mono', monospace; color: var(--green); letter-spacing: .04em; background: rgba(255,255,255,.7); padding: 5px 9px; border-radius: 5px; }
 
 .lp-cta { padding: 0 0 clamp(40px, 7vw, 72px); }
+
+/* ── 스크롤 리빌 ── */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.in { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
 .lp-cta-band { background: var(--green-deep); border-radius: 26px; padding: clamp(32px, 5vw, 52px); display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
 .lp-cta-band h2 { font-size: clamp(24px, 4vw, 34px); font-weight: 800; color: #fff; letter-spacing: -.025em; text-wrap: balance; }
 .lp-cta-band p { font-size: 15px; color: rgba(255,255,255,.72); margin-top: 8px; }
