@@ -61,9 +61,7 @@ function Nav() {
           <NavLinks loc={loc} loggedIn={loggedIn} onLogout={logout} />
         </div>
         <div className="lp-nav-right">
-          {loc.pathname !== '/farmer' && (
-            <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
-          )}
+          <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
           <button
             className="lp-nav-burger"
             aria-label="메뉴"

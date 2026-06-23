@@ -165,9 +165,9 @@ textarea { resize: vertical; min-height: 60px; }
 
 /* ════════ 매칭 카드 ════════ */
 .match-item {
-  background: #fff; border: 1px solid var(--border);
+  background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--green-mid);
   border-radius: var(--radius); padding: 1.25rem;
-  margin-bottom: .85rem; box-shadow: var(--shadow-sm);
+  margin-bottom: 1.1rem; box-shadow: 0 1px 3px rgba(21,53,31,.07);
   transition: border-color .15s, box-shadow .15s, transform .15s;
 }
 .match-item:hover {
@@ -181,17 +181,22 @@ textarea { resize: vertical; min-height: 60px; }
   width: 58px; height: 58px; border-radius: 50%;
   color: #fff; display: flex; flex-direction: column;
   align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
 }
 .match-score-num { font-size: 1.2rem; font-weight: 800; line-height: 1; }
 .match-score-unit { font-size: .58rem; opacity: .85; margin-top: .1rem; }
-.match-farm-name { font-weight: 800; font-size: 1.05rem; color: var(--green-deep); letter-spacing: -.01em; }
+.match-farm-name { font-weight: 800; font-size: 1.1rem; color: var(--green-deep); letter-spacing: -.01em; }
 .match-farm-meta { font-size: .85rem; color: var(--gray); margin-top: .2rem; }
-.score-bars { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem .9rem; margin-top: .85rem; padding-top: .85rem; border-top: 1px solid var(--border); }
+.score-bars {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .55rem 1rem;
+  margin-top: .9rem; padding: .8rem .9rem; border-radius: var(--radius-sm);
+  background: var(--gray-light);
+}
 .score-bar { display: flex; align-items: center; gap: .5rem; font-size: .78rem; }
-.score-bar-label { color: var(--gray); width: 42px; flex-shrink: 0; font-weight: 600; }
-.score-bar-track { flex: 1; height: 6px; background: var(--gray-light); border-radius: 3px; overflow: hidden; }
-.score-bar-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width .4s ease; }
-.score-bar-val { width: 28px; text-align: right; font-weight: 700; color: var(--green-deep); }
+.score-bar-label { color: var(--gray); width: 42px; flex-shrink: 0; font-weight: 700; }
+.score-bar-track { flex: 1; height: 7px; background: rgba(0,0,0,.08); border-radius: 4px; overflow: hidden; }
+.score-bar-fill { height: 100%; background: var(--green); border-radius: 4px; transition: width .4s ease; }
+.score-bar-val { width: 30px; text-align: right; font-weight: 700; color: var(--green-deep); }
 .penalty-badge {
   background: #fde8e8; color: #c0392b; font-size: .76rem; font-weight: 700;
   padding: .2rem .6rem; border-radius: 999px; display: inline-block; margin-top: .5rem;
@@ -204,8 +209,21 @@ textarea { resize: vertical; min-height: 60px; }
 }
 
 /* ── 매칭 카드 펼침: 상세/상담 신청 ── */
-.match-detail { margin-top: .9rem; padding-top: .9rem; border-top: 1px solid var(--border); cursor: default; }
-.match-detail-assets { margin-bottom: .4rem; }
+.match-detail { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); cursor: default; }
+.match-detail-section-title {
+  font-size: .8rem; font-weight: 800; color: var(--green-deep);
+  text-transform: uppercase; letter-spacing: .03em; margin-bottom: .5rem;
+}
+.match-detail-assets { margin-bottom: 1rem; }
+.detail-list { display: flex; flex-direction: column; gap: .5rem; }
+.detail-row {
+  background: var(--gray-light); border-radius: var(--radius-sm);
+  padding: .65rem .8rem;
+}
+.detail-row-title { font-size: .88rem; font-weight: 700; color: var(--ink); }
+.detail-row-meta { font-size: .78rem; color: var(--gray); margin-top: .15rem; }
+.detail-row-pitch { font-size: .8rem; color: var(--green); font-style: italic; margin-top: .35rem; }
+.detail-row-link { font-size: .78rem; display: inline-block; margin-top: .35rem; font-weight: 600; }
 .consult-form { margin-top: .6rem; display: flex; flex-direction: column; gap: 0; }
 .consult-success {
   margin-top: .6rem; background: var(--green-light); color: var(--green);

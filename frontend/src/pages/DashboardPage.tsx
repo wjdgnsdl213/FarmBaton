@@ -40,7 +40,7 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
         const score = Math.round(m.total_score)
         const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
         return (
-          <div key={m.young_farmer_id} className="match-item" style={{ cursor: 'default' }}>
+          <div key={m.young_farmer_id} className="match-item" style={{ cursor: 'default', borderLeftColor: circleColor }}>
             <div className="match-header">
               <div className="match-info">
                 <div className="match-farm-name">청년농 #{m.young_farmer_id}</div>

@@ -74,7 +74,7 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
   }
 
   return (
-    <div className="match-item clickable" onClick={toggle}>
+    <div className="match-item clickable" style={{ borderLeftColor: circleColor }} onClick={toggle}>
       <div className="match-header">
         <div className="match-info">
           <div className="match-farm-name">
@@ -124,32 +124,38 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
 
           {detail && detail.assets.length > 0 && (
             <div className="match-detail-assets">
-              <div className="card-title" style={{ fontSize: '.85rem', marginBottom: '.4rem' }}>시설 현황</div>
-              {detail.assets.map((a, i) => (
-                <div key={i} className="match-farm-meta">
-                  {a.facility_name} · {a.area_m2.toLocaleString('ko-KR')}㎡
-                  {a.installed_year ? ` · ${a.installed_year}년 설치` : ''} · {a.condition_grade}등급
-                </div>
-              ))}
+              <div className="match-detail-section-title">시설 현황</div>
+              <div className="detail-list">
+                {detail.assets.map((a, i) => (
+                  <div key={i} className="detail-row">
+                    <div className="detail-row-title">{a.facility_name}</div>
+                    <div className="detail-row-meta">
+                      {a.area_m2.toLocaleString('ko-KR')}㎡
+                      {a.installed_year ? ` · ${a.installed_year}년 설치` : ' · 설치연도 미상'} · {a.condition_grade}등급
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
           {programs && programs.length > 0 && (
             <div className="match-detail-assets">
-              <div className="card-title" style={{ fontSize: '.85rem', marginBottom: '.4rem' }}>이 농장에 맞는 지원사업</div>
-              {programs.map(p => (
-                <div key={p.program_code} className="match-farm-meta" style={{ marginBottom: '.5rem' }}>
-                  <b style={{ color: 'var(--ink)' }}>{p.name}</b> · {p.amount_text}
-                  {p.pitch && (
-                    <span style={{ display: 'block', fontStyle: 'italic', marginTop: '.15rem' }}>“{p.pitch}”</span>
-                  )}
-                  {p.apply_url && (
-                    <a href={p.apply_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.78rem', display: 'inline-block', marginTop: '.2rem' }}>
-                      신청 안내 보기 →
-                    </a>
-                  )}
-                </div>
-              ))}
+              <div className="match-detail-section-title">이 농장에 맞는 지원사업</div>
+              <div className="detail-list">
+                {programs.map(p => (
+                  <div key={p.program_code} className="detail-row">
+                    <div className="detail-row-title">{p.name}</div>
+                    <div className="detail-row-meta">{p.amount_text}</div>
+                    {p.pitch && <div className="detail-row-pitch">“{p.pitch}”</div>}
+                    {p.apply_url && (
+                      <a href={p.apply_url} target="_blank" rel="noopener noreferrer" className="detail-row-link">
+                        신청 안내 보기 →
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
