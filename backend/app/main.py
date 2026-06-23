@@ -5,11 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)  # .env 우선 (외부 환경변수 따옴표 오염 방지)
 
+import csv
 import json
 import os
 import urllib.error
 import urllib.parse
 import urllib.request
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +19,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app.db import get_db
 from backend.app.routers import auth, farms, young_farmers
 from backend.app.routers.farms import KNN_DISTANCE_WARN_KM
+
+_GEOCODE_FALLBACK_PATH = Path(__file__).resolve().parents[2] / "db" / "seed" / "geocode_fallback.csv"
+
+
+def _load_geocode_fallback() -> dict[str, tuple[float, float]]:
+    """V-World 장애 시 사용할 정적 폴백 — 데모 주소만 사전 좌표 조회해 db/seed/geocode_fallback.csv에 저장."""
+    table: dict[str, tuple[float, float]] = {}
+    if _GEOCODE_FALLBACK_PATH.exists():
+        with open(_GEOCODE_FALLBACK_PATH, encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                if row.get("lon") and row.get("lat"):
+                    key = " ".join(row["address"].split())
+                    table[key] = (float(row["lon"]), float(row["lat"]))
+    return table
+
+
+_GEOCODE_FALLBACK = _load_geocode_fallback()
 
 app = FastAPI(
     title="팜바톤 API",
@@ -83,6 +102,12 @@ def geocode(address: str, crop_code: str = "APPLE", conn=Depends(get_db)):
             print(f"[geocode] V-World HTTPError {e.code} addr_type={addr_type} body={e.read()[:300]!r}")
         except Exception as e:
             print(f"[geocode] V-World call failed addr_type={addr_type} err={e!r}")
+
+    if lon is None:
+        fb_key = " ".join(address.split())
+        if fb_key in _GEOCODE_FALLBACK:
+            lon, lat = _GEOCODE_FALLBACK[fb_key]
+            print(f"[geocode] static fallback hit for {fb_key!r}")
 
     if lon is None:
         raise HTTPException(404, "주소를 찾을 수 없습니다.")
