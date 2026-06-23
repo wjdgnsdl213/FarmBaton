@@ -121,6 +121,15 @@ class FarmSummary(BaseModel):
     est_value_max: Optional[int]
 
 
+class FarmStatusUpdate(BaseModel):
+    status: str = Field(pattern="^(DRAFT|ACTIVE)$")
+
+
+class FarmStatusUpdateResponse(BaseModel):
+    id: int
+    status: str
+
+
 # ── 상담 신청 ────────────────────────────────────────────────────────────────
 
 class ConsultRequestCreate(BaseModel):
@@ -198,6 +207,31 @@ class MatchItem(BaseModel):
 class MatchListResponse(BaseModel):
     young_farmer_id: int
     matches: list[MatchItem]
+
+
+class FarmMatchItem(BaseModel):
+    """농장주 화면용 — 이 농장에 매칭되는 청년농 1명."""
+    young_farmer_id: int
+    pref_sido: Optional[str]
+    pref_crop: Optional[str]
+    available_capital: int  # 만원
+    experience_years: int
+    pref_succession: str
+    policy_fund: bool
+    total_score: float
+    region_score: float
+    crop_score: float
+    capital_score: float
+    experience_score: float
+    succession_score: float
+    policy_score: float
+    risk_penalty: float
+    explanation: Optional[str] = None
+
+
+class FarmMatchListResponse(BaseModel):
+    farm_id: int
+    matches: list[FarmMatchItem]
 
 
 # ── 지원사업 추천 ─────────────────────────────────────────────────────────────

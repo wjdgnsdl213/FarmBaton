@@ -80,6 +80,30 @@ export interface MatchListResult {
   matches: MatchItem[]
 }
 
+export interface FarmMatchItem {
+  young_farmer_id: number
+  pref_sido: string | null
+  pref_crop: string | null
+  available_capital: number
+  experience_years: number
+  pref_succession: string
+  policy_fund: boolean
+  total_score: number
+  region_score: number
+  crop_score: number
+  capital_score: number
+  experience_score: number
+  succession_score: number
+  policy_score: number
+  risk_penalty: number
+  explanation: string | null
+}
+
+export interface FarmMatchListResult {
+  farm_id: number
+  matches: FarmMatchItem[]
+}
+
 export interface YoungFarmerPayload {
   pref_sido?: string | null
   pref_crop?: string | null
@@ -238,4 +262,10 @@ export const api = {
 
   updateConsultRequestStatus: (farmId: number, reqId: number, status: 'ACCEPTED' | 'DECLINED') =>
     client.patch<ConsultRequestResult>(`/farms/${farmId}/consult-requests/${reqId}`, { status }).then(r => r.data),
+
+  updateFarmStatus: (farmId: number, status: 'DRAFT' | 'ACTIVE') =>
+    client.patch<{ id: number; status: string }>(`/farms/${farmId}/status`, { status }).then(r => r.data),
+
+  getFarmMatches: (farmId: number) =>
+    client.get<FarmMatchListResult>(`/farms/${farmId}/matches`).then(r => r.data),
 }

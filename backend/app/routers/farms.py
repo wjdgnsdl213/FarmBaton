@@ -26,13 +26,33 @@ from backend.app.schemas import (
     FarmCreate,
     FarmCreateResponse,
     FarmDetail,
+    FarmMatchItem,
+    FarmMatchListResponse,
+    FarmStatusUpdate,
+    FarmStatusUpdateResponse,
     FarmSummary,
     ValuationResponse,
 )
 from backend.app.services.db_loader import load_farm_input
 from backend.app.services.pdf_render import render_report_pdf
-from backend.app.services.report_ai import CROP_NAMES, GRADE_DESC, ReportContext, generate_narrative
-from backend.app.services.valuation import calc_total_value, derive_risk_flags
+from backend.app.services.report_ai import (
+    CROP_NAMES,
+    GRADE_DESC,
+    MatchContext,
+    ReportContext,
+    fallback_match_explanation,
+    generate_narrative,
+)
+from backend.app.services.valuation import (
+    HIGH_DIFFICULTY_CROPS,
+    FarmProfileForMatch,
+    YoungFarmerInput,
+    calc_match_score,
+    calc_total_value,
+    derive_risk_flags,
+)
+
+FARM_MATCH_TOP_N = 10  # 농장주 화면에 보여줄 매칭 청년농 최대 수
 
 router = APIRouter(prefix="/api/farms", tags=["farms"])
 
@@ -292,6 +312,130 @@ def get_my_farms(conn=Depends(get_db), owner_id: int = Depends(get_current_farme
         )
         for id_, address, sido, crop_code, area_m2, status, val_min, val_max in rows
     ]
+
+
+@router.patch("/{farm_id}/status", response_model=FarmStatusUpdateResponse)
+def update_farm_status(
+    farm_id: int, data: FarmStatusUpdate,
+    conn=Depends(get_db), owner_id: int = Depends(get_current_farmer),
+):
+    """농장 매칭 풀 공개(ACTIVE)/비공개(DRAFT) 전환 — 본인 농장만 가능.
+
+    농가 등록 직후엔 DRAFT 상태라 청년농 매칭에 노출되지 않는다. 리포트를
+    확인한 농가가 명시적으로 "매칭 풀에 공개"해야 ACTIVE로 바뀌어 매칭
+    대상이 된다.
+    """
+    with conn.cursor() as cur:
+        cur.execute("SELECT owner_id, est_value_min FROM farm WHERE id = %s", (farm_id,))
+        row = cur.fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="farm not found")
+        if row[0] != owner_id:
+            raise HTTPException(status_code=403, detail="본인 농장만 변경할 수 있습니다.")
+        if data.status == "ACTIVE" and row[1] is None:
+            raise HTTPException(status_code=422, detail="가치평가가 먼저 산출되어야 공개할 수 있습니다.")
+
+        cur.execute(
+            "UPDATE farm SET status = %s::listing_status_t, updated_at = now() WHERE id = %s RETURNING id, status",
+            (data.status, farm_id),
+        )
+        updated_id, updated_status = cur.fetchone()
+    conn.commit()
+
+    return FarmStatusUpdateResponse(id=updated_id, status=updated_status)
+
+
+@router.get("/{farm_id}/matches", response_model=FarmMatchListResponse)
+def get_farm_matches(
+    farm_id: int, conn=Depends(get_db), owner_id: int = Depends(get_current_farmer),
+):
+    """농장주 화면용 — 이 농장에 매칭되는 청년농 리스트 (점수 내림차순, 상위 10명).
+
+    calc_match_score는 양방향 함수라 청년농 화면(young_farmers.get_matches)과
+    동일한 점수가 나온다. 본인 농장만 조회 가능.
+    """
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT owner_id, sido, crop_code::TEXT, succession_type::TEXT, est_value_min
+            FROM farm WHERE id = %s
+        """, (farm_id,))
+        row = cur.fetchone()
+
+    if row is None:
+        raise HTTPException(status_code=404, detail="farm not found")
+    farm_owner_id, sido, crop_code, succession_type, val_min = row
+    if farm_owner_id != owner_id:
+        raise HTTPException(status_code=403, detail="본인 농장만 조회할 수 있습니다.")
+    if val_min is None:
+        return FarmMatchListResponse(farm_id=farm_id, matches=[])
+
+    farm_profile = FarmProfileForMatch(
+        sido=sido,
+        crop_code=crop_code,
+        succession_type=succession_type or "SALE",
+        est_value_min=float(val_min),
+        crop_difficulty_high=(crop_code in HIGH_DIFFICULTY_CROPS),
+    )
+
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT id, pref_sido, pref_crop::TEXT, available_capital,
+                   experience_years, policy_fund, pref_succession::TEXT
+            FROM young_farmer_profile
+        """)
+        young_rows = cur.fetchall()
+
+    items: list[tuple[float, FarmMatchItem]] = []
+    for yf_id, pref_sido, pref_crop, capital, exp_yrs, policy_fund, pref_succ in young_rows:
+        young = YoungFarmerInput(
+            pref_sido=pref_sido,
+            pref_crop=pref_crop,
+            available_capital=float(capital),
+            experience_years=int(exp_yrs),
+            policy_fund=bool(policy_fund),
+            pref_succession=pref_succ,
+        )
+        result = calc_match_score(young, farm_profile)
+        explanation = fallback_match_explanation(MatchContext(
+            pref_sido=pref_sido,
+            pref_crop=pref_crop,
+            farm_sido=sido,
+            farm_crop=crop_code,
+            pref_succession=pref_succ,
+            succession_type=succession_type or "SALE",
+            total_score=result.total_score,
+            region_score=result.region_score,
+            crop_score=result.crop_score,
+            capital_score=result.capital_score,
+            experience_score=result.experience_score,
+            succession_score=result.succession_score,
+            policy_score=result.policy_score,
+            risk_penalty=result.risk_penalty,
+        ))
+        item = FarmMatchItem(
+            young_farmer_id=yf_id,
+            pref_sido=pref_sido,
+            pref_crop=pref_crop,
+            available_capital=_to_만원(float(capital)),
+            experience_years=int(exp_yrs),
+            pref_succession=pref_succ,
+            policy_fund=bool(policy_fund),
+            total_score=result.total_score,
+            region_score=result.region_score,
+            crop_score=result.crop_score,
+            capital_score=result.capital_score,
+            experience_score=result.experience_score,
+            succession_score=result.succession_score,
+            policy_score=result.policy_score,
+            risk_penalty=result.risk_penalty,
+            explanation=explanation,
+        )
+        items.append((result.total_score, item))
+
+    items.sort(key=lambda x: x[0], reverse=True)
+    top_items = [item for _, item in items[:FARM_MATCH_TOP_N]]
+
+    return FarmMatchListResponse(farm_id=farm_id, matches=top_items)
 
 
 @router.get("/{farm_id}", response_model=FarmDetail)

@@ -18,6 +18,9 @@ INCOME_BAND: dict[str, float] = {"A": 0.08, "B": 0.12, "C": 0.18, "D": 0.25}
 OFFICIAL_TO_MARKET: float = 0.65
 POLICY_FUND_LIMIT: float = 500_000_000.0  # 청년창업농 융자 한도 (원)
 
+# APPLE은 기술 난이도가 높은 작목 (밀식재배 관리 등) — 매칭 점수 계산에 사용
+HIGH_DIFFICULTY_CROPS: set[str] = {"APPLE"}
+
 # 경제수령 상한 — orchard_age_coef 성목기 상단과 일치해야 함 (DB 변경 시 동기화)
 _ECONOMIC_LIFE: dict[str, int] = {"APPLE": 20, "PEACH": 15, "GRAPE": 18}
 

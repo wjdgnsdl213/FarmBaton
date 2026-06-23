@@ -1,8 +1,81 @@
 import { useEffect, useState } from 'react'
-import { api, type ConsultRequestDetail, type FarmSummary } from '../api'
+import { api, type ConsultRequestDetail, type FarmMatchItem, type FarmSummary } from '../api'
 
 const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
+const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
 const STATUS_NAMES: Record<string, string> = { REQUESTED: '대기중', ACCEPTED: '수락', DECLINED: '거절' }
+const FARM_STATUS_NAMES: Record<string, string> = { DRAFT: '비공개', ACTIVE: '공개중', MATCHED: '매칭완료', CLOSED: '종료' }
+
+function ScoreBar({ label, value, max }: { label: string; value: number; max: number }) {
+  return (
+    <div className="score-bar">
+      <span className="score-bar-label">{label}</span>
+      <div className="score-bar-track">
+        <div className="score-bar-fill" style={{ width: `${(value / max) * 100}%` }} />
+      </div>
+      <span className="score-bar-val">{value.toFixed(1)}</span>
+    </div>
+  )
+}
+
+function MatchedYoungFarmers({ farmId }: { farmId: number }) {
+  const [matches, setMatches] = useState<FarmMatchItem[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    api.getFarmMatches(farmId)
+      .then(res => setMatches(res.matches))
+      .catch(err => setError(err.response?.data?.detail || '매칭 목록을 불러오지 못했습니다.'))
+  }, [farmId])
+
+  if (error) return <div className="error-box">{error}</div>
+  if (matches === null) return <div className="match-farm-meta">매칭 목록 불러오는 중...</div>
+  if (matches.length === 0) {
+    return <div className="match-farm-meta">아직 매칭되는 청년농이 없습니다. (공개 상태이며 가치평가가 있어야 매칭됩니다)</div>
+  }
+
+  return (
+    <div>
+      {matches.map(m => {
+        const score = Math.round(m.total_score)
+        const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
+        return (
+          <div key={m.young_farmer_id} className="match-item" style={{ cursor: 'default' }}>
+            <div className="match-header">
+              <div className="match-info">
+                <div className="match-farm-name">청년농 #{m.young_farmer_id}</div>
+                <div className="match-farm-meta" style={{ marginTop: '.25rem' }}>
+                  <span className="tag">{m.pref_sido || '지역 무관'}</span>
+                  <span className="tag">{m.pref_crop ? CROP_NAMES[m.pref_crop] : '작목 무관'}</span>
+                  <span className="tag">{SUCC_NAMES[m.pref_succession]}</span>
+                  <span className="tag">자본 {m.available_capital.toLocaleString('ko-KR')}만원</span>
+                  <span className="tag">경력 {m.experience_years}년</span>
+                </div>
+              </div>
+              <div className="match-score-circle" style={{ background: circleColor }}>
+                <span className="match-score-num">{score}</span>
+                <span className="match-score-unit">/ 100</span>
+              </div>
+            </div>
+            <div className="score-bars">
+              <ScoreBar label="지역" value={m.region_score} max={20} />
+              <ScoreBar label="작목" value={m.crop_score} max={20} />
+              <ScoreBar label="자본" value={m.capital_score} max={20} />
+              <ScoreBar label="경험" value={m.experience_score} max={15} />
+              <ScoreBar label="승계" value={m.succession_score} max={15} />
+              <ScoreBar label="정책금" value={m.policy_score} max={10} />
+            </div>
+            {m.explanation && (
+              <p style={{ fontSize: '.8rem', color: 'var(--gray)', margin: '.6rem 0 0', fontStyle: 'italic' }}>
+                "{m.explanation}"
+              </p>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 function ConsultInbox({ farmId }: { farmId: number }) {
   const [requests, setRequests] = useState<ConsultRequestDetail[] | null>(null)
@@ -47,24 +120,62 @@ function ConsultInbox({ farmId }: { farmId: number }) {
 }
 
 function FarmCard({ farm }: { farm: FarmSummary }) {
-  const [expanded, setExpanded] = useState(false)
+  const [tab, setTab] = useState<'none' | 'consult' | 'matches'>('none')
+  const [status, setStatus] = useState(farm.status)
+  const [publishing, setPublishing] = useState(false)
   const fmt = (n: number | null) => n === null ? '-' : n.toLocaleString('ko-KR')
+
+  const toggleStatus = async () => {
+    const next = status === 'ACTIVE' ? 'DRAFT' : 'ACTIVE'
+    setPublishing(true)
+    try {
+      const res = await api.updateFarmStatus(farm.id, next)
+      setStatus(res.status)
+    } catch {
+      // 실패 시 상태 유지, 버튼으로 재시도 가능
+    } finally {
+      setPublishing(false)
+    }
+  }
 
   return (
     <div className="card">
-      <div className="card-title" style={{ cursor: 'pointer' }} onClick={() => setExpanded(e => !e)}>
+      <div className="card-title">
         {CROP_NAMES[farm.crop_code] || farm.crop_code} 농장 ({farm.sido}) · {(farm.area_m2 / 10000).toFixed(2)}ha
       </div>
       <div className="match-farm-meta">{farm.address}</div>
       <div className="value-range-small">
-        인수 검토가: {fmt(farm.est_value_min)} ~ {fmt(farm.est_value_max)}만원 · <span className="tag">{farm.status}</span>
+        인수 검토가: {fmt(farm.est_value_min)} ~ {fmt(farm.est_value_max)}만원 · <span className="tag">{FARM_STATUS_NAMES[status] || status}</span>
       </div>
-      <button className="btn btn-primary" style={{ marginTop: '.8rem' }} onClick={() => setExpanded(e => !e)}>
-        {expanded ? '상담 신청 접기' : '상담 신청 보기'}
-      </button>
-      {expanded && (
+
+      {(status === 'ACTIVE' || status === 'DRAFT') && (
+        <button
+          className="btn"
+          style={{ marginTop: '.6rem', background: 'var(--gray-light)', color: 'var(--text)' }}
+          onClick={toggleStatus}
+          disabled={publishing}
+        >
+          {publishing ? <span className="spinner" /> : status === 'ACTIVE' ? '매칭 풀에서 비공개로 전환' : '매칭 풀에 공개하기'}
+        </button>
+      )}
+
+      <div style={{ display: 'flex', gap: '.5rem', marginTop: '.6rem' }}>
+        <button className="btn btn-primary" onClick={() => setTab(t => t === 'consult' ? 'none' : 'consult')}>
+          {tab === 'consult' ? '상담 신청 접기' : '상담 신청 보기'}
+        </button>
+        <button className="btn btn-primary" onClick={() => setTab(t => t === 'matches' ? 'none' : 'matches')}>
+          {tab === 'matches' ? '매칭 청년농 접기' : '매칭된 청년농 보기'}
+        </button>
+      </div>
+
+      {tab === 'consult' && (
         <div style={{ marginTop: '.8rem', paddingTop: '.8rem', borderTop: '1px solid var(--border)' }}>
           <ConsultInbox farmId={farm.id} />
+        </div>
+      )}
+      {tab === 'matches' && (
+        <div style={{ marginTop: '.8rem', paddingTop: '.8rem', borderTop: '1px solid var(--border)' }}>
+          <MatchedYoungFarmers farmId={farm.id} />
         </div>
       )}
     </div>

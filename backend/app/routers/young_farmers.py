@@ -31,15 +31,13 @@ from backend.app.services.report_ai import (
     fallback_program_pitch,
 )
 from backend.app.services.valuation import (
+    HIGH_DIFFICULTY_CROPS,
     FarmProfileForMatch,
     YoungFarmerInput,
     calc_match_score,
 )
 
 router = APIRouter(prefix="/api/young-farmers", tags=["young-farmers"])
-
-# APPLE은 기술 난이도가 높은 작목 (밀식재배 관리 등)
-_HIGH_DIFFICULTY_CROPS = {"APPLE"}
 
 TOP_N = 10  # 매칭 리스트 최대 반환 수
 
@@ -172,7 +170,7 @@ def get_matches(yf_id: int, conn=Depends(get_db)):
             crop_code=crop_code,
             succession_type=succession_type or "SALE",
             est_value_min=float(val_min),
-            crop_difficulty_high=(crop_code in _HIGH_DIFFICULTY_CROPS),
+            crop_difficulty_high=(crop_code in HIGH_DIFFICULTY_CROPS),
         )
         result = calc_match_score(young, farm_profile)
         results_by_farm[fid] = result

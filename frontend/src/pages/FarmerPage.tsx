@@ -35,6 +35,7 @@ export default function FarmerPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ValuationResult | null>(null)
+  const [publishState, setPublishState] = useState<'idle' | 'publishing' | 'published' | 'error'>('idle')
   const resultRef = useRef<HTMLDivElement>(null)
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -87,6 +88,7 @@ export default function FarmerPage() {
       const res = await api.createFarm(payload)
       if (res.valuation) {
         setResult(res.valuation)
+        setPublishState('idle')
         setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
       } else {
         setError(res.warning || '가치평가를 산출하지 못했습니다.')
@@ -96,6 +98,17 @@ export default function FarmerPage() {
       setError(e.response?.data?.detail || '서버 오류가 발생했습니다.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePublish = async () => {
+    if (!result) return
+    setPublishState('publishing')
+    try {
+      await api.updateFarmStatus(result.farm_id, 'ACTIVE')
+      setPublishState('published')
+    } catch {
+      setPublishState('error')
     }
   }
 
@@ -253,10 +266,32 @@ export default function FarmerPage() {
 
           <div className="disclaimer">{result.disclaimer}</div>
 
+          {publishState === 'published' ? (
+            <div className="consult-success" style={{ marginTop: '.8rem' }}>
+              ✓ 매칭 풀에 공개되었습니다 — 이제 청년농 매칭 리스트에 노출됩니다.
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ marginTop: '.8rem' }}
+              onClick={handlePublish}
+              disabled={publishState === 'publishing'}
+            >
+              {publishState === 'publishing' ? <span className="spinner" /> : '매칭 풀에 공개하기'}
+            </button>
+          )}
+          {publishState === 'error' && (
+            <div className="error-box" style={{ marginTop: '.5rem' }}>공개 처리에 실패했습니다. 다시 시도해주세요.</div>
+          )}
+          <p style={{ fontSize: '.78rem', color: 'var(--gray)', margin: '.4rem 0 0' }}>
+            공개하지 않아도 등록은 완료되며, 리포트는 아래에서 언제든 다시 받을 수 있습니다.
+          </p>
+
           <a
             href={api.reportPdfUrl(result.farm_id)}
             className="btn btn-primary"
-            style={{ display: 'block', textAlign: 'center', marginTop: '.8rem', textDecoration: 'none' }}
+            style={{ display: 'block', textAlign: 'center', marginTop: '.6rem', textDecoration: 'none' }}
             target="_blank"
             rel="noopener noreferrer"
           >
