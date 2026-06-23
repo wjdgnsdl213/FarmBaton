@@ -10,8 +10,8 @@ html { scroll-behavior: smooth; }
   --green: #1f6b3a;          /* primary */
   --green-mid: #2a8049;      /* hover */
   --green-deep: #15351f;     /* 헤딩/짙은 면 */
-  --lime: #c7ef4d;           /* 악센트 */
-  --lime-soft: #eef9cf;
+  --lime: #a8c66c;           /* 악센트 (세이지 올리브) */
+  --lime-soft: #eef3e0;
   --green-light: #e8f3ea;    /* 연한 그린 틴트 */
   --cream: #f6f5f0;          /* 따뜻한 배경 */
   --ink: #16241b;            /* 본문 텍스트 */
@@ -62,7 +62,7 @@ a { color: var(--green); }
 
 /* 농가(고령 친화): 짙은 그린 면 + 라임 악센트, 큰 글씨·고대비 */
 .hero-farmer { background: var(--green-deep); color: #fff; }
-.hero-farmer .hero-eyebrow { background: rgba(199,239,77,.16); color: var(--lime); }
+.hero-farmer .hero-eyebrow { background: rgba(168,198,108,.16); color: var(--lime); }
 .hero-farmer .hero-eyebrow .dot { background: var(--lime); }
 .hero-farmer h1 { font-size: 2.2rem; }
 .hero-farmer p { color: rgba(255,255,255,.82); }
@@ -247,7 +247,7 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-pill-lime, .lp-pill-dark { box-shadow: 0 1px 2px rgba(21,53,31,.06); }
 .lp-pill-lime:hover, .lp-pill-dark:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(21,53,31,.18); }
 .lp-pill-lime { background: var(--lime); color: var(--green-deep); }
-.lp-pill-lime:hover { background: #d3f562; }
+.lp-pill-lime:hover { background: #97b85a; }
 .lp-pill-dark { background: var(--green-deep); color: #fff; }
 .lp-pill-dark:hover { background: var(--green); }
 .lp-pill-ghost-light { background: rgba(255,255,255,.1); color: #fff; }
@@ -275,10 +275,12 @@ textarea { resize: vertical; min-height: 60px; }
   transition: background .2s;
 }
 .lp-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; gap: 12px; }
+.lp-nav-right { display: flex; align-items: center; gap: 20px; }
 .lp-nav-links { display: none; align-items: center; gap: 26px; }
 .lp-nav-links a { font-size: 15px; font-weight: 600; color: rgba(255,255,255,.85); text-decoration: none; white-space: nowrap; transition: color .15s; }
 .lp-nav-links a:hover { color: #fff; }
 .lp-nav-links a.active { color: var(--lime); }
+.lp-nav-divider { width: 1px; height: 18px; background: rgba(255,255,255,.22); margin: 0 6px; flex: none; }
 
 .lp-nav-burger {
   display: inline-flex; align-items: center; justify-content: center;
@@ -297,6 +299,7 @@ textarea { resize: vertical; min-height: 60px; }
   border-top: 1px solid rgba(255,255,255,.1);
 }
 .lp-nav-mobile-panel a.active { color: var(--lime); }
+.lp-nav-mobile-panel .lp-nav-divider { width: 100%; height: 1px; margin: 6px 0; background: rgba(255,255,255,.15); }
 .lp-hero-content { padding: 40px 0 52px; display: flex; flex-direction: column; gap: 26px; }
 .lp-hero h1 { font-size: clamp(38px, 8.5vw, 60px); line-height: 1.08; letter-spacing: -.035em; font-weight: 800; margin: 18px 0; text-wrap: balance; }
 .lp-hero-lead { font-size: clamp(16px, 2.2vw, 18px); line-height: 1.65; color: rgba(255,255,255,.86); max-width: 30em; margin-bottom: 28px; }

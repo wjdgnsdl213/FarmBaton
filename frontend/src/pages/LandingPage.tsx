@@ -45,7 +45,7 @@ export default function LandingPage() {
         <div className="lp-wrap lp-hero-inner">
           <div className="lp-hero-content">
             <div className="lp-hero-text">
-              <span className="lp-eyebrow" style={{ background: 'rgba(199,239,77,.18)', color: 'var(--lime)' }}>
+              <span className="lp-eyebrow" style={{ background: 'rgba(168,198,108,.18)', color: 'var(--lime)' }}>
                 <span className="dot" style={{ background: 'var(--lime)' }}></span>농장 승계 진단 플랫폼
               </span>
               <h1>떠나는 농장과<br />시작하는 청년을 잇다</h1>

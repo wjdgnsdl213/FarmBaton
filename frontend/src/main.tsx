@@ -27,6 +27,7 @@ function NavLinks({ loc, loggedIn, onLogout, onNavigate }: {
       <Link to="/#steps" onClick={onNavigate}>작동 방식</Link>
       <Link className={isActive('/farmer')} to="/farmer" onClick={onNavigate}>농가 등록</Link>
       <Link className={isActive('/young')} to="/young" onClick={onNavigate}>청년농 매칭</Link>
+      <span className="lp-nav-divider" aria-hidden="true" />
       {loggedIn ? (
         <>
           <Link className={isActive('/dashboard')} to="/dashboard" onClick={onNavigate}>내 농장</Link>
@@ -59,20 +60,22 @@ function Nav() {
         <div className="lp-nav-links">
           <NavLinks loc={loc} loggedIn={loggedIn} onLogout={logout} />
         </div>
-        {loc.pathname !== '/farmer' && (
-          <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
-        )}
-        <button
-          className="lp-nav-burger"
-          aria-label="메뉴"
-          onClick={() => setMobileOpen(o => !o)}
-        >
-          {mobileOpen ? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6L6 18" /></svg>
-          ) : (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        <div className="lp-nav-right">
+          {loc.pathname !== '/farmer' && (
+            <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
           )}
-        </button>
+          <button
+            className="lp-nav-burger"
+            aria-label="메뉴"
+            onClick={() => setMobileOpen(o => !o)}
+          >
+            {mobileOpen ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6L6 18" /></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+            )}
+          </button>
+        </div>
       </div>
       {mobileOpen && (
         <div className="lp-nav-mobile-panel">
