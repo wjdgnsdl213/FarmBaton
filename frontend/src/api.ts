@@ -210,8 +210,10 @@ export const api = {
   getMatches: (yfId: number) =>
     client.get<MatchListResult>(`/young-farmers/${yfId}/matches`).then(r => r.data),
 
-  getSupportPrograms: (yfId: number) =>
-    client.get<SupportProgramListResult>(`/young-farmers/${yfId}/support-programs`).then(r => r.data),
+  getSupportPrograms: (yfId: number, farmId?: number) =>
+    client.get<SupportProgramListResult>(`/young-farmers/${yfId}/support-programs`, {
+      params: farmId ? { farm_id: farmId } : undefined,
+    }).then(r => r.data),
 
   getFarmDetail: (farmId: number) =>
     client.get<FarmDetail>(`/farms/${farmId}`).then(r => r.data),

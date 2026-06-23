@@ -155,7 +155,7 @@ class MatchContext:
     risk_penalty: float
 
 
-def _fallback_match_explanation(ctx: MatchContext) -> str:
+def fallback_match_explanation(ctx: MatchContext) -> str:
     parts = []
     if ctx.region_score > 0:
         parts.append("희망 지역과 일치")
@@ -175,7 +175,7 @@ def generate_match_explanation(ctx: MatchContext) -> str:
     """매칭 추천 설명문 생성 (1~2문장). 실패 시 결정론적 폴백."""
     client = _get_client()
     if client is None:
-        return _fallback_match_explanation(ctx)
+        return fallback_match_explanation(ctx)
 
     prompt = f"""다음은 청년농과 농장의 매칭 점수(이미 계산 완료, 100점 만점)다.
 아래 점수를 그대로 인용해 왜 이 점수가 나왔는지 1~2문장으로 자연스럽게 설명하라.
@@ -203,7 +203,7 @@ def generate_match_explanation(ctx: MatchContext) -> str:
             raise ValueError("empty AI output")
         return text
     except Exception:
-        return _fallback_match_explanation(ctx)
+        return fallback_match_explanation(ctx)
 
 
 # ── 지원사업 추천 사유 ────────────────────────────────────────────────────────
@@ -221,7 +221,7 @@ class ProgramPitchContext:
     policy_fund: bool
 
 
-def _fallback_program_pitch(ctx: ProgramPitchContext) -> str:
+def fallback_program_pitch(ctx: ProgramPitchContext) -> str:
     return "지역·작목 조건에 부합하는 지원사업입니다."
 
 
@@ -229,7 +229,7 @@ def generate_program_pitch(ctx: ProgramPitchContext) -> str:
     """지원사업 추천 사유 1문장 생성. 실패 시 결정론적 폴백."""
     client = _get_client()
     if client is None:
-        return _fallback_program_pitch(ctx)
+        return fallback_program_pitch(ctx)
 
     sido_text = ctx.pref_sido or "지역 무관"
     crop_text = CROP_NAMES.get(ctx.pref_crop, ctx.pref_crop) if ctx.pref_crop else "작목 무관"
@@ -258,4 +258,4 @@ def generate_program_pitch(ctx: ProgramPitchContext) -> str:
             raise ValueError("empty AI output")
         return text
     except Exception:
-        return _fallback_program_pitch(ctx)
+        return fallback_program_pitch(ctx)

@@ -27,6 +27,7 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
   const [expanded, setExpanded] = useState(false)
   const [detail, setDetail] = useState<FarmDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
+  const [programs, setPrograms] = useState<SupportProgramItem[] | null>(null)
   const [message, setMessage] = useState('')
   const [contactName, setContactName] = useState('')
   const [contactPhone, setContactPhone] = useState('')
@@ -44,6 +45,14 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
         // 상세 조회 실패해도 카드 자체는 펼쳐진 상태 유지 (PDF·상담신청은 그대로 가능)
       } finally {
         setDetailLoading(false)
+      }
+    }
+    if (next && programs === null) {
+      try {
+        const sp = await api.getSupportPrograms(yfId, item.farm_id)
+        setPrograms(sp.programs)
+      } catch {
+        setPrograms([])
       }
     }
   }
@@ -125,6 +134,25 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
             </div>
           )}
 
+          {programs && programs.length > 0 && (
+            <div className="match-detail-assets">
+              <div className="card-title" style={{ fontSize: '.85rem', marginBottom: '.4rem' }}>이 농장에 맞는 지원사업</div>
+              {programs.map(p => (
+                <div key={p.program_code} className="match-farm-meta" style={{ marginBottom: '.5rem' }}>
+                  <b style={{ color: 'var(--ink)' }}>{p.name}</b> · {p.amount_text}
+                  {p.pitch && (
+                    <span style={{ display: 'block', fontStyle: 'italic', marginTop: '.15rem' }}>“{p.pitch}”</span>
+                  )}
+                  {p.apply_url && (
+                    <a href={p.apply_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.78rem', display: 'inline-block', marginTop: '.2rem' }}>
+                      신청 안내 보기 →
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
           <a
             href={api.reportPdfUrl(item.farm_id)}
             className="btn btn-primary"
@@ -174,32 +202,6 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
   )
 }
 
-function SupportProgramPanel({ programs }: { programs: SupportProgramItem[] }) {
-  if (programs.length === 0) return null
-  return (
-    <div className="card">
-      <div className="card-title">추천 지원사업</div>
-      {programs.map(p => (
-        <div key={p.program_code} className="match-item" style={{ cursor: 'default' }}>
-          <div className="match-farm-name">{p.name}</div>
-          <div className="match-farm-meta">{p.description}</div>
-          <div className="value-range-small">{p.amount_text}</div>
-          {p.pitch && (
-            <p style={{ fontSize: '.8rem', color: 'var(--gray)', margin: '.5rem 0 0', fontStyle: 'italic' }}>
-              “{p.pitch}”
-            </p>
-          )}
-          {p.apply_url && (
-            <a href={p.apply_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.8rem', display: 'inline-block', marginTop: '.4rem' }}>
-              신청 안내 보기 →
-            </a>
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
-
 export default function YoungPage() {
   const [form, setForm] = useState({
     pref_sido: '충북',
@@ -212,7 +214,6 @@ export default function YoungPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [matches, setMatches] = useState<MatchItem[] | null>(null)
-  const [programs, setPrograms] = useState<SupportProgramItem[]>([])
   const [yfId, setYfId] = useState<number | null>(null)
   const resultRef = useRef<HTMLDivElement>(null)
 
@@ -236,12 +237,6 @@ export default function YoungPage() {
       const res = await api.getMatches(reg.young_farmer_id)
       setMatches(res.matches)
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
-      try {
-        const sp = await api.getSupportPrograms(reg.young_farmer_id)
-        setPrograms(sp.programs)
-      } catch {
-        // 지원사업 조회 실패해도 매칭 결과는 그대로 표시 (부수 정보)
-      }
     } catch (err: any) {
       setError(err.response?.data?.detail || '서버 오류가 발생했습니다.')
     } finally {
@@ -341,8 +336,6 @@ export default function YoungPage() {
               {matches[0].disclaimer}
             </div>
           )}
-
-          <SupportProgramPanel programs={programs} />
         </div>
       )}
     </div>

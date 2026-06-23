@@ -3,6 +3,11 @@
 
 POST /api/young-farmers              — 청년농 프로필 등록
 GET  /api/young-farmers/{id}/matches — 매칭 농장 리스트 (점수 내림차순)
+
+매칭·지원사업 설명문은 여기서는 항상 결정론적 폴백 문장만 사용한다 — 화면을
+열 때마다 Claude API를 여러 번 호출하면 응답이 느려지고 비용도 누적되므로,
+풍부한 AI 설명은 PDF 리포트를 요청하는 시점(report.pdf, 1회 호출+캐싱)에만
+넣는다.
 """
 from __future__ import annotations
 
@@ -22,8 +27,8 @@ from backend.app.schemas import (
 from backend.app.services.report_ai import (
     MatchContext,
     ProgramPitchContext,
-    generate_match_explanation,
-    generate_program_pitch,
+    fallback_match_explanation,
+    fallback_program_pitch,
 )
 from backend.app.services.valuation import (
     FarmProfileForMatch,
@@ -75,18 +80,6 @@ def _upsert_match_score(farm_id: int, yf_id: int, result, explanation: Optional[
         ))
 
 
-def _fetch_cached_explanations(farm_ids: list[int], yf_id: int, conn) -> dict[int, str]:
-    """이미 생성된 매칭 설명문 캐시 조회 (LLM 재호출 방지)."""
-    if not farm_ids:
-        return {}
-    with conn.cursor() as cur:
-        cur.execute("""
-            SELECT farm_id, explanation FROM match_score
-            WHERE young_farmer_id = %s AND farm_id = ANY(%s) AND explanation IS NOT NULL
-        """, (yf_id, farm_ids))
-        return dict(cur.fetchall())
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 # 엔드포인트
 # ─────────────────────────────────────────────────────────────────────────────
@@ -123,7 +116,8 @@ def get_matches(yf_id: int, conn=Depends(get_db)):
     """청년농 프로필 기반 매칭 농장 리스트 (상위 10개, 점수 내림차순).
 
     가치평가 캐시가 있는 ACTIVE 농장 전체를 대상으로 calc_match_score 산출.
-    결과는 match_score 테이블에 UPSERT 캐시.
+    결과는 match_score 테이블에 UPSERT 캐시. 설명문은 결정론적 폴백 — AI
+    설명은 PDF 리포트에서만 생성한다.
     """
     # ── 1. 청년농 프로필 로드 ─────────────────────────────────────────
     with conn.cursor() as cur:
@@ -163,8 +157,9 @@ def get_matches(yf_id: int, conn=Depends(get_db)):
     if not farms:
         return MatchListResponse(young_farmer_id=yf_id, matches=[])
 
-    # ── 3. 매칭 점수 산출 ────────────────────────────────────────────
+    # ── 3. 매칭 점수 산출 + 설명문(결정론적 폴백) ────────────────────
     items: list[tuple[float, MatchItem]] = []
+    results_by_farm = {}  # farm_id -> MatchScoreResult (UPSERT에서 재사용)
 
     for (fid, address, sido, crop_code, tree_age,
          area_m2, succession_type, val_min, val_max) in farms:
@@ -180,6 +175,24 @@ def get_matches(yf_id: int, conn=Depends(get_db)):
             crop_difficulty_high=(crop_code in _HIGH_DIFFICULTY_CROPS),
         )
         result = calc_match_score(young, farm_profile)
+        results_by_farm[fid] = result
+
+        explanation = fallback_match_explanation(MatchContext(
+            pref_sido=young.pref_sido,
+            pref_crop=young.pref_crop,
+            farm_sido=sido,
+            farm_crop=crop_code,
+            pref_succession=young.pref_succession,
+            succession_type=succession_type or "SALE",
+            total_score=result.total_score,
+            region_score=result.region_score,
+            crop_score=result.crop_score,
+            capital_score=result.capital_score,
+            experience_score=result.experience_score,
+            succession_score=result.succession_score,
+            policy_score=result.policy_score,
+            risk_penalty=result.risk_penalty,
+        ))
 
         item = MatchItem(
             farm_id=fid,
@@ -199,6 +212,7 @@ def get_matches(yf_id: int, conn=Depends(get_db)):
             succession_score=result.succession_score,
             policy_score=result.policy_score,
             risk_penalty=result.risk_penalty,
+            explanation=explanation,
         )
         items.append((result.total_score, item))
 
@@ -206,53 +220,24 @@ def get_matches(yf_id: int, conn=Depends(get_db)):
     items.sort(key=lambda x: x[0], reverse=True)
     top_items = [item for _, item in items[:TOP_N]]
 
-    # ── 5. 매칭 설명문 (캐시 우선, 없으면 생성) — 실제 반환되는 TOP_N만 ──
-    cached = _fetch_cached_explanations([item.farm_id for item in top_items], yf_id, conn)
+    # ── 5. match_score 테이블 UPSERT (3단계 계산 결과 재사용) ─────────
     for item in top_items:
-        if item.farm_id in cached:
-            item.explanation = cached[item.farm_id]
-        else:
-            item.explanation = generate_match_explanation(MatchContext(
-                pref_sido=young.pref_sido,
-                pref_crop=young.pref_crop,
-                farm_sido=item.sido,
-                farm_crop=item.crop_code,
-                pref_succession=young.pref_succession,
-                succession_type=item.succession_type or "SALE",
-                total_score=item.total_score,
-                region_score=item.region_score,
-                crop_score=item.crop_score,
-                capital_score=item.capital_score,
-                experience_score=item.experience_score,
-                succession_score=item.succession_score,
-                policy_score=item.policy_score,
-                risk_penalty=item.risk_penalty,
-            ))
-
-    # ── 6. match_score 테이블 UPSERT ────────────────────────────────
-    with conn.cursor() as cur:
-        for score, item in items[:TOP_N]:
-            farm_profile = FarmProfileForMatch(
-                sido=item.sido,
-                crop_code=item.crop_code,
-                succession_type=item.succession_type or "SALE",
-                est_value_min=float(item.est_value_min) * 10_000,
-                crop_difficulty_high=(item.crop_code in _HIGH_DIFFICULTY_CROPS),
-            )
-            result = calc_match_score(young, farm_profile)
-            _upsert_match_score(item.farm_id, yf_id, result, item.explanation, conn)
+        _upsert_match_score(item.farm_id, yf_id, results_by_farm[item.farm_id], item.explanation, conn)
     conn.commit()
 
     return MatchListResponse(young_farmer_id=yf_id, matches=top_items)
 
 
 @router.get("/{yf_id}/support-programs", response_model=SupportProgramListResponse)
-def get_support_programs(yf_id: int, conn=Depends(get_db)):
-    """청년농 프로필에 맞는 지원사업 추천.
+def get_support_programs(yf_id: int, farm_id: Optional[int] = None, conn=Depends(get_db)):
+    """청년농 프로필(또는 특정 매칭 농장)에 맞는 지원사업 추천.
+
+    farm_id가 주어지면 그 농장의 실제 sido·crop_code로 필터링·추천 사유를
+    맞춤화한다 (매칭 리스트의 각 농장 카드에서 호출하는 용도). 없으면 청년농
+    프로필의 희망 지역·작목으로 필터링(페이지 진입 시 기본 추천).
 
     자격·금액 등 사실 정보는 support_program 테이블 원문 그대로 반환(필터링만
-    결정론적 SQL). pitch는 generate_program_pitch가 "왜 추천되는지" 한 문장만
-    덧붙인 것 — 절대 사업명/금액을 새로 만들지 않는다.
+    결정론적 SQL). pitch도 결정론적 폴백 문장 — AI 설명은 PDF 리포트에서만.
     """
     with conn.cursor() as cur:
         cur.execute("""
@@ -265,6 +250,16 @@ def get_support_programs(yf_id: int, conn=Depends(get_db)):
         raise HTTPException(status_code=404, detail="young_farmer not found")
     pref_sido, pref_crop, policy_fund = row
 
+    # farm_id가 있으면 그 농장의 실제 지역·작목을 필터 기준으로 사용
+    sido_filter, crop_filter = pref_sido, pref_crop
+    if farm_id is not None:
+        with conn.cursor() as cur:
+            cur.execute("SELECT sido, crop_code::TEXT FROM farm WHERE id = %s", (farm_id,))
+            farm_row = cur.fetchone()
+        if farm_row is None:
+            raise HTTPException(status_code=404, detail="farm not found")
+        sido_filter, crop_filter = farm_row
+
     with conn.cursor() as cur:
         cur.execute("""
             SELECT program_code, name, description, amount_text, apply_url
@@ -273,17 +268,17 @@ def get_support_programs(yf_id: int, conn=Depends(get_db)):
               AND (target_crop IS NULL OR %s IS NULL OR target_crop = %s)
               AND target_role IN ('YOUNG', 'ANY')
             ORDER BY program_code
-        """, (pref_sido, pref_sido, pref_crop, pref_crop))
+        """, (sido_filter, sido_filter, crop_filter, crop_filter))
         rows = cur.fetchall()
 
     programs = []
     for program_code, name, description, amount_text, apply_url in rows:
-        pitch = generate_program_pitch(ProgramPitchContext(
+        pitch = fallback_program_pitch(ProgramPitchContext(
             program_name=name,
             program_description=description,
             amount_text=amount_text,
-            pref_sido=pref_sido,
-            pref_crop=pref_crop,
+            pref_sido=sido_filter,
+            pref_crop=crop_filter,
             policy_fund=bool(policy_fund),
         ))
         programs.append(SupportProgramItem(
