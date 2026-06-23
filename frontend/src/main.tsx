@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import LandingPage from './pages/LandingPage'
 import FarmerPage from './pages/FarmerPage'
 import YoungPage from './pages/YoungPage'
 import LoginPage from './pages/LoginPage'
@@ -25,9 +26,11 @@ function Nav() {
 
   return (
     <nav className="nav">
-      <span className="nav-logo">🌾 팜바톤</span>
+      <Link className="nav-logo" to="/">
+        <span className="mark"><i></i></span>팜바톤
+      </Link>
       <div className="nav-links">
-        <Link className={`nav-link ${loc.pathname === '/' ? 'active' : ''}`} to="/">농가 등록</Link>
+        <Link className={`nav-link ${loc.pathname === '/farmer' ? 'active' : ''}`} to="/farmer">농가 등록</Link>
         <Link className={`nav-link ${loc.pathname === '/young' ? 'active' : ''}`} to="/young">청년농 매칭</Link>
         {loggedIn ? (
           <>
@@ -43,23 +46,35 @@ function Nav() {
 }
 
 function App() {
+  const loc = useLocation()
+  const isLanding = loc.pathname === '/'
+
   return (
-    <BrowserRouter>
-      <Nav />
-      <main className="main">
+    <>
+      {!isLanding && <Nav />}
+      <main className={isLanding ? 'main main-wide' : 'main'}>
         <Routes>
-          <Route path="/" element={<RequireAuth><FarmerPage /></RequireAuth>} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/farmer" element={<RequireAuth><FarmerPage /></RequireAuth>} />
           <Route path="/young" element={<YoungPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
         </Routes>
       </main>
+    </>
+  )
+}
+
+function Root() {
+  return (
+    <BrowserRouter>
+      <App />
     </BrowserRouter>
   )
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <Root />
   </React.StrictMode>
 )

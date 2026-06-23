@@ -102,8 +102,12 @@ export default function FarmerPage() {
   const fmt = (n: number) => n.toLocaleString('ko-KR')
 
   return (
-    <div>
-      <p className="section-title">농가 등록 &amp; 인수 검토 리포트</p>
+    <div className="page page-farmer">
+      <header className="hero hero-farmer">
+        <span className="hero-eyebrow"><span className="dot"></span>농가 승계 진단</span>
+        <h1>내 농장의 인수 검토가<br />범위로 정리됩니다</h1>
+        <p>주소와 작목만 입력하면 예상 소득·토지·시설 가치를 한눈에 확인할 수 있습니다.</p>
+      </header>
 
       <form className="card" onSubmit={handleSubmit}>
         <div className="card-title">농장 정보 입력</div>

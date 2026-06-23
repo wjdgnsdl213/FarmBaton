@@ -250,8 +250,12 @@ export default function YoungPage() {
   }
 
   return (
-    <div>
-      <p className="section-title">청년농 프로필 &amp; 매칭 농장 리스트</p>
+    <div className="page page-young">
+      <header className="hero hero-young">
+        <span className="hero-eyebrow"><span className="dot"></span>청년농 매칭</span>
+        <h1>내 조건에 맞는 농장을<br />점수로 만나보세요</h1>
+        <p>희망 지역·작목·자본을 입력하면 승계 가능한 농장을 매칭 점수순으로 추천해 드립니다.</p>
+      </header>
 
       <form className="card" onSubmit={handleSubmit}>
         <div className="card-title">나의 영농 조건</div>
