@@ -287,16 +287,18 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; padding: 7px 15px; border-radius: 999px; white-space: nowrap; }
 .lp-eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 
-.lp-hero { position: relative; background: var(--green-deep); color: #fff; overflow: hidden; }
-.lp-hero-bg {
+.lp-hero { position: relative; background: var(--green-deep); color: #fff; overflow: hidden; min-height: 520px; display: flex; flex-direction: column; }
+.lp-hero-photo {
   position: absolute; inset: 0; z-index: 0;
-  background: linear-gradient(135deg, #1a4027 0%, var(--green-deep) 45%, #0d2114 100%);
+  width: 100%; height: 100%; object-fit: cover; object-position: 65% 45%;
 }
-.lp-hero-bg::after {
-  content: ''; position: absolute; inset: 0;
-  background-image: repeating-linear-gradient(45deg, rgba(199,239,77,.05), rgba(199,239,77,.05) 2px, transparent 2px, transparent 26px);
+.lp-hero-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(to top, rgba(11,28,17,.92) 6%, rgba(11,28,17,.62) 40%, rgba(11,28,17,.28) 68%, rgba(11,28,17,.45) 100%),
+    linear-gradient(to right, rgba(11,28,17,.5) 0%, rgba(11,28,17,0) 60%);
 }
-.lp-hero-inner { position: relative; z-index: 2; display: flex; flex-direction: column; }
+.lp-hero-inner { position: relative; z-index: 2; display: flex; flex-direction: column; width: 100%; margin-top: auto; }
 .lp-nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
 .lp-nav-links { display: none; align-items: center; gap: 26px; }
 .lp-nav-links a { font-size: 15px; font-weight: 600; color: rgba(255,255,255,.85); text-decoration: none; white-space: nowrap; }
@@ -374,6 +376,7 @@ textarea { resize: vertical; min-height: 60px; }
 }
 @media (min-width: 760px) {
   .lp-nav-links { display: flex; }
+  .lp-hero { min-height: clamp(560px, 78vh, 760px); }
   .lp-hero-content { padding: 56px 0 68px; flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 32px; }
   .lp-hero-content .lp-hero-text { max-width: 56%; }
   .lp-feat-cards { grid-template-columns: repeat(3, 1fr); }

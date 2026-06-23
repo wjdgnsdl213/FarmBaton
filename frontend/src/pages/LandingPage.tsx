@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
+import heroFarm from '../assets/hero-farm.jpg'
 
 export default function LandingPage() {
   return (
     <div>
       {/* ════════ HERO ════════ */}
       <header className="lp-hero">
-        <div className="lp-hero-bg" />
+        <img src={heroFarm} alt="" className="lp-hero-photo" />
+        <div className="lp-hero-overlay" />
         <div className="lp-wrap lp-hero-inner">
           <nav className="lp-nav">
             <span className="lp-logo" style={{ color: '#fff' }}>
@@ -14,6 +16,7 @@ export default function LandingPage() {
             <div className="lp-nav-links">
               <a href="#features">서비스 소개</a>
               <a href="#steps">작동 방식</a>
+              <Link to="/farmer">농가 등록</Link>
               <Link to="/young">청년농 매칭</Link>
             </div>
             <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
