@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
@@ -14,10 +14,36 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+function NavLinks({ loc, loggedIn, onLogout, onNavigate }: {
+  loc: ReturnType<typeof useLocation>
+  loggedIn: boolean
+  onLogout: () => void
+  onNavigate?: () => void
+}) {
+  const isActive = (path: string) => loc.pathname === path ? 'active' : ''
+  return (
+    <>
+      <Link to="/#features" onClick={onNavigate}>서비스 소개</Link>
+      <Link to="/#steps" onClick={onNavigate}>작동 방식</Link>
+      <Link className={isActive('/farmer')} to="/farmer" onClick={onNavigate}>농가 등록</Link>
+      <Link className={isActive('/young')} to="/young" onClick={onNavigate}>청년농 매칭</Link>
+      {loggedIn ? (
+        <>
+          <Link className={isActive('/dashboard')} to="/dashboard" onClick={onNavigate}>내 농장</Link>
+          <a href="#" onClick={e => { e.preventDefault(); onLogout(); onNavigate?.() }}>로그아웃</a>
+        </>
+      ) : (
+        <Link className={isActive('/login')} to="/login" onClick={onNavigate}>로그인</Link>
+      )}
+    </>
+  )
+}
+
 function Nav() {
   const loc = useLocation()
   const navigate = useNavigate()
   const loggedIn = !!getToken()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const logout = () => {
     clearToken()
@@ -25,22 +51,34 @@ function Nav() {
   }
 
   return (
-    <nav className="nav">
-      <Link className="nav-logo" to="/">
-        <span className="mark"><i></i></span>팜바톤
-      </Link>
-      <div className="nav-links">
-        <Link className={`nav-link ${loc.pathname === '/farmer' ? 'active' : ''}`} to="/farmer">농가 등록</Link>
-        <Link className={`nav-link ${loc.pathname === '/young' ? 'active' : ''}`} to="/young">청년농 매칭</Link>
-        {loggedIn ? (
-          <>
-            <Link className={`nav-link ${loc.pathname === '/dashboard' ? 'active' : ''}`} to="/dashboard">내 농장</Link>
-            <a className="nav-link" href="#" onClick={e => { e.preventDefault(); logout() }}>로그아웃</a>
-          </>
-        ) : (
-          <Link className={`nav-link ${loc.pathname === '/login' ? 'active' : ''}`} to="/login">로그인</Link>
+    <nav className="lp-nav">
+      <div className="lp-wrap lp-nav-inner">
+        <Link className="lp-logo" to="/" style={{ color: '#fff' }} onClick={() => setMobileOpen(false)}>
+          <span className="mark"><i></i></span>팜바톤
+        </Link>
+        <div className="lp-nav-links">
+          <NavLinks loc={loc} loggedIn={loggedIn} onLogout={logout} />
+        </div>
+        {loc.pathname !== '/farmer' && (
+          <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
         )}
+        <button
+          className="lp-nav-burger"
+          aria-label="메뉴"
+          onClick={() => setMobileOpen(o => !o)}
+        >
+          {mobileOpen ? (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          )}
+        </button>
       </div>
+      {mobileOpen && (
+        <div className="lp-nav-mobile-panel">
+          <NavLinks loc={loc} loggedIn={loggedIn} onLogout={logout} onNavigate={() => setMobileOpen(false)} />
+        </div>
+      )}
     </nav>
   )
 }
@@ -51,7 +89,7 @@ function App() {
 
   return (
     <>
-      {!isLanding && <Nav />}
+      <Nav />
       <main className={isLanding ? 'main main-wide' : 'main'}>
         <Routes>
           <Route path="/" element={<LandingPage />} />

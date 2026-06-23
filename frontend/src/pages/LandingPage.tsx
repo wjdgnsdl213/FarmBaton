@@ -1,6 +1,15 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import heroFarm from '../assets/hero-farm.jpg'
+
+function useHashScroll() {
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (!hash) return
+    const el = document.querySelector(hash)
+    if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 80)
+  }, [hash])
+}
 
 function useScrollReveal() {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -26,24 +35,9 @@ function useScrollReveal() {
 
 export default function LandingPage() {
   const rootRef = useScrollReveal()
+  useHashScroll()
   return (
     <div ref={rootRef}>
-      {/* ════════ NAV (sticky) ════════ */}
-      <nav className="lp-nav">
-        <div className="lp-wrap lp-nav-inner">
-          <span className="lp-logo" style={{ color: '#fff' }}>
-            <span className="mark"><i></i></span>팜바톤
-          </span>
-          <div className="lp-nav-links">
-            <a href="#features">서비스 소개</a>
-            <a href="#steps">작동 방식</a>
-            <Link to="/farmer">농가 등록</Link>
-            <Link to="/young">청년농 매칭</Link>
-          </div>
-          <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
-        </div>
-      </nav>
-
       {/* ════════ HERO ════════ */}
       <header className="lp-hero">
         <img src={heroFarm} alt="" className="lp-hero-photo" />
