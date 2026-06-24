@@ -12,8 +12,8 @@ html { scroll-behavior: smooth; }
   --green-deep: #15351f;     /* 헤딩/짙은 면 */
   --lime: #a8c66c;           /* 악센트 (세이지 올리브) */
   --lime-soft: #eef3e0;
-  --accent: #c1623f;         /* CTA 버튼(시작하기류) — 웜 테라코타 */
-  --accent-dark: #a84f30;
+  --accent: #2e9e57;         /* CTA 버튼(시작하기류) — 생기 있는 그린 */
+  --accent-dark: #1f6b3a;
   --green-light: #e8f3ea;    /* 연한 그린 틴트 */
   --cream: #f6f5f0;          /* 따뜻한 배경 */
   --ink: #16241b;            /* 본문 텍스트 */

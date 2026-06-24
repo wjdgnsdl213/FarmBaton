@@ -323,7 +323,7 @@ export default function YoungPage() {
             </select>
           </div>
           <div className="form-group" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', marginBottom: 0 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', marginBottom: '.3rem' }}>
               <input
                 type="checkbox"
                 style={{ width: 'auto' }}
@@ -332,6 +332,9 @@ export default function YoungPage() {
               />
               청년창업농 정책자금 신청 예정
             </label>
+            <p style={{ fontSize: '.76rem', color: 'var(--gray)', lineHeight: 1.5, margin: 0 }}>
+              체크하면 정책자금 융자 한도(5억원) 안에서 인수 가능한 농장을 매칭 점수에서 우대합니다.
+            </p>
           </div>
         </div>
 
