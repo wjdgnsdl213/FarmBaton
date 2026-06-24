@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { api, type FarmDetail, type MatchItem, type SupportProgramItem } from '../api'
 import heroYoung from '../assets/hero-young.jpg'
 
@@ -119,91 +120,103 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
         </p>
       )}
 
-      {expanded && (
-        <div className="match-detail" onClick={e => e.stopPropagation()}>
-          {detailLoading && <div className="match-farm-meta">상세 정보 불러오는 중...</div>}
+      {expanded && createPortal(
+        <div className="modal-backdrop" onClick={() => setExpanded(false)}>
+          <div className="modal-panel" onClick={e => e.stopPropagation()}>
+            <button type="button" className="modal-close" aria-label="닫기" onClick={() => setExpanded(false)}>×</button>
+            <div className="match-farm-name">
+              #{rank} {CROP_NAMES[item.crop_code] || item.crop_code} 농장 ({item.sido})
+            </div>
+            <div className="match-farm-meta">{item.address}</div>
+            <div className="value-range-small" style={{ marginBottom: '1rem' }}>
+              인수 검토가: {fmt(item.est_value_min)} ~ {fmt(item.est_value_max)}만원
+            </div>
 
-          {detail && detail.assets.length > 0 && (
-            <div className="match-detail-assets">
-              <div className="match-detail-section-title">시설 현황</div>
-              <div className="detail-list">
-                {detail.assets.map((a, i) => (
-                  <div key={i} className="detail-row">
-                    <div className="detail-row-title">{a.facility_name}</div>
-                    <div className="detail-row-meta">
-                      {a.area_m2.toLocaleString('ko-KR')}㎡
-                      {a.installed_year ? ` · ${a.installed_year}년 설치` : ' · 설치연도 미상'} · {a.condition_grade}등급
+            {detailLoading && <div className="match-farm-meta">상세 정보 불러오는 중...</div>}
+
+            {detail && detail.assets.length > 0 && (
+              <div className="match-detail-assets">
+                <div className="match-detail-section-title">시설 현황</div>
+                <div className="detail-list">
+                  {detail.assets.map((a, i) => (
+                    <div key={i} className="detail-row">
+                      <div className="detail-row-title">{a.facility_name}</div>
+                      <div className="detail-row-meta">
+                        {a.area_m2.toLocaleString('ko-KR')}㎡
+                        {a.installed_year ? ` · ${a.installed_year}년 설치` : ' · 설치연도 미상'} · {a.condition_grade}등급
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {programs && programs.length > 0 && (
-            <div className="match-detail-assets">
-              <div className="match-detail-section-title">이 농장에 맞는 지원사업</div>
-              <div className="detail-list">
-                {programs.map(p => (
-                  <div key={p.program_code} className="detail-row">
-                    <div className="detail-row-title">{p.name}</div>
-                    <div className="detail-row-meta">{p.amount_text}</div>
-                    {p.pitch && <div className="detail-row-pitch">“{p.pitch}”</div>}
-                    {p.apply_url && (
-                      <a href={p.apply_url} target="_blank" rel="noopener noreferrer" className="detail-row-link">
-                        신청 안내 보기 →
-                      </a>
-                    )}
-                  </div>
-                ))}
+            {programs && programs.length > 0 && (
+              <div className="match-detail-assets">
+                <div className="match-detail-section-title">이 농장에 맞는 지원사업</div>
+                <div className="detail-list">
+                  {programs.map(p => (
+                    <div key={p.program_code} className="detail-row">
+                      <div className="detail-row-title">{p.name}</div>
+                      <div className="detail-row-meta">{p.amount_text}</div>
+                      {p.pitch && <div className="detail-row-pitch">“{p.pitch}”</div>}
+                      {p.apply_url && (
+                        <a href={p.apply_url} target="_blank" rel="noopener noreferrer" className="detail-row-link">
+                          신청 안내 보기 →
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <a
-            href={api.reportPdfUrl(item.farm_id)}
-            className="btn btn-primary"
-            style={{ display: 'block', textAlign: 'center', marginTop: '.8rem', textDecoration: 'none' }}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            PDF 리포트 다운로드
-          </a>
+            <a
+              href={api.reportPdfUrl(item.farm_id)}
+              className="btn btn-primary"
+              style={{ display: 'block', textAlign: 'center', marginTop: '.8rem', textDecoration: 'none' }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              PDF 리포트 다운로드
+            </a>
 
-          {consultState === 'sent' ? (
-            <div className="consult-success">상담 신청이 접수되었습니다.</div>
-          ) : (
-            <form className="consult-form" onSubmit={submitConsult}>
-              <input
-                type="text"
-                required
-                placeholder="이름"
-                value={contactName}
-                onChange={e => setContactName(e.target.value)}
-                disabled={consultState === 'sending'}
-                style={{ marginBottom: '.5rem' }}
-              />
-              <input
-                type="text"
-                placeholder="연락처 (선택)"
-                value={contactPhone}
-                onChange={e => setContactPhone(e.target.value)}
-                disabled={consultState === 'sending'}
-                style={{ marginBottom: '.5rem' }}
-              />
-              <textarea
-                placeholder="농가에 전달할 메시지 (선택)"
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-                disabled={consultState === 'sending'}
-              />
-              {consultState === 'error' && <div className="error-box">상담 신청에 실패했습니다. 다시 시도해주세요.</div>}
-              <button type="submit" className="btn btn-primary" disabled={consultState === 'sending'}>
-                {consultState === 'sending' ? <span className="spinner" /> : '상담 신청'}
-              </button>
-            </form>
-          )}
-        </div>
+            {consultState === 'sent' ? (
+              <div className="consult-success">상담 신청이 접수되었습니다.</div>
+            ) : (
+              <form className="consult-form" onSubmit={submitConsult}>
+                <input
+                  type="text"
+                  required
+                  placeholder="이름"
+                  value={contactName}
+                  onChange={e => setContactName(e.target.value)}
+                  disabled={consultState === 'sending'}
+                  style={{ marginBottom: '.5rem' }}
+                />
+                <input
+                  type="text"
+                  placeholder="연락처 (선택)"
+                  value={contactPhone}
+                  onChange={e => setContactPhone(e.target.value)}
+                  disabled={consultState === 'sending'}
+                  style={{ marginBottom: '.5rem' }}
+                />
+                <textarea
+                  placeholder="농가에 전달할 메시지 (선택)"
+                  value={message}
+                  onChange={e => setMessage(e.target.value)}
+                  disabled={consultState === 'sending'}
+                />
+                {consultState === 'error' && <div className="error-box">상담 신청에 실패했습니다. 다시 시도해주세요.</div>}
+                <button type="submit" className="btn btn-primary" disabled={consultState === 'sending'}>
+                  {consultState === 'sending' ? <span className="spinner" /> : '상담 신청'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   )
