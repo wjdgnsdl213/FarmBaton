@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { api, type ValuationResult } from '../api'
+import heroFarmer from '../assets/hero-farmer.jpg'
 
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -117,6 +118,8 @@ export default function FarmerPage() {
   return (
     <div className="page page-farmer">
       <header className="hero hero-farmer">
+        <img src={heroFarmer} alt="" className="hero-photo" />
+        <div className="hero-overlay" />
         <div className="hero-inner">
           <span className="hero-eyebrow"><span className="dot"></span>농가 승계 진단</span>
           <h1>내 농장의 인수 검토가<br />범위로 정리됩니다</h1>

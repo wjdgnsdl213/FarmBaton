@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { api, type FarmDetail, type MatchItem, type SupportProgramItem } from '../api'
+import heroYoung from '../assets/hero-young.jpg'
 
 const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
 const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
@@ -253,6 +254,8 @@ export default function YoungPage() {
   return (
     <div className="page page-young">
       <header className="hero hero-young">
+        <img src={heroYoung} alt="" className="hero-photo" />
+        <div className="hero-overlay" />
         <div className="hero-inner">
           <span className="hero-eyebrow"><span className="dot"></span>청년농 매칭</span>
           <h1>내 조건에 맞는 농장을<br />점수로 만나보세요</h1>

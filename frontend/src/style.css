@@ -49,12 +49,17 @@ a { color: var(--green); }
 .page-wrap-wide { max-width: 1120px; margin: 0 auto; padding: 2.4rem 20px 5rem; }
 .scroll-anchor { scroll-margin-top: 84px; }
 
-/* ════════ 히어로 헤더 (FarmerPage / YoungPage 상단, 풀블리드) ════════ */
+/* ════════ 히어로 헤더 (FarmerPage / YoungPage 상단, 풀블리드 사진+오버레이) ════════ */
 .hero {
   position: relative; overflow: hidden;
   padding: 2.6rem 0 2.8rem;
+  min-height: 280px; display: flex; align-items: center;
 }
-.hero-inner { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.hero-photo { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-farmer .hero-photo { object-position: 62% 38%; }
+.hero-young .hero-photo { object-position: 58% 48%; }
+.hero-overlay { position: absolute; inset: 0; z-index: 1; }
+.hero-inner { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap;
   font-size: .82rem; font-weight: 700; letter-spacing: .01em;
@@ -67,18 +72,24 @@ a { color: var(--green); }
 }
 .hero p { font-size: 1rem; max-width: 42ch; }
 
-/* 농가(고령 친화): 짙은 그린 면 + 라임 악센트, 큰 글씨·고대비 */
+/* 농가(고령 친화): 짙은 그린 오버레이 + 큰 글씨·고대비 */
 .hero-farmer { background: var(--green-deep); color: #fff; }
+.hero-farmer .hero-overlay {
+  background: linear-gradient(110deg, rgba(11,28,17,.93) 0%, rgba(11,28,17,.78) 42%, rgba(11,28,17,.42) 100%);
+}
 .hero-farmer .hero-eyebrow { background: rgba(168,198,108,.16); color: var(--lime); }
 .hero-farmer .hero-eyebrow .dot { background: var(--lime); }
 .hero-farmer h1 { font-size: 2.2rem; }
 .hero-farmer p { color: rgba(255,255,255,.82); }
 
-/* 청년농(모던): 라임 카드 + 짙은 텍스트 */
-.hero-young { background: var(--lime); color: var(--green-deep); }
-.hero-young .hero-eyebrow { background: rgba(21,53,31,.1); color: var(--green-deep); }
-.hero-young .hero-eyebrow .dot { background: var(--green-deep); }
-.hero-young p { color: rgba(21,53,31,.72); }
+/* 청년농(모던): 올리브 톤 오버레이로 농가 페이지와 구분, 사진 위 가독성 위해 흰 텍스트 */
+.hero-young { background: #2b3315; color: #fff; }
+.hero-young .hero-overlay {
+  background: linear-gradient(110deg, rgba(38,46,18,.92) 0%, rgba(38,46,18,.76) 42%, rgba(38,46,18,.4) 100%);
+}
+.hero-young .hero-eyebrow { background: rgba(168,198,108,.2); color: var(--lime); }
+.hero-young .hero-eyebrow .dot { background: var(--lime); }
+.hero-young p { color: rgba(255,255,255,.82); }
 
 /* ════════ 카드 ════════ */
 .card {
@@ -439,7 +450,7 @@ textarea { resize: vertical; min-height: 60px; }
 
 /* ════════ 반응형 (모바일 퍼스트 → 데스크톱 보강) ════════ */
 @media (min-width: 560px) {
-  .hero { padding: 3.4rem 0 3.6rem; }
+  .hero { padding: 3.4rem 0 3.6rem; min-height: 380px; }
   .hero h1 { font-size: 2.4rem; }
   .hero-farmer h1 { font-size: 2.7rem; }
 }
