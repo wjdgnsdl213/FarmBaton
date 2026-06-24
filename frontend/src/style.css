@@ -53,11 +53,11 @@ a { color: var(--green); }
 .hero {
   position: relative; overflow: hidden;
   padding: 2.6rem 0 2.8rem;
-  min-height: 280px; display: flex; align-items: center;
+  min-height: 320px; display: flex; align-items: center;
 }
 .hero-photo { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; }
-.hero-farmer .hero-photo { object-position: 62% 38%; }
-.hero-young .hero-photo { object-position: 58% 48%; }
+.hero-farmer .hero-photo { object-position: 62% 18%; }
+.hero-young .hero-photo { object-position: 58% 22%; }
 .hero-overlay { position: absolute; inset: 0; z-index: 1; }
 .hero-inner { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
 .hero-eyebrow {
@@ -450,7 +450,7 @@ textarea { resize: vertical; min-height: 60px; }
 
 /* ════════ 반응형 (모바일 퍼스트 → 데스크톱 보강) ════════ */
 @media (min-width: 560px) {
-  .hero { padding: 3.4rem 0 3.6rem; min-height: 380px; }
+  .hero { padding: 3.4rem 0 3.6rem; min-height: 460px; }
   .hero h1 { font-size: 2.4rem; }
   .hero-farmer h1 { font-size: 2.7rem; }
 }
