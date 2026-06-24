@@ -49,6 +49,21 @@ a { color: var(--green); }
 .page-wrap-wide { max-width: 1120px; margin: 0 auto; padding: 2.4rem 20px 5rem; }
 .scroll-anchor { scroll-margin-top: 84px; }
 
+/* 역할 불일치 안내 (농장주/청년농 전용 메뉴) */
+.role-notice { display: flex; justify-content: center; padding: 3rem 1rem; }
+.role-notice-card {
+  max-width: 420px; text-align: center; background: #fff;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 2.4rem 1.8rem; box-shadow: var(--shadow);
+}
+.role-notice-icon { font-size: 2.4rem; margin-bottom: .6rem; }
+.role-notice-card h2 {
+  font-size: 1.3rem; font-weight: 800; color: var(--green-deep);
+  margin-bottom: .6rem; letter-spacing: -.01em;
+}
+.role-notice-card p { font-size: .92rem; color: var(--gray); line-height: 1.6; margin-bottom: 1.4rem; }
+.role-notice-card .btn { width: auto; padding: .8rem 1.6rem; }
+
 /* 회원가입 역할 선택 토글 */
 .role-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
 .role-toggle button {
@@ -93,7 +108,6 @@ a { color: var(--green); }
 }
 .hero-farmer .hero-eyebrow { background: rgba(168,198,108,.16); color: var(--lime); }
 .hero-farmer .hero-eyebrow .dot { background: var(--lime); }
-.hero-farmer h1 { font-size: 2.2rem; }
 .hero-farmer p { color: rgba(255,255,255,.82); }
 
 /* 청년농(모던): 올리브 톤 오버레이로 농가 페이지와 구분, 사진 위 가독성 위해 흰 텍스트 */
@@ -488,7 +502,6 @@ textarea { resize: vertical; min-height: 60px; }
 @media (min-width: 560px) {
   .hero { padding: 3.4rem 0 3.6rem; min-height: 460px; }
   .hero h1 { font-size: 2.4rem; }
-  .hero-farmer h1 { font-size: 2.7rem; }
 }
 @media (max-width: 380px) {
   .form-row { grid-template-columns: 1fr; }

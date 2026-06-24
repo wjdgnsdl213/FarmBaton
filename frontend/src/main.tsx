@@ -9,11 +9,33 @@ import DashboardPage from './pages/DashboardPage'
 import { getToken, getRole, clearToken } from './api'
 import './style.css'
 
+function RoleNotice({ requiredRole }: { requiredRole: 'FARMER' | 'YOUNG' }) {
+  const roleLabel = requiredRole === 'FARMER' ? '농장주' : '청년농'
+  const myRole = getRole()
+  const backTo = myRole === 'YOUNG' ? '/young' : '/dashboard'
+  const backLabel = myRole === 'YOUNG' ? '청년농 매칭으로 가기' : '내 농장으로 가기'
+  return (
+    <div className="role-notice">
+      <div className="role-notice-card">
+        <div className="role-notice-icon" aria-hidden="true">🔒</div>
+        <h2>{roleLabel} 전용 메뉴입니다</h2>
+        <p>
+          이 페이지는 {roleLabel} 계정만 이용할 수 있습니다.
+          {myRole === 'YOUNG' && requiredRole === 'FARMER'
+            ? ' 청년농 계정은 농장을 찾아 인수하는 쪽이라 농가 등록은 제공되지 않습니다.'
+            : ''}
+        </p>
+        <Link className="btn btn-primary" to={backTo}>{backLabel}</Link>
+      </div>
+    </div>
+  )
+}
+
 function RequireAuth({ children, role }: { children: React.ReactNode; role?: 'FARMER' | 'YOUNG' }) {
   if (!getToken()) return <Navigate to="/login" replace />
-  // 역할이 지정된 라우트인데 다른 역할로 로그인했으면 본인 영역으로 보냄
+  // 역할이 지정된 라우트인데 다른 역할로 로그인했으면 전용 메뉴 안내 표시
   if (role && getRole() && getRole() !== role) {
-    return <Navigate to={getRole() === 'YOUNG' ? '/young' : '/dashboard'} replace />
+    return <RoleNotice requiredRole={role} />
   }
   return <>{children}</>
 }
@@ -69,7 +91,7 @@ function Nav() {
           <NavLinks loc={loc} loggedIn={loggedIn} role={role} onLogout={logout} />
         </div>
         <div className="lp-nav-right">
-          <Link className="lp-pill lp-pill-warm" to="/farmer">시작하기 →</Link>
+          {!loggedIn && <Link className="lp-pill lp-pill-warm" to="/farmer">시작하기 →</Link>}
           <button
             className="lp-nav-burger"
             aria-label="메뉴"
