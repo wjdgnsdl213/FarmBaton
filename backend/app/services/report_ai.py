@@ -24,7 +24,7 @@ GRADE_DESC = {
 
 MODEL = "claude-haiku-4-5-20251001"
 
-# 관점별 메타: (라벨, AI 프롬프트용 관점 지시, 폴백 조언 문장)
+# 관점별 메타: (라벨, AI 프롬프트용 관점 지시, 폴백 조언 행동 항목)
 _AUDIENCE = {
     "FARMER": {
         "label": "농장주",
@@ -35,12 +35,12 @@ _AUDIENCE = {
             "판로 계약서 등)를 준비하면 좋은지, 승계 조건 협상에서 신뢰등급을 올릴 방법, "
             "지금 제시된 인수 검토가 범위를 어떻게 활용할지."
         ),
-        "fallback_advice": (
-            "신뢰등급을 올리려면 최근 매출 장부와 시설 설치·수리 내역, 판로 계약서를 "
-            "준비해 제출하시면 영업권과 시설 가치를 더 정확히 인정받을 수 있습니다. "
-            "제시된 인수 검토가 범위는 협상의 출발점으로 활용하시고, 실제 거래 전 "
-            "공인중개사·감정평가사 검토를 함께 받아보시길 권합니다."
-        ),
+        "fallback_actions": [
+            "최근 매출 장부·출하 내역을 정리해 영업권 근거 자료로 준비합니다.",
+            "시설 설치·수리 내역과 연도를 문서화해 시설 잔존가 평가를 보강합니다.",
+            "기존 판로(계약재배·직거래) 승계 가능 여부를 문서로 확보합니다.",
+            "제시된 인수 검토가 범위를 협상 출발점으로 두고, 거래 전 공인중개사·감정평가사 검토를 받습니다.",
+        ],
     },
     "YOUNG": {
         "label": "청년농",
@@ -51,12 +51,12 @@ _AUDIENCE = {
             "예상 연소득 대비 투자 회수 관점, 작목 수령과 시설 노후도가 초기 영농에 주는 부담, "
             "영농을 시작하기 전 확인할 체크리스트."
         ),
-        "fallback_advice": (
-            "인수 검토가 범위를 보유 자본과 청년창업농 정책자금 한도(5억원)로 감당할 수 "
-            "있는지 먼저 확인하시고, 예상 연소득 기준 투자 회수 기간을 가늠해 보세요. "
-            "작목 수령과 시설 상태에 따라 초기 추가 투자가 필요할 수 있으니, 현장 방문과 "
-            "기존 판로 인수 가능 여부를 영농 시작 전에 꼭 확인하시길 권합니다."
-        ),
+        "fallback_actions": [
+            "보유 자본과 청년창업농 정책자금 한도로 인수 검토가 범위를 감당할 수 있는지 계산합니다.",
+            "예상 연소득 기준으로 대략적인 투자 회수 기간을 가늠합니다.",
+            "현장 방문으로 수목 생육 상태와 주요 시설의 가동 수명을 확인합니다.",
+            "기존 판로 인수 가능 여부와 초기 추가 투자 필요액을 영농 시작 전에 점검합니다.",
+        ],
     },
 }
 
@@ -95,8 +95,8 @@ class ReportContext:
 class NarrativeResult:
     summary: str
     risk_notes: str
-    advice: str        # 관점별 조언/다음 단계
-    is_ai_generated: bool  # False면 폴백 템플릿 문장
+    advice_items: list[str]  # 관점별 조언/다음 단계 (행동 항목 3~5개)
+    is_ai_generated: bool    # False면 폴백 템플릿 문장
 
 
 def _strip_code_fence(text: str) -> str:
@@ -132,7 +132,7 @@ def _fallback_narrative(ctx: ReportContext) -> NarrativeResult:
     risk_notes = " / ".join(ctx.risk_flags) if ctx.risk_flags else "현재 확인된 추가 리스크 요인은 없습니다."
     return NarrativeResult(
         summary=summary, risk_notes=risk_notes,
-        advice=meta["fallback_advice"], is_ai_generated=False,
+        advice_items=list(meta["fallback_actions"]), is_ai_generated=False,
     )
 
 
@@ -169,8 +169,14 @@ def generate_narrative(ctx: ReportContext) -> NarrativeResult:
 
 [독자 관점] {meta['perspective']}
 
+작성 규칙:
+- summary: 큰 금액(인수 검토가 범위)은 별도 영역에 크게 표시되므로 요약에서는
+  같은 숫자를 다시 반복하지 말고, 농장 성격과 판단 포인트를 1~2문장으로.
+- advice_items: 위 독자 관점에서 바로 실행할 행동을 3~5개의 짧은 항목으로.
+  각 항목은 한 문장, 명령형(~합니다/~확인합니다)으로. 새 금액·수치 만들지 말 것.
+
 다음 JSON 형식으로만 응답하라 (다른 텍스트 없이):
-{{"summary": "농장 개요와 가치평가 핵심을 위 독자 관점에 맞춰 2~3문장으로 요약", "risk_notes": "리스크 요인을 1~2문장으로 자연스럽게 풀어쓴 설명 (리스크 요인이 없으면 '확인된 추가 리스크 요인은 없습니다.')", "advice": "위 독자 관점에서 실질적으로 도움이 되는 조언과 다음 단계를 3~4문장으로 작성"}}"""
+{{"summary": "1~2문장 요약(큰 금액 반복 금지)", "risk_notes": "리스크 요인을 1문장으로 (없으면 '확인된 추가 리스크 요인은 없습니다.')", "advice_items": ["행동 항목1", "행동 항목2", "행동 항목3"]}}"""
 
     try:
         resp = client.messages.create(
@@ -181,11 +187,12 @@ def generate_narrative(ctx: ReportContext) -> NarrativeResult:
         data = json.loads(_strip_code_fence(resp.content[0].text))
         summary = str(data["summary"]).strip()
         risk_notes = str(data["risk_notes"]).strip()
-        advice = str(data.get("advice", "")).strip()
-        if not summary or not risk_notes or not advice:
+        advice_items = [str(x).strip() for x in data.get("advice_items", []) if str(x).strip()]
+        if not summary or not risk_notes or not advice_items:
             raise ValueError("empty AI output")
         return NarrativeResult(
-            summary=summary, risk_notes=risk_notes, advice=advice, is_ai_generated=True,
+            summary=summary, risk_notes=risk_notes,
+            advice_items=advice_items, is_ai_generated=True,
         )
     except Exception:
         return _fallback_narrative(ctx)

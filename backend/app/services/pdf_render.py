@@ -7,6 +7,8 @@ Noto Sans KR(OFL) 파일을 직접 임베드(@font-face)한다 — 시스템 폰
 """
 from __future__ import annotations
 
+import base64
+import functools
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -21,13 +23,27 @@ _env = Environment(
 )
 
 
+@functools.lru_cache(maxsize=4)
+def _font_data_uri(filename: str) -> str:
+    """TTF를 base64 data: URI로 변환(1회 캐시).
+
+    set_content는 about:blank 출처라 Chromium이 file:// 폰트 로드를 차단한다.
+    data: URI로 인라인하면 외부 로드 없이 Noto Sans KR(OFL)이 그대로 로드·
+    임베딩돼, 로컬과 Railway에서 동일하게 동작하고 폰트 없는 PC에서도 깨지지
+    않는다.
+    """
+    raw = (_FONTS_DIR / filename).read_bytes()
+    b64 = base64.b64encode(raw).decode("ascii")
+    return f"data:font/ttf;base64,{b64}"
+
+
 def render_report_html(context: dict) -> str:
-    """report.html 템플릿 렌더. 폰트는 file:// URI로 절대경로 주입."""
+    """report.html 템플릿 렌더. 폰트는 base64 data: URI로 인라인 임베드."""
     template = _env.get_template("report.html")
     ctx = {
         **context,
-        "font_regular_uri": (_FONTS_DIR / "NotoSansKR-Regular.ttf").as_uri(),
-        "font_bold_uri": (_FONTS_DIR / "NotoSansKR-Bold.ttf").as_uri(),
+        "font_regular_uri": _font_data_uri("NotoSansKR-Regular.ttf"),
+        "font_bold_uri": _font_data_uri("NotoSansKR-Bold.ttf"),
     }
     return template.render(**ctx)
 
@@ -39,6 +55,8 @@ def html_to_pdf(html: str) -> bytes:
         try:
             page = browser.new_page()
             page.set_content(html, wait_until="load")
+            # @font-face(file:// TTF)가 실제로 로드돼 PDF에 임베딩되도록 대기
+            page.evaluate("() => document.fonts.ready")
             return page.pdf(
                 format="A4",
                 print_background=True,

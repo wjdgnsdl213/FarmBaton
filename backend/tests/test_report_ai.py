@@ -44,9 +44,9 @@ def test_generate_narrative_falls_back_without_key(report_ctx):
     assert "8,000" in result.summary
     assert "9,800" in result.summary
     assert "실거래 표본 부족" in result.risk_notes
-    # 폴백도 관점별 조언을 채워야 함 (기본 FARMER)
-    assert result.advice
-    assert "영업권" in result.advice or "시설" in result.advice
+    # 폴백도 관점별 조언을 행동 항목 리스트로 채워야 함 (기본 FARMER)
+    assert isinstance(result.advice_items, list) and len(result.advice_items) >= 3
+    assert any("영업권" in a or "시설" in a for a in result.advice_items)
 
 
 def test_generate_narrative_no_risk_flags(report_ctx):
@@ -61,9 +61,10 @@ def test_generate_narrative_audience_differs(report_ctx):
     farmer = generate_narrative(report_ctx)
     report_ctx.audience = "YOUNG"
     young = generate_narrative(report_ctx)
-    assert farmer.advice != young.advice
+    assert farmer.advice_items != young.advice_items
     # 청년농 조언엔 인수/정책자금 관점 키워드가 들어가야 함
-    assert "정책자금" in young.advice or "회수" in young.advice
+    young_text = " ".join(young.advice_items)
+    assert "정책자금" in young_text or "회수" in young_text
 
 
 @pytest.fixture
@@ -111,7 +112,7 @@ def test_strip_code_fence_passthrough_when_unfenced():
 
 def test_generate_narrative_parses_fenced_json_response(report_ctx, monkeypatch):
     """실제 Claude 응답이 ```json 펜스로 감싸여 와도 is_ai_generated=True로 파싱돼야 함."""
-    fenced = '```json\n{"summary": "AI 생성 요약", "risk_notes": "AI 생성 리스크", "advice": "AI 생성 조언"}\n```'
+    fenced = '```json\n{"summary": "AI 생성 요약", "risk_notes": "AI 생성 리스크", "advice_items": ["행동1", "행동2", "행동3"]}\n```'
 
     class _FakeBlock:
         text = fenced
@@ -132,7 +133,7 @@ def test_generate_narrative_parses_fenced_json_response(report_ctx, monkeypatch)
     assert result.is_ai_generated is True
     assert result.summary == "AI 생성 요약"
     assert result.risk_notes == "AI 생성 리스크"
-    assert result.advice == "AI 생성 조언"
+    assert result.advice_items == ["행동1", "행동2", "행동3"]
 
 
 def test_generate_program_pitch_falls_back_without_key():

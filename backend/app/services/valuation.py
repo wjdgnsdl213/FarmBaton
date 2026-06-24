@@ -167,6 +167,26 @@ def grade_confidence(farm: FarmInput) -> str:
     return _GRADES[min(idx, 3)]
 
 
+def grade_reasons(farm: FarmInput) -> dict:
+    """신뢰등급 하향 사유와 누락 데이터 (표현용 — 계산 불변).
+
+    grade_confidence와 동일 조건을 재사용해 "왜 이 등급인지"를 사람이 읽을
+    형태로 반환한다. 어떤 수치도 바꾸지 않으며 PDF/리포트 표현에만 쓴다.
+    """
+    downgrades: list[str] = []
+    missing: list[str] = []
+
+    if farm.land.deal_price_m2 is None or (farm.land.deal_sample_cnt or 0) < 3:
+        downgrades.append("인근 실거래 표본 부족 — 공시지가 기반으로 토지가를 추정")
+        missing.append("최근 실거래가 (인근 3건 이상)")
+
+    if any(a.installed_year is None for a in farm.assets):
+        downgrades.append("일부 시설 설치연도 미상 — 잔존가를 보수적으로 추정")
+        missing.append("시설 설치연도")
+
+    return {"downgrades": downgrades, "missing": missing}
+
+
 def derive_risk_flags(farm: FarmInput) -> list[str]:
     """리스크 플래그 (사람이 읽을 한국어 문구).
 

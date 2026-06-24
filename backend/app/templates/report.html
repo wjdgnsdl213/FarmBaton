@@ -3,127 +3,261 @@
 <head>
 <meta charset="utf-8">
 <style>
+  /* 고유 family명 — 시스템 폰트와 충돌하지 않게 해 file:// TTF를 강제 로드·임베딩 */
   @font-face {
-    font-family: 'Noto Sans KR';
-    font-weight: 400;
+    font-family: 'FarmbatonReportKR'; font-weight: 400;
     src: url('{{ font_regular_uri }}') format('truetype');
   }
   @font-face {
-    font-family: 'Noto Sans KR';
-    font-weight: 700;
+    font-family: 'FarmbatonReportKR'; font-weight: 700;
     src: url('{{ font_bold_uri }}') format('truetype');
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  @page { size: A4; margin: 0; }
   body {
-    font-family: 'Noto Sans KR', sans-serif;
-    color: #1f2937;
-    margin: 0;
-    padding: 28px 36px;
-    font-size: 12px;
-    line-height: 1.55;
+    font-family: 'FarmbatonReportKR', sans-serif;
+    color: #2b3440; font-size: 10.5px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
-  h1 { font-size: 18px; margin: 0 0 2px; }
-  .sub { color: #6b7280; font-size: 11px; margin-bottom: 16px; }
-  .grade-badge {
-    display: inline-block;
-    background: #ecfdf5; color: #047857;
-    border: 1px solid #a7f3d0; border-radius: 4px;
-    padding: 2px 8px; font-weight: 700; font-size: 11px;
+  .page {
+    width: 210mm; min-height: 297mm; padding: 16mm 15mm 13mm;
+    position: relative;
   }
-  .audience-badge {
-    display: inline-block;
-    background: #eff6ff; color: #1d4ed8;
-    border: 1px solid #bfdbfe; border-radius: 4px;
-    padding: 2px 8px; font-weight: 700; font-size: 11px;
+  .page + .page { page-break-before: always; }
+  section { page-break-inside: avoid; margin-bottom: 11px; }
+
+  /* ── 헤더 ── */
+  .rpt-head { border-bottom: 1px solid #e5e7eb; padding-bottom: 11px; margin-bottom: 12px; }
+  .rpt-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+  .rpt-kicker { font-size: 10px; font-weight: 700; color: #1f6b3a; letter-spacing: .04em; margin-bottom: 3px; }
+  .rpt-title { font-size: 17px; font-weight: 800; color: #15351f; letter-spacing: -.3px; }
+  .rpt-sub { font-size: 10px; color: #6b7280; margin-top: 4px; }
+  .rpt-badges { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; flex: none; }
+  .badge { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 4px; white-space: nowrap; }
+  .badge-grade { background: #eef5f0; color: #1f6b3a; border: 1px solid #cfe3d6; }
+  .badge-aud { background: #eef4fb; color: #2563a8; border: 1px solid #cfe0f1; }
+
+  .rpt-lead { font-size: 10.5px; color: #374151; line-height: 1.6; margin-bottom: 13px; }
+
+  /* ── 섹션 제목 ── */
+  .sec-title {
+    font-size: 11px; font-weight: 700; color: #15351f;
+    padding-left: 8px; border-left: 3px solid #1f6b3a; margin-bottom: 8px;
   }
-  .advice-box {
-    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px;
-    padding: 10px 12px;
+
+  /* ── 히어로 ── */
+  .hero { display: flex; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 13px; }
+  .hero-main { flex: 1.55; padding: 14px 16px; }
+  .hero-side { flex: 1; padding: 14px 16px; border-left: 1px solid #e5e7eb; background: #fafbfa; }
+  .hero-label, .hero-side-label { font-size: 10px; color: #6b7280; margin-bottom: 5px; }
+  .hero-eok { font-size: 25px; font-weight: 800; color: #15351f; letter-spacing: -.5px; line-height: 1.1; }
+  .hero-manwon { font-size: 10.5px; color: #6b7280; margin-top: 3px; }
+  .hero-side-value { font-size: 16px; font-weight: 800; color: #1f6b3a; }
+  .hero-note { font-size: 9px; color: #9ca3af; margin-top: 5px; line-height: 1.45; }
+
+  /* ── 신뢰도 패널 ── */
+  .panel { border: 1px solid #e5e7eb; border-radius: 6px; padding: 9px 12px; background: #fbfcfb; }
+  .panel-row { display: flex; gap: 10px; margin-bottom: 4px; }
+  .panel-row:last-child { margin-bottom: 0; }
+  .panel-k { font-size: 10px; font-weight: 700; color: #1f6b3a; flex: none; width: 74px; }
+  .panel-row ul { margin: 0; padding-left: 15px; }
+  .panel-row li { font-size: 10px; margin-bottom: 1px; }
+  .panel-row span:not(.panel-k) { font-size: 10px; color: #374151; }
+
+  /* ── 가치 구성 ── */
+  .comp-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .comp-label { width: 70px; font-size: 10px; color: #374151; flex: none; }
+  .comp-bar { flex: 1; height: 7px; background: #eef1ee; border-radius: 4px; overflow: hidden; }
+  .comp-fill { height: 100%; background: #2a8049; border-radius: 4px; }
+  .comp-amount { width: 110px; text-align: right; font-size: 10.5px; font-weight: 700; color: #15351f; flex: none; }
+  .comp-total { text-align: right; font-size: 11px; font-weight: 800; color: #1f6b3a; margin-top: 6px; padding-top: 6px; border-top: 1px solid #eef1ee; }
+
+  /* ── 표 ── */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .tbl th { background: #f6f8f6; color: #374151; font-weight: 700; text-align: left; padding: 6px 9px; border-bottom: 1px solid #e5e7eb; }
+  .tbl td { padding: 6px 9px; border-bottom: 1px solid #f0f1ee; }
+  .tbl-note { font-size: 9.5px; color: #6b7280; margin-top: 6px; line-height: 1.5; }
+  .tbl-src .src-k { font-weight: 700; color: #374151; width: 90px; }
+
+  /* ── 리스크 3분류 ── */
+  .risk-lead { font-size: 10px; color: #6b7280; margin-bottom: 8px; }
+  .risk-grid { display: flex; gap: 9px; }
+  .risk-col { flex: 1; border: 1px solid #e5e7eb; border-radius: 6px; padding: 9px 10px; }
+  .risk-cat { font-size: 9.5px; font-weight: 700; margin-bottom: 6px; padding: 2px 7px; border-radius: 4px; display: inline-block; }
+  .cat-confirmed { background: #fdeeee; color: #b4452f; }
+  .cat-missing { background: #fff5e6; color: #a76a10; }
+  .cat-onsite { background: #eef5f0; color: #1f6b3a; }
+  .risk-col ul { margin: 0; padding-left: 14px; }
+  .risk-col li { font-size: 9.5px; margin-bottom: 3px; line-height: 1.4; }
+  .risk-empty { font-size: 9.5px; color: #9ca3af; }
+
+  /* ── 조언 행동 항목 ── */
+  .actions { list-style: none; counter-reset: a; }
+  .actions li {
+    counter-increment: a; position: relative; padding: 5px 0 5px 24px;
+    font-size: 10.5px; border-bottom: 1px solid #f3f4f2; line-height: 1.45;
   }
-  section { margin-bottom: 14px; }
-  .section-title {
-    font-weight: 700; font-size: 13px; margin: 0 0 6px;
-    border-bottom: 2px solid #111827; padding-bottom: 3px;
+  .actions li:last-child { border-bottom: none; }
+  .actions li::before {
+    content: counter(a); position: absolute; left: 0; top: 5px;
+    width: 16px; height: 16px; background: #1f6b3a; color: #fff;
+    border-radius: 50%; font-size: 9px; line-height: 16px; text-align: center; font-weight: 700;
   }
-  .value-range {
-    font-size: 22px; font-weight: 700; color: #111827; margin: 4px 0;
-  }
-  .ai-box {
-    background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;
-    padding: 10px 12px;
-  }
-  table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
-  th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid #e5e7eb; }
-  th { color: #6b7280; font-weight: 700; width: 38%; }
-  ul.risk-list { margin: 4px 0 0; padding-left: 18px; }
-  ul.risk-list li { margin-bottom: 2px; }
-  .disclaimer {
-    font-size: 10px; color: #9ca3af; border-top: 1px solid #e5e7eb;
-    padding-top: 8px; margin-top: 10px;
-  }
-  .footer { font-size: 9.5px; color: #9ca3af; margin-top: 6px; }
+
+  /* ── 산정 방법 ── */
+  .method { margin: 0 0 9px; padding-left: 16px; }
+  .method li { font-size: 10px; margin-bottom: 2px; color: #374151; }
+
+  /* ── 푸터 ── */
+  .rpt-foot { margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 9px; }
+  .foot-disc { font-size: 9px; color: #9ca3af; line-height: 1.5; }
+  .foot-meta { font-size: 9px; color: #b6bcc4; margin-top: 4px; }
+  .page2-kicker { font-size: 10px; font-weight: 700; color: #1f6b3a; letter-spacing: .04em; margin-bottom: 12px; padding-bottom: 9px; border-bottom: 1px solid #e5e7eb; }
 </style>
 </head>
 <body>
 
-  <h1>인수 검토가 범위(참고용 추정)</h1>
-  <div class="sub">
-    {{ sido }} · {{ crop_name }} {{ tree_age }}년생 · 작성일 {{ generated_date }}
-    &nbsp;<span class="grade-badge">{{ confidence_grade }}등급 — {{ grade_desc }}</span>
-    &nbsp;<span class="audience-badge">{{ audience_label }}용</span>
+  <!-- ════════ PAGE 1 — 요약 ════════ -->
+  <div class="page">
+
+    <!-- ReportHeader -->
+    <header class="rpt-head">
+      <div class="rpt-title-row">
+        <div>
+          <div class="rpt-kicker">농장 인수 검토 리포트</div>
+          <div class="rpt-title">{{ sido }} · {{ crop_name }} {{ tree_age }}년생 · {{ area_m2 }}㎡</div>
+          <div class="rpt-sub">{{ address }} · 승계 방식 {{ succession_name }} · 작성일 {{ generated_date }}</div>
+        </div>
+        <div class="rpt-badges">
+          <span class="badge badge-grade">신뢰도 {{ confidence_grade }}등급</span>
+          <span class="badge badge-aud">{{ audience_label }}용</span>
+        </div>
+      </div>
+    </header>
+
+    <p class="rpt-lead">{{ ai_summary }}</p>
+
+    <!-- HeroMetrics -->
+    <section class="hero">
+      <div class="hero-main">
+        <div class="hero-label">인수 검토가 범위 (참고용 추정)</div>
+        <div class="hero-eok">{{ value_eok }}</div>
+        <div class="hero-manwon">{{ value_manwon }}</div>
+      </div>
+      <div class="hero-side">
+        <div class="hero-side-label">예상 연소득</div>
+        <div class="hero-side-value">{{ income_range }}</div>
+        <div class="hero-note">{{ income_definition }}</div>
+      </div>
+    </section>
+
+    <!-- ConfidencePanel -->
+    <section>
+      <div class="sec-title">신뢰도 {{ confidence_grade }}등급 — {{ grade_desc }}</div>
+      {% if grade_downgrades %}
+      <div class="panel">
+        <div class="panel-row">
+          <span class="panel-k">등급 근거</span>
+          <ul>{% for d in grade_downgrades %}<li>{{ d }}</li>{% endfor %}</ul>
+        </div>
+        {% if grade_missing %}
+        <div class="panel-row">
+          <span class="panel-k">보완 시 상향</span>
+          <span>{{ grade_missing | join(', ') }} 을(를) 제출하면 등급이 올라갈 수 있습니다.</span>
+        </div>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="panel"><div class="panel-row"><span>추가 하향 요인 없이 기본 검토 등급으로 산정되었습니다.</span></div></div>
+      {% endif %}
+    </section>
+
+    <!-- ValueComposition -->
+    <section>
+      <div class="sec-title">가치 구성</div>
+      {% for c in composition %}
+      <div class="comp-row">
+        <span class="comp-label">{{ c.label }}</span>
+        <span class="comp-bar"><span class="comp-fill" style="width: {{ c.pct }}%;"></span></span>
+        <span class="comp-amount">{{ c.amount }}</span>
+      </div>
+      {% endfor %}
+      <div class="comp-total">토지·시설·영업권 합계 {{ value_total }}</div>
+    </section>
+
   </div>
 
-  <section>
-    <div class="section-title">핵심 요약</div>
-    <div class="ai-box">{{ ai_summary }}</div>
-  </section>
+  <!-- ════════ PAGE 2 — 근거 ════════ -->
+  <div class="page">
 
-  <section>
-    <div class="section-title">핵심 수치</div>
-    <div class="value-range">{{ est_value_min }}만원 ~ {{ est_value_max }}만원</div>
-    <table>
-      <tr><th>예상 연소득</th><td>{{ est_income_min }} ~ {{ est_income_max }}만원</td></tr>
-      <tr><th>시세 참고</th><td>{{ normal_year_text }}</td></tr>
-    </table>
-  </section>
+    <div class="page2-kicker">산정 근거 · 시나리오 · 확인사항</div>
 
-  <section>
-    <div class="section-title">가치평가 구성</div>
-    <table>
-      <tr><th>토지 기준가</th><td>{{ land_value_point }}만원</td></tr>
-      <tr><th>시설 잔존가</th><td>{{ facility_value }}만원</td></tr>
-      <tr><th>영업권</th><td>{{ goodwill_text }}</td></tr>
-    </table>
-  </section>
+    <!-- ScenarioTable -->
+    <section>
+      <div class="sec-title">시나리오</div>
+      <table class="tbl">
+        <thead><tr><th>구분</th><th>인수 검토가</th><th>예상 연소득</th></tr></thead>
+        <tbody>
+          {% for s in scenarios %}
+          <tr><td>{{ s.label }}</td><td>{{ s.value }}</td><td>{{ s.income }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="tbl-note">시세 참고 — {{ normal_year_text }}</div>
+    </section>
 
-  <section>
-    <div class="section-title">리스크 요인</div>
-    <div class="ai-box">
-      {{ ai_risk_notes }}
-      {% if risk_flags %}
-      <ul class="risk-list">
-        {% for flag in risk_flags %}<li>{{ flag }}</li>{% endfor %}
-      </ul>
-      {% endif %}
-    </div>
-  </section>
+    <!-- RiskChecklist -->
+    <section>
+      <div class="sec-title">리스크 · 확인사항</div>
+      <div class="risk-lead">{{ ai_risk_notes }}</div>
+      <div class="risk-grid">
+        <div class="risk-col">
+          <span class="risk-cat cat-confirmed">확정 리스크</span>
+          {% if risk_confirmed %}
+          <ul>{% for r in risk_confirmed %}<li>{{ r }}</li>{% endfor %}</ul>
+          {% else %}<div class="risk-empty">확인된 항목 없음</div>{% endif %}
+        </div>
+        <div class="risk-col">
+          <span class="risk-cat cat-missing">정보 부족</span>
+          {% if risk_missing %}
+          <ul>{% for r in risk_missing %}<li>{{ r }}</li>{% endfor %}</ul>
+          {% else %}<div class="risk-empty">확인된 항목 없음</div>{% endif %}
+        </div>
+        <div class="risk-col">
+          <span class="risk-cat cat-onsite">현장 확인 필요</span>
+          <ul>{% for r in risk_onsite %}<li>{{ r }}</li>{% endfor %}</ul>
+        </div>
+      </div>
+    </section>
 
-  <section>
-    <div class="section-title">{{ advice_title }}</div>
-    <div class="advice-box">{{ ai_advice }}</div>
-  </section>
+    <!-- Advice action items -->
+    <section>
+      <div class="sec-title">{{ advice_title }}</div>
+      <ol class="actions">
+        {% for a in advice_items %}<li>{{ a }}</li>{% endfor %}
+      </ol>
+    </section>
 
-  <section>
-    <div class="section-title">농장 개요</div>
-    <table>
-      <tr><th>주소</th><td>{{ address }}</td></tr>
-      <tr><th>면적</th><td>{{ area_m2 }}㎡</td></tr>
-      <tr><th>승계 방식</th><td>{{ succession_name }}</td></tr>
-    </table>
-  </section>
+    <!-- MethodologyAndSources -->
+    <section>
+      <div class="sec-title">산정 방법 · 데이터 출처</div>
+      <ul class="method">{% for m in methodology %}<li>{{ m }}</li>{% endfor %}</ul>
+      <table class="tbl tbl-src">
+        <tbody>
+          {% for s in sources %}
+          <tr><td class="src-k">{{ s.label }}</td><td>{{ s.detail }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
 
-  <div class="disclaimer">{{ disclaimer }}</div>
-  <div class="footer">팜바톤(FarmBaton) · 본 리포트의 요약·리스크 설명문 일부는 AI(Claude)가 생성했으며, 모든 수치는 결정론적 계산 결과입니다.</div>
+    <!-- ReportFooter -->
+    <footer class="rpt-foot">
+      <div class="foot-disc">{{ disclaimer }}</div>
+      <div class="foot-meta">팜바톤(FarmBaton) · 모든 수치는 결정론적 계산 결과이며, 요약·조언 문장은 AI(Claude)가 작성했습니다.</div>
+    </footer>
+
+  </div>
 
 </body>
 </html>
