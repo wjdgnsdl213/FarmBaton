@@ -75,7 +75,7 @@ export default function LandingPage() {
               <h1>떠나는 농장과<br />시작하는 청년을 잇다</h1>
               <p className="lp-hero-lead">주소만 입력하면 농장의 인수 검토가 범위를 산출하고, 조건에 맞는 청년농과 연결합니다. 승계의 첫 숫자를 팜바톤에서.</p>
               <div className="lp-hero-actions">
-                <Link className="lp-pill lp-pill-lime" to="/farmer">농가 등록하기 →</Link>
+                <Link className="lp-pill lp-pill-warm" to="/farmer">농가 등록하기 →</Link>
                 <Link className="lp-pill lp-pill-ghost-light" to="/young">청년농으로 시작</Link>
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function LandingPage() {
               <h2>지금 내 농장부터 진단해 보세요</h2>
               <p>3분이면 충분합니다. 등록비 없이 시작할 수 있습니다.</p>
             </div>
-            <Link className="lp-pill lp-pill-lime" to="/farmer">무료로 진단받기 →</Link>
+            <Link className="lp-pill lp-pill-warm" to="/farmer">무료로 진단받기 →</Link>
           </div>
         </div>
       </section>

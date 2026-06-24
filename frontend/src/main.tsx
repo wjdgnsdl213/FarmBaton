@@ -61,7 +61,7 @@ function Nav() {
           <NavLinks loc={loc} loggedIn={loggedIn} onLogout={logout} />
         </div>
         <div className="lp-nav-right">
-          <Link className="lp-pill lp-pill-lime" to="/farmer">시작하기 →</Link>
+          <Link className="lp-pill lp-pill-warm" to="/farmer">시작하기 →</Link>
           <button
             className="lp-nav-burger"
             aria-label="메뉴"
@@ -86,12 +86,12 @@ function Nav() {
 
 function App() {
   const loc = useLocation()
-  const isLanding = loc.pathname === '/'
+  const isWide = loc.pathname === '/' || loc.pathname === '/farmer' || loc.pathname === '/young'
 
   return (
     <>
       <Nav />
-      <main className={isLanding ? 'main main-wide' : 'main'}>
+      <main className={isWide ? 'main main-wide' : 'main'}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/farmer" element={<RequireAuth><FarmerPage /></RequireAuth>} />

@@ -117,11 +117,14 @@ export default function FarmerPage() {
   return (
     <div className="page page-farmer">
       <header className="hero hero-farmer">
-        <span className="hero-eyebrow"><span className="dot"></span>농가 승계 진단</span>
-        <h1>내 농장의 인수 검토가<br />범위로 정리됩니다</h1>
-        <p>주소와 작목만 입력하면 예상 소득·토지·시설 가치를 한눈에 확인할 수 있습니다.</p>
+        <div className="hero-inner">
+          <span className="hero-eyebrow"><span className="dot"></span>농가 승계 진단</span>
+          <h1>내 농장의 인수 검토가<br />범위로 정리됩니다</h1>
+          <p>주소와 작목만 입력하면 예상 소득·토지·시설 가치를 한눈에 확인할 수 있습니다.</p>
+        </div>
       </header>
 
+      <div className="page-wrap">
       <form className="card" onSubmit={handleSubmit}>
         <div className="card-title">농장 정보 입력</div>
 
@@ -224,7 +227,7 @@ export default function FarmerPage() {
       </form>
 
       {result && (
-        <div className="card" ref={resultRef}>
+        <div className="card scroll-anchor" ref={resultRef}>
           <div className="card-title">
             인수 검토가 범위(참고용 추정)&nbsp;
             <span className="grade-badge">
@@ -299,6 +302,7 @@ export default function FarmerPage() {
           </a>
         </div>
       )}
+      </div>
     </div>
   )
 }

@@ -253,11 +253,14 @@ export default function YoungPage() {
   return (
     <div className="page page-young">
       <header className="hero hero-young">
-        <span className="hero-eyebrow"><span className="dot"></span>청년농 매칭</span>
-        <h1>내 조건에 맞는 농장을<br />점수로 만나보세요</h1>
-        <p>희망 지역·작목·자본을 입력하면 승계 가능한 농장을 매칭 점수순으로 추천해 드립니다.</p>
+        <div className="hero-inner">
+          <span className="hero-eyebrow"><span className="dot"></span>청년농 매칭</span>
+          <h1>내 조건에 맞는 농장을<br />점수로 만나보세요</h1>
+          <p>희망 지역·작목·자본을 입력하면 승계 가능한 농장을 매칭 점수순으로 추천해 드립니다.</p>
+        </div>
       </header>
 
+      <div className="page-wrap-wide">
       <form className="card" onSubmit={handleSubmit}>
         <div className="card-title">나의 영농 조건</div>
 
@@ -322,7 +325,7 @@ export default function YoungPage() {
       </form>
 
       {matches !== null && (
-        <div ref={resultRef}>
+        <div className="scroll-anchor" ref={resultRef}>
           <p className="section-title">
             매칭 결과 {matches.length}개
             {yfId && <span style={{ fontSize: '.8rem', color: 'var(--gray)', fontWeight: 400, marginLeft: '.5rem' }}>ID #{yfId}</span>}
@@ -334,7 +337,9 @@ export default function YoungPage() {
               조건에 맞는 농장이 없습니다.
             </div>
           ) : (
-            matches.map((m, i) => <MatchCard key={m.farm_id} item={m} rank={i + 1} yfId={yfId!} />)
+            <div className="match-grid">
+              {matches.map((m, i) => <MatchCard key={m.farm_id} item={m} rank={i + 1} yfId={yfId!} />)}
+            </div>
           )}
 
           {matches.length > 0 && (
@@ -344,6 +349,7 @@ export default function YoungPage() {
           )}
         </div>
       )}
+      </div>
     </div>
   )
 }

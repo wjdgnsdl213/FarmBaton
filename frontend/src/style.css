@@ -12,6 +12,8 @@ html { scroll-behavior: smooth; }
   --green-deep: #15351f;     /* 헤딩/짙은 면 */
   --lime: #a8c66c;           /* 악센트 (세이지 올리브) */
   --lime-soft: #eef3e0;
+  --accent: #c1623f;         /* CTA 버튼(시작하기류) — 웜 테라코타 */
+  --accent-dark: #a84f30;
   --green-light: #e8f3ea;    /* 연한 그린 틴트 */
   --cream: #f6f5f0;          /* 따뜻한 배경 */
   --ink: #16241b;            /* 본문 텍스트 */
@@ -40,14 +42,19 @@ a { color: var(--green); }
 /* ════════ 레이아웃 ════════ */
 .main { max-width: 720px; margin: 0 auto; padding: 0 1rem 5rem; }
 .main.main-wide { max-width: none; padding: 0; }
-.page { padding-top: 1.25rem; }
+.page { padding-top: 0; }
 
-/* ════════ 히어로 헤더 (FarmerPage / YoungPage 상단) ════════ */
+/* 폼/결과 영역 — 풀블리드 히어로 아래, 가독성 위해 폭 제한 */
+.page-wrap { max-width: 880px; margin: 0 auto; padding: 2.4rem 20px 5rem; }
+.page-wrap-wide { max-width: 1120px; margin: 0 auto; padding: 2.4rem 20px 5rem; }
+.scroll-anchor { scroll-margin-top: 84px; }
+
+/* ════════ 히어로 헤더 (FarmerPage / YoungPage 상단, 풀블리드) ════════ */
 .hero {
   position: relative; overflow: hidden;
-  border-radius: 22px; padding: 1.9rem 1.6rem;
-  margin-bottom: 1.5rem;
+  padding: 2.6rem 0 2.8rem;
 }
+.hero-inner { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap;
   font-size: .82rem; font-weight: 700; letter-spacing: .01em;
@@ -164,10 +171,17 @@ textarea { resize: vertical; min-height: 60px; }
 .map-wrap .leaflet-container { height: 220px; width: 100%; }
 
 /* ════════ 매칭 카드 ════════ */
+.match-grid {
+  display: grid; grid-template-columns: 1fr; gap: 1.1rem;
+  align-items: start;
+}
+@media (min-width: 760px) {
+  .match-grid { grid-template-columns: repeat(2, 1fr); }
+}
 .match-item {
   background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--green-mid);
-  border-radius: var(--radius); padding: 1.25rem;
-  margin-bottom: 1.1rem; box-shadow: 0 1px 3px rgba(21,53,31,.07);
+  border-radius: var(--radius); padding: 1.4rem;
+  margin-bottom: 0; box-shadow: 0 1px 3px rgba(21,53,31,.07);
   transition: border-color .15s, box-shadow .15s, transform .15s;
 }
 .match-item:hover {
@@ -262,10 +276,10 @@ textarea { resize: vertical; min-height: 60px; }
   transition: transform .12s, background .15s, opacity .15s;
 }
 .lp-pill:active { transform: translateY(1px); }
-.lp-pill-lime, .lp-pill-dark { box-shadow: 0 1px 2px rgba(21,53,31,.06); }
-.lp-pill-lime:hover, .lp-pill-dark:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(21,53,31,.18); }
-.lp-pill-lime { background: var(--lime); color: var(--green-deep); }
-.lp-pill-lime:hover { background: #97b85a; }
+.lp-pill-warm, .lp-pill-dark { box-shadow: 0 1px 2px rgba(21,53,31,.06); }
+.lp-pill-warm:hover, .lp-pill-dark:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(21,53,31,.18); }
+.lp-pill-warm { background: var(--accent); color: #fff; }
+.lp-pill-warm:hover { background: var(--accent-dark); }
 .lp-pill-dark { background: var(--green-deep); color: #fff; }
 .lp-pill-dark:hover { background: var(--green); }
 .lp-pill-ghost-light { background: rgba(255,255,255,.1); color: #fff; }
@@ -425,7 +439,7 @@ textarea { resize: vertical; min-height: 60px; }
 
 /* ════════ 반응형 (모바일 퍼스트 → 데스크톱 보강) ════════ */
 @media (min-width: 560px) {
-  .hero { padding: 2.4rem 2rem; }
+  .hero { padding: 3.4rem 0 3.6rem; }
   .hero h1 { font-size: 2.4rem; }
   .hero-farmer h1 { font-size: 2.7rem; }
 }
@@ -436,6 +450,7 @@ textarea { resize: vertical; min-height: 60px; }
 @media (min-width: 760px) {
   .lp-nav-links { display: flex; }
   .lp-nav-burger, .lp-nav-mobile-panel { display: none; }
+  .valuation-grid { grid-template-columns: repeat(4, 1fr); }
   .lp-hero { min-height: clamp(560px, 78vh, 760px); }
   .lp-hero-content { padding: 56px 0 68px; flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 32px; }
   .lp-hero-content .lp-hero-text { max-width: 56%; }
