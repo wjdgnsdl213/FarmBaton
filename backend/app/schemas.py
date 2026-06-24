@@ -142,6 +142,7 @@ class ConsultRequestCreate(BaseModel):
 class ConsultRequestResponse(BaseModel):
     id: int
     status: str
+    farm_status: Optional[str] = None
 
 
 class ConsultRequestDetail(BaseModel):

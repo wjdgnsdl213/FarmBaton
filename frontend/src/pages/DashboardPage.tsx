@@ -36,6 +36,10 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
 
   return (
     <div>
+      <p className="match-farm-meta" style={{ marginBottom: '.8rem' }}>
+        점수 미리보기용 목록입니다 — 청년농 프로필은 익명이라 여기서 먼저 연락할 수는 없습니다.
+        직접 연락은 아래 "상담 신청 보기"로 들어온 신청에서 가능합니다.
+      </p>
       {matches.map(m => {
         const score = Math.round(m.total_score)
         const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
@@ -77,7 +81,7 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
   )
 }
 
-function ConsultInbox({ farmId }: { farmId: number }) {
+function ConsultInbox({ farmId, onFarmStatusChange }: { farmId: number; onFarmStatusChange: (status: string) => void }) {
   const [requests, setRequests] = useState<ConsultRequestDetail[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -90,6 +94,7 @@ function ConsultInbox({ farmId }: { farmId: number }) {
   const updateStatus = async (reqId: number, status: 'ACCEPTED' | 'DECLINED') => {
     const updated = await api.updateConsultRequestStatus(farmId, reqId, status)
     setRequests(reqs => reqs && reqs.map(r => r.id === reqId ? { ...r, status: updated.status } : r))
+    if (updated.farm_status) onFarmStatusChange(updated.farm_status)
   }
 
   if (error) return <div className="error-box">{error}</div>
@@ -101,7 +106,9 @@ function ConsultInbox({ farmId }: { farmId: number }) {
       {requests.map(r => (
         <div key={r.id} className="match-item" style={{ cursor: 'default' }}>
           <div className="match-farm-name">{r.contact_name || '익명'}</div>
-          <div className="match-farm-meta">{r.contact_phone || '연락처 미입력'}</div>
+          <div className="match-farm-meta">
+            {r.contact_phone ? <a href={`tel:${r.contact_phone}`}>{r.contact_phone}</a> : '연락처 미입력'}
+          </div>
           {r.message && <p style={{ fontSize: '.85rem', margin: '.4rem 0' }}>"{r.message}"</p>}
           <div className="match-farm-meta" style={{ marginTop: '.3rem' }}>
             <span className="tag">{STATUS_NAMES[r.status] || r.status}</span>
@@ -112,6 +119,11 @@ function ConsultInbox({ farmId }: { farmId: number }) {
               <button className="btn btn-primary" onClick={() => updateStatus(r.id, 'ACCEPTED')}>수락</button>
               <button className="btn" style={{ background: 'var(--gray-light)', color: 'var(--text)' }} onClick={() => updateStatus(r.id, 'DECLINED')}>거절</button>
             </div>
+          )}
+          {r.status === 'ACCEPTED' && r.contact_phone && (
+            <a href={`tel:${r.contact_phone}`} className="btn btn-primary" style={{ marginTop: '.6rem', textDecoration: 'none', display: 'block', textAlign: 'center' }}>
+              전화 연결 →
+            </a>
           )}
         </div>
       ))}
@@ -170,7 +182,7 @@ function FarmCard({ farm }: { farm: FarmSummary }) {
 
       {tab === 'consult' && (
         <div style={{ marginTop: '.8rem', paddingTop: '.8rem', borderTop: '1px solid var(--border)' }}>
-          <ConsultInbox farmId={farm.id} />
+          <ConsultInbox farmId={farm.id} onFarmStatusChange={setStatus} />
         </div>
       )}
       {tab === 'matches' && (

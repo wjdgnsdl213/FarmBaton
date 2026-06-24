@@ -543,14 +543,19 @@ def update_consult_request_status(
     farm_id: int, req_id: int, data: ConsultRequestStatusUpdate,
     conn=Depends(get_db), owner_id: int = Depends(get_current_farmer),
 ):
-    """상담 신청 수락/거절 — 본인 농장의 신청만 변경 가능."""
+    """상담 신청 수락/거절 — 본인 농장의 신청만 변경 가능.
+
+    수락(ACCEPTED) 시 farm.status를 MATCHED로 전환한다 — "수락 다음 단계가
+    없다"는 피드백에 따라, 최소한 농장 목록에서 진행 상황이 보이도록.
+    """
     with conn.cursor() as cur:
-        cur.execute("SELECT owner_id FROM farm WHERE id = %s", (farm_id,))
+        cur.execute("SELECT owner_id, status::TEXT FROM farm WHERE id = %s", (farm_id,))
         row = cur.fetchone()
         if row is None:
             raise HTTPException(status_code=404, detail="farm not found")
         if row[0] != owner_id:
             raise HTTPException(status_code=403, detail="본인 농장만 변경할 수 있습니다.")
+        farm_status = row[1]
 
         cur.execute("""
             UPDATE consult_request SET status = %s
@@ -560,9 +565,16 @@ def update_consult_request_status(
         updated = cur.fetchone()
         if updated is None:
             raise HTTPException(status_code=404, detail="consult_request not found")
+
+        if data.status == "ACCEPTED" and farm_status != "MATCHED":
+            cur.execute(
+                "UPDATE farm SET status = 'MATCHED' WHERE id = %s RETURNING status::TEXT",
+                (farm_id,),
+            )
+            farm_status = cur.fetchone()[0]
     conn.commit()
 
-    return ConsultRequestResponse(id=updated[0], status=updated[1])
+    return ConsultRequestResponse(id=updated[0], status=updated[1], farm_status=farm_status)
 
 
 @router.get("/{farm_id}/valuation", response_model=ValuationResponse)

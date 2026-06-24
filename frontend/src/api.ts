@@ -155,6 +155,7 @@ export interface ConsultRequestPayload {
 export interface ConsultRequestResult {
   id: number
   status: string
+  farm_status?: string | null
 }
 
 export interface ConsultRequestDetail {
