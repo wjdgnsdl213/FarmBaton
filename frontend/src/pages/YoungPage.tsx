@@ -172,7 +172,7 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
             )}
 
             <a
-              href={api.reportPdfUrl(item.farm_id)}
+              href={api.reportPdfUrl(item.farm_id, 'young')}
               className="btn btn-primary"
               style={{ display: 'block', textAlign: 'center', marginTop: '.8rem', textDecoration: 'none' }}
               target="_blank"

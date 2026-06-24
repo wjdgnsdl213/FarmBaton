@@ -11,7 +11,7 @@ import datetime
 import math
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from backend.app.db import get_db
 from backend.app.routers.auth import get_current_farmer
@@ -628,21 +628,61 @@ def _build_normal_year_text(crop_code: str, conn) -> str:
     )
 
 
-@router.get("/{farm_id}/report.pdf")
-def get_report_pdf(farm_id: int, conn=Depends(get_db)):
-    """인수 검토 리포트 PDF (AI 요약/리스크 설명문 + 결정론적 가치평가 breakdown).
+_AUDIENCE_LABEL = {"FARMER": "농장주", "YOUNG": "청년농"}
 
-    ai_summary가 캐시돼 있으면 재사용(LLM 재호출 없음), 없으면 1회 생성 후 캐시.
+
+def _get_or_create_narrative(farm_id: int, audience: str, ctx: ReportContext, conn):
+    """(farm_id, audience)별 설명문 캐시 조회 — 없으면 1회 생성 후 저장.
+
+    같은 농장이라도 관점(농가/청년농)이 다르면 다른 행으로 캐시한다.
     """
     with conn.cursor() as cur:
+        cur.execute(
+            "SELECT summary, risk_notes, advice FROM report_narrative "
+            "WHERE farm_id = %s AND audience = %s",
+            (farm_id, audience),
+        )
+        cached = cur.fetchone()
+    if cached is not None:
+        return cached[0], cached[1], cached[2]
+
+    narrative = generate_narrative(ctx)
+    with conn.cursor() as cur:
         cur.execute("""
-            SELECT address, sido, succession_type::TEXT, ai_summary, ai_risk_notes
+            INSERT INTO report_narrative (farm_id, audience, summary, risk_notes, advice, is_ai)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (farm_id, audience) DO UPDATE SET
+                summary = EXCLUDED.summary, risk_notes = EXCLUDED.risk_notes,
+                advice = EXCLUDED.advice, is_ai = EXCLUDED.is_ai, generated_at = now()
+        """, (farm_id, audience, narrative.summary, narrative.risk_notes,
+              narrative.advice, narrative.is_ai_generated))
+    conn.commit()
+    return narrative.summary, narrative.risk_notes, narrative.advice
+
+
+@router.get("/{farm_id}/report.pdf")
+def get_report_pdf(
+    farm_id: int,
+    audience: str = Query("farmer", pattern="^(farmer|young)$"),
+    conn=Depends(get_db),
+):
+    """인수 검토 리포트 PDF (AI 요약/리스크/조언 + 결정론적 가치평가 breakdown).
+
+    audience=farmer|young 으로 관점별 설명문을 생성·캐시한다. 숫자는 동일하고
+    서술 관점(매도 준비 vs 인수 검토)만 달라진다 — rule 1 안전.
+    설명문은 (farm_id, audience)별로 1회 생성 후 캐시(LLM 재호출 없음).
+    """
+    aud = audience.upper()  # FARMER | YOUNG
+
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT address, sido, succession_type::TEXT
             FROM farm WHERE id = %s
         """, (farm_id,))
         row = cur.fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="farm not found")
-    address, sido, succession_type, cached_summary, cached_risk_notes = row
+    address, sido, succession_type = row
 
     try:
         farm_input = load_farm_input(farm_id, conn)
@@ -653,8 +693,9 @@ def get_report_pdf(farm_id: int, conn=Depends(get_db)):
     risk_flags = derive_risk_flags(farm_input)
     normal_year_text = _build_normal_year_text(farm_input.crop_code, conn)
 
-    if cached_summary is None:
-        narrative = generate_narrative(ReportContext(
+    ai_summary, ai_risk_notes, ai_advice = _get_or_create_narrative(
+        farm_id, aud,
+        ReportContext(
             crop_code=farm_input.crop_code,
             tree_age=farm_input.tree_age,
             area_m2=farm_input.area_m2,
@@ -669,16 +710,10 @@ def get_report_pdf(farm_id: int, conn=Depends(get_db)):
             goodwill_min=_to_만원(result.goodwill_min),
             goodwill_max=_to_만원(result.goodwill_max),
             risk_flags=risk_flags,
-        ))
-        with conn.cursor() as cur:
-            cur.execute("""
-                UPDATE farm SET ai_summary = %s, ai_risk_notes = %s, ai_generated_at = now()
-                WHERE id = %s
-            """, (narrative.summary, narrative.risk_notes, farm_id))
-        conn.commit()
-        ai_summary, ai_risk_notes = narrative.summary, narrative.risk_notes
-    else:
-        ai_summary, ai_risk_notes = cached_summary, cached_risk_notes
+            audience=aud,
+        ),
+        conn,
+    )
 
     goodwill_min_w = _to_만원(result.goodwill_min)
     goodwill_max_w = _to_만원(result.goodwill_max)
@@ -694,8 +729,11 @@ def get_report_pdf(farm_id: int, conn=Depends(get_db)):
         "generated_date": datetime.date.today().isoformat(),
         "confidence_grade": result.confidence_grade,
         "grade_desc": GRADE_DESC.get(result.confidence_grade, ""),
+        "audience_label": _AUDIENCE_LABEL.get(aud, "농장주"),
+        "advice_title": "매도·승계 준비 조언" if aud == "FARMER" else "인수 검토 조언",
         "ai_summary": ai_summary,
         "ai_risk_notes": ai_risk_notes,
+        "ai_advice": ai_advice,
         "est_value_min": f"{_to_만원(result.est_value_min):,}",
         "est_value_max": f"{_to_만원(result.est_value_max):,}",
         "est_income_min": f"{_to_만원(result.est_income_min):,}",

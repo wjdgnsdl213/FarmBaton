@@ -295,7 +295,7 @@ export default function FarmerPage() {
           </p>
 
           <a
-            href={api.reportPdfUrl(result.farm_id)}
+            href={api.reportPdfUrl(result.farm_id, 'farmer')}
             className="btn btn-primary"
             style={{ display: 'block', textAlign: 'center', marginTop: '.6rem', textDecoration: 'none' }}
             target="_blank"

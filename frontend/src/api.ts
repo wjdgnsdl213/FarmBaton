@@ -221,7 +221,8 @@ export const api = {
   geocode: (address: string, crop_code = 'APPLE') =>
     client.get<GeocodeResult>('/geocode', { params: { address, crop_code } }).then(r => r.data),
 
-  reportPdfUrl: (farmId: number) => `${API_BASE_URL}/farms/${farmId}/report.pdf`,
+  reportPdfUrl: (farmId: number, audience: 'farmer' | 'young' = 'farmer') =>
+    `${API_BASE_URL}/farms/${farmId}/report.pdf?audience=${audience}`,
 
   createFarm: (data: FarmCreatePayload) =>
     client.post<FarmCreateResult>('/farms', data).then(r => r.data),

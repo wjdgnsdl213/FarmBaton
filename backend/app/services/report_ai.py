@@ -24,12 +24,56 @@ GRADE_DESC = {
 
 MODEL = "claude-haiku-4-5-20251001"
 
+# 관점별 메타: (라벨, AI 프롬프트용 관점 지시, 폴백 조언 문장)
+_AUDIENCE = {
+    "FARMER": {
+        "label": "농장주",
+        "perspective": (
+            "이 리포트를 읽는 사람은 '농장을 넘기려는 농장주'다. "
+            "매도·승계를 준비하는 입장에서, 위 숫자를 근거로 다음을 짚어라: "
+            "시설 잔존가와 영업권을 더 인정받으려면 어떤 자료(매출 장부, 시설 설치 내역, "
+            "판로 계약서 등)를 준비하면 좋은지, 승계 조건 협상에서 신뢰등급을 올릴 방법, "
+            "지금 제시된 인수 검토가 범위를 어떻게 활용할지."
+        ),
+        "fallback_advice": (
+            "신뢰등급을 올리려면 최근 매출 장부와 시설 설치·수리 내역, 판로 계약서를 "
+            "준비해 제출하시면 영업권과 시설 가치를 더 정확히 인정받을 수 있습니다. "
+            "제시된 인수 검토가 범위는 협상의 출발점으로 활용하시고, 실제 거래 전 "
+            "공인중개사·감정평가사 검토를 함께 받아보시길 권합니다."
+        ),
+    },
+    "YOUNG": {
+        "label": "청년농",
+        "perspective": (
+            "이 리포트를 읽는 사람은 '이 농장을 인수하려는 청년농'이다. "
+            "인수를 검토하는 입장에서, 위 숫자를 근거로 다음을 짚어라: "
+            "보유 자본과 정책자금(청년창업농 융자 등)으로 인수 검토가 범위를 감당할 수 있는지, "
+            "예상 연소득 대비 투자 회수 관점, 작목 수령과 시설 노후도가 초기 영농에 주는 부담, "
+            "영농을 시작하기 전 확인할 체크리스트."
+        ),
+        "fallback_advice": (
+            "인수 검토가 범위를 보유 자본과 청년창업농 정책자금 한도(5억원)로 감당할 수 "
+            "있는지 먼저 확인하시고, 예상 연소득 기준 투자 회수 기간을 가늠해 보세요. "
+            "작목 수령과 시설 상태에 따라 초기 추가 투자가 필요할 수 있으니, 현장 방문과 "
+            "기존 판로 인수 가능 여부를 영농 시작 전에 꼭 확인하시길 권합니다."
+        ),
+    },
+}
+
+
+def _audience_meta(audience: str) -> dict:
+    return _AUDIENCE.get(audience, _AUDIENCE["FARMER"])
+
 
 # ── 리포트 요약/리스크 설명문 ─────────────────────────────────────────────────
 
 @dataclass
 class ReportContext:
-    """리포트 PDF용 입력. 전부 calc_total_value 산출값(만원 단위)과 메타데이터."""
+    """리포트 PDF용 입력. 전부 calc_total_value 산출값(만원 단위)과 메타데이터.
+
+    audience: 'FARMER'(농장주) | 'YOUNG'(청년농). 같은 숫자라도 관점별로
+    설명문·조언을 달리 생성한다(숫자는 동일, 서술만 분기 — rule 1 안전).
+    """
     crop_code: str
     tree_age: int
     area_m2: float
@@ -44,12 +88,14 @@ class ReportContext:
     goodwill_min: int
     goodwill_max: int
     risk_flags: list[str]
+    audience: str = "FARMER"
 
 
 @dataclass
 class NarrativeResult:
     summary: str
     risk_notes: str
+    advice: str        # 관점별 조언/다음 단계
     is_ai_generated: bool  # False면 폴백 템플릿 문장
 
 
@@ -76,6 +122,7 @@ def _get_client():
 
 def _fallback_narrative(ctx: ReportContext) -> NarrativeResult:
     crop = CROP_NAMES.get(ctx.crop_code, ctx.crop_code)
+    meta = _audience_meta(ctx.audience)
     summary = (
         f"{ctx.sido} 소재 {crop} {ctx.tree_age}년생, 면적 {ctx.area_m2:,.0f}㎡ 농장입니다. "
         f"예상 연소득은 {ctx.est_income_min:,}~{ctx.est_income_max:,}만원, "
@@ -83,7 +130,10 @@ def _fallback_narrative(ctx: ReportContext) -> NarrativeResult:
         f"({ctx.confidence_grade}등급, {GRADE_DESC.get(ctx.confidence_grade, '')})."
     )
     risk_notes = " / ".join(ctx.risk_flags) if ctx.risk_flags else "현재 확인된 추가 리스크 요인은 없습니다."
-    return NarrativeResult(summary=summary, risk_notes=risk_notes, is_ai_generated=False)
+    return NarrativeResult(
+        summary=summary, risk_notes=risk_notes,
+        advice=meta["fallback_advice"], is_ai_generated=False,
+    )
 
 
 def generate_narrative(ctx: ReportContext) -> NarrativeResult:
@@ -93,6 +143,7 @@ def generate_narrative(ctx: ReportContext) -> NarrativeResult:
         return _fallback_narrative(ctx)
 
     crop = CROP_NAMES.get(ctx.crop_code, ctx.crop_code)
+    meta = _audience_meta(ctx.audience)
     risk_flags_text = "\n".join(f"- {f}" for f in ctx.risk_flags) or "- 없음"
     goodwill_text = (
         "해당 없음" if ctx.goodwill_min == 0
@@ -102,6 +153,7 @@ def generate_narrative(ctx: ReportContext) -> NarrativeResult:
     prompt = f"""다음은 이미 결정론적으로 계산이 끝난 농장 인수 검토 수치다.
 아래 숫자를 그대로 사용해 자연스러운 한국어 설명문을 작성하라.
 **절대 숫자를 새로 만들거나 변경하지 마라** — 주어진 숫자만 문장에 그대로 인용할 것.
+조언(advice)에는 새로운 금액·수치를 만들지 말고, 위 숫자에 근거한 정성적 조언만 담아라.
 
 - 지역: {ctx.sido}
 - 작목: {crop}, 수령 {ctx.tree_age}년
@@ -115,21 +167,26 @@ def generate_narrative(ctx: ReportContext) -> NarrativeResult:
 - 리스크 요인:
 {risk_flags_text}
 
+[독자 관점] {meta['perspective']}
+
 다음 JSON 형식으로만 응답하라 (다른 텍스트 없이):
-{{"summary": "농장 개요와 가치평가 핵심을 2~3문장으로 요약", "risk_notes": "리스크 요인을 1~2문장으로 자연스럽게 풀어쓴 설명 (리스크 요인이 없으면 '확인된 추가 리스크 요인은 없습니다.')"}}"""
+{{"summary": "농장 개요와 가치평가 핵심을 위 독자 관점에 맞춰 2~3문장으로 요약", "risk_notes": "리스크 요인을 1~2문장으로 자연스럽게 풀어쓴 설명 (리스크 요인이 없으면 '확인된 추가 리스크 요인은 없습니다.')", "advice": "위 독자 관점에서 실질적으로 도움이 되는 조언과 다음 단계를 3~4문장으로 작성"}}"""
 
     try:
         resp = client.messages.create(
             model=MODEL,
-            max_tokens=500,
+            max_tokens=900,
             messages=[{"role": "user", "content": prompt}],
         )
         data = json.loads(_strip_code_fence(resp.content[0].text))
         summary = str(data["summary"]).strip()
         risk_notes = str(data["risk_notes"]).strip()
-        if not summary or not risk_notes:
+        advice = str(data.get("advice", "")).strip()
+        if not summary or not risk_notes or not advice:
             raise ValueError("empty AI output")
-        return NarrativeResult(summary=summary, risk_notes=risk_notes, is_ai_generated=True)
+        return NarrativeResult(
+            summary=summary, risk_notes=risk_notes, advice=advice, is_ai_generated=True,
+        )
     except Exception:
         return _fallback_narrative(ctx)
 

@@ -30,6 +30,16 @@
     border: 1px solid #a7f3d0; border-radius: 4px;
     padding: 2px 8px; font-weight: 700; font-size: 11px;
   }
+  .audience-badge {
+    display: inline-block;
+    background: #eff6ff; color: #1d4ed8;
+    border: 1px solid #bfdbfe; border-radius: 4px;
+    padding: 2px 8px; font-weight: 700; font-size: 11px;
+  }
+  .advice-box {
+    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px;
+    padding: 10px 12px;
+  }
   section { margin-bottom: 14px; }
   .section-title {
     font-weight: 700; font-size: 13px; margin: 0 0 6px;
@@ -60,6 +70,7 @@
   <div class="sub">
     {{ sido }} · {{ crop_name }} {{ tree_age }}년생 · 작성일 {{ generated_date }}
     &nbsp;<span class="grade-badge">{{ confidence_grade }}등급 — {{ grade_desc }}</span>
+    &nbsp;<span class="audience-badge">{{ audience_label }}용</span>
   </div>
 
   <section>
@@ -95,6 +106,11 @@
       </ul>
       {% endif %}
     </div>
+  </section>
+
+  <section>
+    <div class="section-title">{{ advice_title }}</div>
+    <div class="advice-box">{{ ai_advice }}</div>
   </section>
 
   <section>
