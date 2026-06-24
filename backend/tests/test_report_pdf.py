@@ -65,6 +65,24 @@ def test_displayed_amounts_match_calculation():
     assert ctx["scenarios"][2]["value"] == f"{v_max:,}만원"
 
 
+def test_small_amount_shown_in_manwon():
+    """1억 미만 인수 검토가는 억이 아니라 만원으로 표기 (소면적 농장)."""
+    fi = FarmInput(
+        crop_code="APPLE", tree_age=8, area_m2=1500.0,
+        income_10a=4_000_000, age_coef=1.0, trend_index=0.93,
+        land=LandData(area_m2=1500.0, official_price_m2=60_000,
+                      deal_price_m2=65_000, deal_sample_cnt=4),
+        assets=[],
+    )
+    result, ctx = _ctx_for(fi)
+    v_max = round(result.est_value_min / 10000), round(result.est_value_max / 10000)
+    # 둘 다 1억 미만이면 억 표기가 없어야 함
+    if result.est_value_max < 100_000_000:
+        assert "억" not in ctx["value_eok"]
+        assert "만원" in ctx["value_eok"]
+        assert ctx["value_manwon"] == ""  # 보조 만원 줄은 비움(중복 방지)
+
+
 def test_grade_c_when_data_sufficient():
     fi = _make_input(deal=130_000, deal_cnt=5, installed=2017)
     result, ctx = _ctx_for(fi)

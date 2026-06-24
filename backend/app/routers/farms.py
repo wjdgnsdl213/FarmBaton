@@ -775,8 +775,16 @@ def _build_report_context(
         "grade_desc": GRADE_DESC.get(result.confidence_grade, ""),
         "grade_downgrades": reasons["downgrades"],
         "grade_missing": reasons["missing"],
-        "value_eok": f"{v_min / 10000:.2f}억 ~ {v_max / 10000:.2f}억원",
-        "value_manwon": f"{v_min:,}만원 ~ {v_max:,}만원",
+        # 1억 이상이면 억 주표기 + 만원 보조, 1억 미만이면 만원만 표기
+        "value_eok": (
+            f"{v_min / 10000:.2f}억 ~ {v_max / 10000:.2f}억원"
+            if (v_min >= 10000 and v_max >= 10000)
+            else f"{v_min:,}만원 ~ {v_max:,}만원"
+        ),
+        "value_manwon": (
+            f"{v_min:,}만원 ~ {v_max:,}만원"
+            if (v_min >= 10000 and v_max >= 10000) else ""
+        ),
         "income_range": f"{i_min:,} ~ {i_max:,}만원",
         "income_definition": _INCOME_DEFINITION,
         "ai_summary": ai_summary,
