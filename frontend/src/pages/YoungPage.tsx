@@ -1,7 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { api, type FarmDetail, type MatchItem, type SupportProgramItem } from '../api'
+import { api, getToken, getRole, type FarmDetail, type MatchItem, type SupportProgramItem } from '../api'
 import heroYoung from '../assets/hero-young.jpg'
+
+interface Account { name: string; phone: string | null }
 
 const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
 const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
@@ -21,7 +23,7 @@ function ScoreBar({ label, value, max }: ScoreBarProps) {
   )
 }
 
-function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: number }) {
+function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: number; yfId: number; account: Account | null }) {
   const fmt = (n: number) => n.toLocaleString('ko-KR')
   const score = Math.round(item.total_score)
   const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
@@ -185,23 +187,32 @@ function MatchCard({ item, rank, yfId }: { item: MatchItem; rank: number; yfId: 
               <div className="consult-success">상담 신청이 접수되었습니다.</div>
             ) : (
               <form className="consult-form" onSubmit={submitConsult}>
-                <input
-                  type="text"
-                  required
-                  placeholder="이름"
-                  value={contactName}
-                  onChange={e => setContactName(e.target.value)}
-                  disabled={consultState === 'sending'}
-                  style={{ marginBottom: '.5rem' }}
-                />
-                <input
-                  type="text"
-                  placeholder="연락처 (선택)"
-                  value={contactPhone}
-                  onChange={e => setContactPhone(e.target.value)}
-                  disabled={consultState === 'sending'}
-                  style={{ marginBottom: '.5rem' }}
-                />
+                {account ? (
+                  <div className="consult-account">
+                    <div className="detail-row-title">{account.name}{account.phone ? ` · ${account.phone}` : ''}</div>
+                    <div className="detail-row-meta">내 계정 정보로 신청됩니다.</div>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      required
+                      placeholder="이름"
+                      value={contactName}
+                      onChange={e => setContactName(e.target.value)}
+                      disabled={consultState === 'sending'}
+                      style={{ marginBottom: '.5rem' }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="연락처 (선택)"
+                      value={contactPhone}
+                      onChange={e => setContactPhone(e.target.value)}
+                      disabled={consultState === 'sending'}
+                      style={{ marginBottom: '.5rem' }}
+                    />
+                  </>
+                )}
                 <textarea
                   placeholder="농가에 전달할 메시지 (선택)"
                   value={message}
@@ -235,7 +246,16 @@ export default function YoungPage() {
   const [error, setError] = useState<string | null>(null)
   const [matches, setMatches] = useState<MatchItem[] | null>(null)
   const [yfId, setYfId] = useState<number | null>(null)
+  const [account, setAccount] = useState<Account | null>(null)
   const resultRef = useRef<HTMLDivElement>(null)
+
+  // 청년농으로 로그인했으면 상담 신청에 쓸 계정 정보(이름/연락처)를 불러온다.
+  useEffect(() => {
+    if (!getToken() || getRole() !== 'YOUNG') return
+    api.getMe()
+      .then(me => setAccount({ name: me.name, phone: me.phone ?? null }))
+      .catch(() => setAccount(null))
+  }, [])
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value }))
@@ -357,7 +377,7 @@ export default function YoungPage() {
             </div>
           ) : (
             <div className="match-grid">
-              {matches.map((m, i) => <MatchCard key={m.farm_id} item={m} rank={i + 1} yfId={yfId!} />)}
+              {matches.map((m, i) => <MatchCard key={m.farm_id} item={m} rank={i + 1} yfId={yfId!} account={account} />)}
             </div>
           )}
 

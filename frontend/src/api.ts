@@ -9,9 +9,15 @@ const client = axios.create({
 })
 
 const TOKEN_KEY = 'farmbaton_token'
+const ROLE_KEY = 'farmbaton_role'
 export const getToken = () => localStorage.getItem(TOKEN_KEY)
 export const setToken = (token: string) => localStorage.setItem(TOKEN_KEY, token)
-export const clearToken = () => localStorage.removeItem(TOKEN_KEY)
+export const getRole = () => localStorage.getItem(ROLE_KEY)
+export const setRole = (role: string) => localStorage.setItem(ROLE_KEY, role)
+export const clearToken = () => {
+  localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(ROLE_KEY)
+}
 
 client.interceptors.request.use(config => {
   const token = getToken()
@@ -184,6 +190,7 @@ export interface RegisterPayload {
   password: string
   name: string
   phone?: string
+  role: 'FARMER' | 'YOUNG'
 }
 
 export interface LoginPayload {
@@ -195,12 +202,15 @@ export interface AuthResult {
   token: string
   user_id: number
   name: string
+  role: string
 }
 
 export interface MeResult {
   user_id: number
   name: string
   email: string
+  role: string
+  phone?: string | null
 }
 
 export interface SupportProgramItem {

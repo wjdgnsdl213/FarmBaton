@@ -12,6 +12,7 @@ class RegisterRequest(BaseModel):
     password: str = Field(min_length=8)
     name: str
     phone: Optional[str] = None
+    role: str = Field(default="FARMER", pattern="^(FARMER|YOUNG)$")
 
 
 class LoginRequest(BaseModel):
@@ -23,12 +24,15 @@ class AuthResponse(BaseModel):
     token: str
     user_id: int
     name: str
+    role: str
 
 
 class MeResponse(BaseModel):
     user_id: int
     name: str
     email: str
+    role: str
+    phone: Optional[str] = None
 
 
 # ── 농가 등록 요청 ────────────────────────────────────────────────────────────

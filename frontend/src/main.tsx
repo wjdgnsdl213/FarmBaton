@@ -6,17 +6,22 @@ import FarmerPage from './pages/FarmerPage'
 import YoungPage from './pages/YoungPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
-import { getToken, clearToken } from './api'
+import { getToken, getRole, clearToken } from './api'
 import './style.css'
 
-function RequireAuth({ children }: { children: React.ReactNode }) {
+function RequireAuth({ children, role }: { children: React.ReactNode; role?: 'FARMER' | 'YOUNG' }) {
   if (!getToken()) return <Navigate to="/login" replace />
+  // 역할이 지정된 라우트인데 다른 역할로 로그인했으면 본인 영역으로 보냄
+  if (role && getRole() && getRole() !== role) {
+    return <Navigate to={getRole() === 'YOUNG' ? '/young' : '/dashboard'} replace />
+  }
   return <>{children}</>
 }
 
-function NavLinks({ loc, loggedIn, onLogout, onNavigate }: {
+function NavLinks({ loc, loggedIn, role, onLogout, onNavigate }: {
   loc: ReturnType<typeof useLocation>
   loggedIn: boolean
+  role: string | null
   onLogout: () => void
   onNavigate?: () => void
 }) {
@@ -30,7 +35,9 @@ function NavLinks({ loc, loggedIn, onLogout, onNavigate }: {
       <span className="lp-nav-divider" aria-hidden="true" />
       {loggedIn ? (
         <>
-          <Link className={isActive('/dashboard')} to="/dashboard" onClick={onNavigate}>내 농장</Link>
+          {role !== 'YOUNG' && (
+            <Link className={isActive('/dashboard')} to="/dashboard" onClick={onNavigate}>내 농장</Link>
+          )}
           <a href="#" onClick={e => { e.preventDefault(); onLogout(); onNavigate?.() }}>로그아웃</a>
         </>
       ) : (
@@ -44,6 +51,7 @@ function Nav() {
   const loc = useLocation()
   const navigate = useNavigate()
   const loggedIn = !!getToken()
+  const role = getRole()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const logout = () => {
@@ -58,7 +66,7 @@ function Nav() {
           <span className="mark"><i></i></span>팜바톤
         </Link>
         <div className="lp-nav-links">
-          <NavLinks loc={loc} loggedIn={loggedIn} onLogout={logout} />
+          <NavLinks loc={loc} loggedIn={loggedIn} role={role} onLogout={logout} />
         </div>
         <div className="lp-nav-right">
           <Link className="lp-pill lp-pill-warm" to="/farmer">시작하기 →</Link>
@@ -77,7 +85,7 @@ function Nav() {
       </div>
       {mobileOpen && (
         <div className="lp-nav-mobile-panel">
-          <NavLinks loc={loc} loggedIn={loggedIn} onLogout={logout} onNavigate={() => setMobileOpen(false)} />
+          <NavLinks loc={loc} loggedIn={loggedIn} role={role} onLogout={logout} onNavigate={() => setMobileOpen(false)} />
         </div>
       )}
     </nav>
@@ -94,10 +102,10 @@ function App() {
       <main className={isWide ? 'main main-wide' : 'main'}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/farmer" element={<RequireAuth><FarmerPage /></RequireAuth>} />
+          <Route path="/farmer" element={<RequireAuth role="FARMER"><FarmerPage /></RequireAuth>} />
           <Route path="/young" element={<YoungPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
+          <Route path="/dashboard" element={<RequireAuth role="FARMER"><DashboardPage /></RequireAuth>} />
         </Routes>
       </main>
     </>

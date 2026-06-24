@@ -14,7 +14,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from backend.app.db import get_db
-from backend.app.routers.auth import get_current_farmer
+from backend.app.routers.auth import get_current_farmer, get_current_user_optional
 from backend.app.schemas import (
     DISCLAIMER,
     AssetCreate,
@@ -490,8 +490,19 @@ def get_farm(farm_id: int, conn=Depends(get_db)):
 
 
 @router.post("/{farm_id}/consult-requests", response_model=ConsultRequestResponse, status_code=201)
-def create_consult_request(farm_id: int, data: ConsultRequestCreate, conn=Depends(get_db)):
-    """청년농 → 농장 상담 신청."""
+def create_consult_request(
+    farm_id: int, data: ConsultRequestCreate,
+    conn=Depends(get_db), user=Depends(get_current_user_optional),
+):
+    """청년농 → 농장 상담 신청.
+
+    로그인한 YOUNG 사용자면 연락처를 폼이 아니라 계정 정보(이름/전화)에서
+    가져온다 — 청년농이 매번 입력할 필요 없이 본인 정보로 신청되고, 농장주는
+    실명 계정과 함께 신청을 받는다. 익명이면 기존대로 폼의 이름/연락처 사용.
+    """
+    contact_name = data.contact_name
+    contact_phone = data.contact_phone
+
     with conn.cursor() as cur:
         cur.execute("SELECT 1 FROM farm WHERE id = %s", (farm_id,))
         if cur.fetchone() is None:
@@ -501,11 +512,18 @@ def create_consult_request(farm_id: int, data: ConsultRequestCreate, conn=Depend
         if cur.fetchone() is None:
             raise HTTPException(status_code=404, detail="young_farmer not found")
 
+        if user is not None and user[1] == "YOUNG":
+            cur.execute("SELECT name, phone FROM app_user WHERE id = %s", (user[0],))
+            acct = cur.fetchone()
+            if acct is not None:
+                contact_name = acct[0] or contact_name
+                contact_phone = acct[1] or contact_phone
+
         cur.execute("""
             INSERT INTO consult_request (farm_id, young_farmer_id, message, contact_name, contact_phone)
             VALUES (%s, %s, %s, %s, %s)
             RETURNING id, status
-        """, (farm_id, data.young_farmer_id, data.message, data.contact_name, data.contact_phone))
+        """, (farm_id, data.young_farmer_id, data.message, contact_name, contact_phone))
         req_id, status = cur.fetchone()
     conn.commit()
 

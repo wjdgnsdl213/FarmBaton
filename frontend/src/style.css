@@ -49,6 +49,20 @@ a { color: var(--green); }
 .page-wrap-wide { max-width: 1120px; margin: 0 auto; padding: 2.4rem 20px 5rem; }
 .scroll-anchor { scroll-margin-top: 84px; }
 
+/* 회원가입 역할 선택 토글 */
+.role-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.role-toggle button {
+  display: flex; flex-direction: column; align-items: center; gap: .2rem;
+  padding: .9rem .6rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  background: #fff; font-size: 1rem; font-weight: 700; color: var(--green-deep);
+  cursor: pointer; transition: border-color .15s, background .15s;
+}
+.role-toggle button span { font-size: .76rem; font-weight: 500; color: var(--gray); }
+.role-toggle button.active {
+  border-color: var(--green); background: var(--green-light);
+}
+.role-toggle button.active span { color: var(--green); }
+
 /* ════════ 히어로 헤더 (FarmerPage / YoungPage 상단, 풀블리드 사진+오버레이) ════════ */
 .hero {
   position: relative; overflow: hidden;
@@ -268,6 +282,10 @@ textarea { resize: vertical; min-height: 60px; }
 .detail-row-pitch { font-size: .8rem; color: var(--green); font-style: italic; margin-top: .35rem; }
 .detail-row-link { font-size: .78rem; display: inline-block; margin-top: .35rem; font-weight: 600; }
 .consult-form { margin-top: .6rem; display: flex; flex-direction: column; gap: 0; }
+.consult-account {
+  background: var(--green-light); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: .6rem .8rem; margin-bottom: .5rem;
+}
 .consult-success {
   margin-top: .6rem; background: var(--green-light); color: var(--green);
   font-size: .9rem; font-weight: 700; padding: .8rem 1rem;
