@@ -1,6 +1,19 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import heroFarm from '../assets/hero-farm.jpg'
+
+const INTRO_SESSION_KEY = 'fb_intro_shown'
+
+function useIntro() {
+  const [show, setShow] = useState(() => !sessionStorage.getItem(INTRO_SESSION_KEY))
+  useEffect(() => {
+    if (!show) return
+    sessionStorage.setItem(INTRO_SESSION_KEY, '1')
+    const t = setTimeout(() => setShow(false), 3000)
+    return () => clearTimeout(t)
+  }, [show])
+  return show
+}
 
 function useHashScroll() {
   const { hash } = useLocation()
@@ -35,9 +48,20 @@ function useScrollReveal() {
 
 export default function LandingPage() {
   const rootRef = useScrollReveal()
+  const showIntro = useIntro()
   useHashScroll()
   return (
     <div ref={rootRef}>
+      {showIntro && (
+        <div className="lp-intro" aria-hidden="true">
+          <img src={heroFarm} alt="" className="lp-intro-photo" />
+          <div className="lp-intro-overlay" />
+          <div className="lp-intro-text">
+            <p>떠나는 농장의 가치를 이어갑니다</p>
+            <p className="lime">경험은 남기고, 청년의 꿈은 자라납니다.</p>
+          </div>
+        </div>
+      )}
       {/* ════════ HERO ════════ */}
       <header className="lp-hero">
         <img src={heroFarm} alt="" className="lp-hero-photo" />

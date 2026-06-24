@@ -333,6 +333,33 @@ textarea { resize: vertical; min-height: 60px; }
 @media (prefers-reduced-motion: reduce) {
   .lp-hero-text > *, .lp-glass { opacity: 1; animation: none; }
 }
+
+.lp-intro {
+  position: fixed; inset: 0; z-index: 999; overflow: hidden;
+  background: var(--green-deep);
+  display: flex; align-items: center; justify-content: center;
+  animation: lp-intro-out .5s ease forwards;
+  animation-delay: 2.5s;
+}
+.lp-intro-photo {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  filter: blur(4px) brightness(.55) saturate(1.05); transform: scale(1.08);
+}
+.lp-intro-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(11,28,17,.5) 0%, rgba(11,28,17,.82) 100%);
+}
+.lp-intro-text { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+.lp-intro-text p {
+  color: #fff; font-size: clamp(18px, 3.4vw, 26px); font-weight: 700;
+  letter-spacing: -.02em; opacity: 0; animation: lp-fade-up .6s ease forwards;
+}
+.lp-intro-text p:nth-child(1) { animation-delay: .2s; }
+.lp-intro-text p.lime { color: var(--lime); animation-delay: .8s; }
+@keyframes lp-intro-out { to { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) {
+  .lp-intro { display: none; }
+}
 .lp-glass {
   background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
   border-radius: 18px; padding: 20px 22px; backdrop-filter: blur(12px); max-width: 320px;
