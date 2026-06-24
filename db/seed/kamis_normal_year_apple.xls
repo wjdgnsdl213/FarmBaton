@@ -1,0 +1,127 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<head>
+	<title>가격정보 - 친환경농산물 - 품목별 엑셀 출력</title>
+	<meta http-equiv="Content-Type" content="application/vnd.ms-excel;charset=utf-8">
+	<style type="text/css">
+		table caption	{ text-align:left; }
+		table th		{ background-color:#eff2f9; }
+		table td		{ mso-number-format:\@; text-align:general; vertical-align:middle; text-align:center; white-space:nowrap; mso-rotate:0; mso-background-source:auto; mso-pattern:auto; color:black; font-size:11.0pt; font-style:normal; text-decoration:none; font-family:"맑은 고딕", monospace; mso-font-charset:129; border:1px; mso-protection:locked visible; mso-style-name:표준; mso-style-id:0; }
+		table td.c		{ text-align:center;}
+		table td.l		{ text-align:left; }
+		table td.r		{ text-align:right; }
+	</style>
+</head>
+<body>
+	<table>
+		<tr>
+			<td	class="data">
+				<table id="data" border="1px">
+					
+											<caption>소매가격
+					                    			
+						                    			
+						                    				과일류,
+						                    				
+												           		사과,
+												           	
+												           		후지,
+												           	
+												           	상품,
+												           	10개
+						                    			
+					                    			
+						                    			
+					                    			
+											 기간별/연간 가격정보</caption>
+											<colgroup><col><col>
+											</colgroup><thead>
+												<tr>
+													<th class="first" scope="col">구분
+														<button type="button" class="btn ic filter" title="필터" onclick="setTableId(1);view_show('_filter');"><i class="feather icon-filter"></i></button>
+														<button type="button" class="btn ic sort" onclick="fncSortTbl(this, '#itemTable_1', 'desc');" title="기본 정렬됨"><i class="feather icon-align-justify"></i></button>
+													</th>
+													<th scope="col">평균<button type="button" class="btn ic sort" onclick="fncSortTbl(this, '#itemTable_1', 'desc');" title="기본 정렬됨"><i class="feather icon-align-justify"></i></button></th>
+													
+													<th scope="col" class="hidden_tr">표준편차<button type="button" class="btn ic sort" onclick="fncSortTbl(this, '#itemTable_1', 'desc');" title="기본 정렬됨"><i class="feather icon-align-justify"></i></button></th>
+													<th scope="col" class="hidden_tr">변동계수<button type="button" class="btn ic sort" onclick="fncSortTbl(this, '#itemTable_1', 'desc');" title="기본 정렬됨"><i class="feather icon-align-justify"></i></button></th>
+													<th class="last hidden_tr" scope="col">진폭계수<button type="button" class="btn ic sort" onclick="fncSortTbl(this, '#itemTable_1', 'desc');" title="기본 정렬됨"><i class="feather icon-align-justify"></i></button></th>
+												</tr>
+											</thead>
+											<tbody>
+												
+													<tr>
+														<th scope="col" class="first cell_tit1 lvl1">2026</th>
+														<td>27,779</td>
+														
+														<td class="hidden_tr" style="">868</td>
+														<td class="hidden_tr" style="">3.12</td>
+														<td class="last hidden_tr" style="">0.15</td>
+													</tr>
+												
+													<tr>
+														<th scope="col" class="first cell_tit1 lvl1">2025</th>
+														<td>28,073</td>
+														
+														<td class="hidden_tr" style="">1,940</td>
+														<td class="hidden_tr" style="">6.91</td>
+														<td class="last hidden_tr" style="">0.42</td>
+													</tr>
+												
+													<tr>
+														<th scope="col" class="first cell_tit1 lvl1">2024</th>
+														<td>28,322</td>
+														
+														<td class="hidden_tr" style="">3,202</td>
+														<td class="hidden_tr" style="">11.31</td>
+														<td class="last hidden_tr" style="">0.46</td>
+													</tr>
+												
+													<tr>
+														<th scope="col" class="first cell_tit1 lvl1">2023</th>
+														<td>25,384</td>
+														
+														<td class="hidden_tr" style="">2,698</td>
+														<td class="hidden_tr" style="">10.63</td>
+														<td class="last hidden_tr" style="">0.55</td>
+													</tr>
+												
+													<tr>
+														<th scope="col" class="first cell_tit1 lvl1">2022</th>
+														<td>26,878</td>
+														
+														<td class="hidden_tr" style="">2,784</td>
+														<td class="hidden_tr" style="">10.36</td>
+														<td class="last hidden_tr" style="">0.49</td>
+													</tr>
+												
+													<tr>
+														<th scope="col" class="first cell_tit1 lvl1">2021</th>
+														<td>31,634</td>
+														
+														<td class="hidden_tr" style="">3,246</td>
+														<td class="hidden_tr" style="">10.26</td>
+														<td class="last hidden_tr" style="">0.45</td>
+													</tr>
+												
+													<tr>
+														<th scope="col" class="first cell_tit1 lvl1">평년</th>
+														<td>27,758</td>
+														
+														<td class="hidden_tr" style="">2,313</td>
+														<td class="hidden_tr" style="">8.33</td>
+														<td class="last hidden_tr" style="">0.71</td>
+													</tr>
+												
+												
+											</tbody>
+										
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

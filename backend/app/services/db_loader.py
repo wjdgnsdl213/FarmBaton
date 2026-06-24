@@ -81,6 +81,26 @@ def load_farm_input(farm_id: int, conn) -> FarmInput:
         )
 
 
+def load_normal_year_price(crop_code: str, conn) -> tuple[float | None, str | None, str | None]:
+    """price_trend.normal_year_price 조회 (PDF 참고용 — 가치평가 계산엔 쓰지 않음).
+
+    KAMIS 평년가(5개년 중 최고·최저 제외 3개년 평균)가 없는 작목(예: GRAPE,
+    변동성 과다로 KAMIS 자체가 평년값을 산출 못함)은 (None, unit, source)를
+    반환한다.
+    """
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT normal_year_price, price_unit, normal_year_source "
+            "FROM price_trend WHERE crop_code = %s",
+            (crop_code,),
+        )
+        row = cur.fetchone()
+    if row is None:
+        return None, None, None
+    price, unit, source = row
+    return (float(price) if price is not None else None), unit, source
+
+
 def _load_land(cur, bjd_cd: str | None, area_m2: float, sido: str | None = None) -> LandData:
     """동(8자리 bjd_cd) 단위 지가 조회. 좌표 미확보 시 시도 단위 평균으로 폴백.
 

@@ -33,7 +33,7 @@ from backend.app.schemas import (
     FarmSummary,
     ValuationResponse,
 )
-from backend.app.services.db_loader import load_farm_input
+from backend.app.services.db_loader import load_farm_input, load_normal_year_price
 from backend.app.services.pdf_render import render_report_pdf
 from backend.app.services.report_ai import (
     CROP_NAMES,
@@ -600,6 +600,22 @@ def get_valuation(farm_id: int, conn=Depends(get_db)):
     return _build_valuation_response(farm_id, result)
 
 
+def _build_normal_year_text(crop_code: str, conn) -> str:
+    """결정론적 평년가 안내문 — LLM 미사용(rule 1), 값 없으면 사유를 명시."""
+    price, unit, _source = load_normal_year_price(crop_code, conn)
+    crop_name = CROP_NAMES.get(crop_code, crop_code)
+    if price is None:
+        return (
+            f"{crop_name} 작목은 가격 변동성이 커서 KAMIS도 평년가(5개년 중 "
+            f"최고·최저 제외 3개년 평균)를 산출하지 못했습니다."
+        )
+    return (
+        f"{price:,.0f}원/{unit} — KAMIS 평년 소매가"
+        f"(5개년 중 최고·최저 제외 3개년 평균, {crop_name} 기준). "
+        f"위 예상 연소득과는 별도 참고 지표입니다."
+    )
+
+
 @router.get("/{farm_id}/report.pdf")
 def get_report_pdf(farm_id: int, conn=Depends(get_db)):
     """인수 검토 리포트 PDF (AI 요약/리스크 설명문 + 결정론적 가치평가 breakdown).
@@ -623,6 +639,7 @@ def get_report_pdf(farm_id: int, conn=Depends(get_db)):
 
     result = calc_total_value(farm_input, CURRENT_YEAR)
     risk_flags = derive_risk_flags(farm_input)
+    normal_year_text = _build_normal_year_text(farm_input.crop_code, conn)
 
     if cached_summary is None:
         narrative = generate_narrative(ReportContext(
@@ -671,6 +688,7 @@ def get_report_pdf(farm_id: int, conn=Depends(get_db)):
         "est_value_max": f"{_to_만원(result.est_value_max):,}",
         "est_income_min": f"{_to_만원(result.est_income_min):,}",
         "est_income_max": f"{_to_만원(result.est_income_max):,}",
+        "normal_year_text": normal_year_text,
         "land_value_point": f"{_to_만원(result.land_value_point):,}",
         "facility_value": f"{_to_만원(result.facility_value):,}",
         "goodwill_text": goodwill_text,

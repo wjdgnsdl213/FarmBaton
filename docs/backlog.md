@@ -2,14 +2,20 @@
 
 스코프 밖 개선점·후속 작업 기록용. 구현은 여기 적힌 뒤 별도 승인 후 진행.
 
-## PDF "3년 평균 예상 순소득·인수 적정가" — 데이터 부재로 보류
+## [FIXED] PDF "3년 평균 예상 순소득·인수 적정가"
 
 - **무엇**: 리포트에 작목별 소득데이터+시세를 결합한 3년 평균치 산출 추가 요청.
-- **왜 보류**: `price_trend` 테이블은 작목별 1행만 저장(연도 히스토리 없음),
-  KAMIS Open-API에도 진짜 다년 평년 통계 엔드포인트가 없음(`etl/05_price_trend.py`
-  자체 주석에 명시). "3년 평균"에 해당하는 데이터가 파이프라인에 전혀 없어
-  rule 8에 따라 임의 생성하지 않고 보류.
-- **상세·다음 단계**: `docs/handoff.md` 3절 참고 (옵션 A/B/C 검토됨).
+- **막혔던 이유**: KAMIS Open-API에는 다년 평년 통계 엔드포인트가 없음
+  (`etl/05_price_trend.py` 자체 주석에 명시) — Open-API만으로는 데이터 없음.
+- **돌파구**: KAMIS *웹사이트*(API 아님) "소매가격 > 기간별" 화면에 공식
+  "평년"(5개년 중 최고·최저 제외 3개년 평균) 행이 있음 — 사용자가 직접
+  사과/복숭아/포도 3개 화면을 받아 `db/seed/kamis_normal_year_*.xls`로 제공.
+  `etl/06_normal_year_price.py`가 정적 파일을 파싱해 `price_trend.normal_year_price`
+  (006 마이그레이션으로 추가)에 적재. 가치평가 계산(`valuation.py`)은 그대로
+  두고, PDF 리포트("시세 참고" 행, `backend/app/routers/farms.py:_build_normal_year_text`)
+  에만 결정론적 텍스트로 노출 — rule 1 준수, LLM 미사용.
+- **포도 예외**: KAMIS 자체가 변동성 과다로 평년값을 "-"로 비워둠 →
+  `normal_year_price = NULL` 유지, PDF엔 "산출하지 못했습니다" 문구로 명시.
 
 ## farm.id=1 address 데이터 손상 (literal "?" 치환)
 
