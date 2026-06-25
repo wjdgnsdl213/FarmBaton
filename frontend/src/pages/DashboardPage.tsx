@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, type ConsultRequestDetail, type FarmMatchItem, type FarmSummary } from '../api'
+import ChatPanel from '../components/ChatPanel'
 
 const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
 const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
@@ -80,6 +81,7 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
 function ConsultInbox({ farmId, onFarmStatusChange }: { farmId: number; onFarmStatusChange: (status: string) => void }) {
   const [requests, setRequests] = useState<ConsultRequestDetail[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [chatOpen, setChatOpen] = useState<number | null>(null)
 
   useEffect(() => {
     api.getConsultRequests(farmId)
@@ -132,8 +134,18 @@ function ConsultInbox({ farmId, onFarmStatusChange }: { farmId: number; onFarmSt
               </div>
             )}
             {r.status === 'ACCEPTED' && (
-              <div className="consult-success" style={{ marginTop: '.6rem' }}>
-                수락됨 — 채팅으로 대화를 이어가세요.
+              <div style={{ marginTop: '.6rem' }}>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setChatOpen(o => o === r.id ? null : r.id)}
+                >
+                  {chatOpen === r.id ? '채팅 닫기' : '채팅 열기'}
+                </button>
+                {chatOpen === r.id && (
+                  <div style={{ marginTop: '.6rem' }}>
+                    <ChatPanel reqId={r.id} title={`${r.applicant_name || '청년농'} 님과의 대화`} />
+                  </div>
+                )}
               </div>
             )}
             {r.status === 'DECLINED' && (

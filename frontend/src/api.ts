@@ -179,6 +179,32 @@ export interface ConsultRequestDetail {
   total_score: number
 }
 
+export interface ChatMessageItem {
+  id: number
+  sender_role: string
+  body: string
+  created_at: string
+  mine: boolean
+}
+
+export interface ChatThread {
+  consult_request_id: number
+  status: string
+  chat_enabled: boolean
+  messages: ChatMessageItem[]
+}
+
+export interface MyConsultRequest {
+  id: number
+  farm_id: number
+  farm_label: string
+  address: string
+  est_value_min: number | null
+  est_value_max: number | null
+  status: string
+  created_at: string
+}
+
 export interface FarmSummary {
   id: number
   address: string
@@ -285,4 +311,15 @@ export const api = {
 
   getFarmMatches: (farmId: number) =>
     client.get<FarmMatchListResult>(`/farms/${farmId}/matches`).then(r => r.data),
+
+  // ── 채팅 ──
+  getChatThread: (reqId: number) =>
+    client.get<ChatThread>(`/consult-requests/${reqId}/messages`).then(r => r.data),
+
+  sendChatMessage: (reqId: number, body: string) =>
+    client.post<ChatMessageItem>(`/consult-requests/${reqId}/messages`, { body }).then(r => r.data),
+
+  // ── 청년농 본인 상담함 ──
+  getMyConsultRequests: () =>
+    client.get<MyConsultRequest[]>('/young-farmers/me/consult-requests').then(r => r.data),
 }

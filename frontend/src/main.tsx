@@ -6,6 +6,7 @@ import FarmerPage from './pages/FarmerPage'
 import YoungPage from './pages/YoungPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
+import MyRequestsPage from './pages/MyRequestsPage'
 import { getToken, getRole, clearToken } from './api'
 import './style.css'
 
@@ -59,6 +60,9 @@ function NavLinks({ loc, loggedIn, role, onLogout, onNavigate }: {
         <>
           {role !== 'YOUNG' && (
             <Link className={isActive('/dashboard')} to="/dashboard" onClick={onNavigate}>내 농장</Link>
+          )}
+          {role === 'YOUNG' && (
+            <Link className={isActive('/my-requests')} to="/my-requests" onClick={onNavigate}>내 상담</Link>
           )}
           <a href="#" onClick={e => { e.preventDefault(); onLogout(); onNavigate?.() }}>로그아웃</a>
         </>
@@ -128,6 +132,7 @@ function App() {
           <Route path="/young" element={<YoungPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<RequireAuth role="FARMER"><DashboardPage /></RequireAuth>} />
+          <Route path="/my-requests" element={<RequireAuth role="YOUNG"><MyRequestsPage /></RequireAuth>} />
         </Routes>
       </main>
     </>

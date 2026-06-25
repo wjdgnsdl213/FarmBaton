@@ -300,6 +300,20 @@ textarea { resize: vertical; min-height: 60px; }
   background: var(--green-light); border: 1px solid var(--border);
   border-radius: var(--radius-sm); padding: .6rem .8rem; margin-bottom: .5rem;
 }
+/* ════════ 채팅 패널 ════════ */
+.chat-panel { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: #fff; }
+.chat-title { font-size: .85rem; font-weight: 700; color: var(--green-deep); padding: .6rem .8rem; border-bottom: 1px solid var(--border); background: var(--gray-light); }
+.chat-list { height: 260px; overflow-y: auto; padding: .8rem; display: flex; flex-direction: column; gap: .5rem; background: #fbfcfb; }
+.chat-empty { color: var(--gray); font-size: .85rem; text-align: center; margin: auto; }
+.chat-bubble { max-width: 78%; padding: .5rem .7rem; border-radius: 12px; font-size: .88rem; line-height: 1.45; }
+.chat-bubble .chat-body { white-space: pre-wrap; word-break: break-word; }
+.chat-bubble .chat-time { font-size: .68rem; opacity: .6; margin-top: .2rem; }
+.chat-bubble.mine { align-self: flex-end; background: var(--green); color: #fff; border-bottom-right-radius: 3px; }
+.chat-bubble.theirs { align-self: flex-start; background: #fff; border: 1px solid var(--border); color: var(--ink); border-bottom-left-radius: 3px; }
+.chat-input { display: flex; gap: .4rem; padding: .6rem; border-top: 1px solid var(--border); }
+.chat-input input { flex: 1; }
+.chat-input .btn { width: auto; padding: .6rem 1rem; }
+
 .consult-login-prompt { margin-top: .6rem; text-align: center; }
 .consult-login-prompt p { font-size: .88rem; color: var(--gray); margin-bottom: .6rem; }
 .consult-login-prompt .btn { width: auto; padding: .7rem 1.4rem; }

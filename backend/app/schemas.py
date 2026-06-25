@@ -170,6 +170,40 @@ class ConsultRequestStatusUpdate(BaseModel):
     status: str = Field(pattern="^(ACCEPTED|DECLINED)$")
 
 
+# ── 채팅 ────────────────────────────────────────────────────────────────────
+
+class ChatMessageCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=2000)
+
+
+class ChatMessageItem(BaseModel):
+    id: int
+    sender_role: str          # FARMER | YOUNG
+    body: str
+    created_at: str
+    mine: bool                # 요청자 기준 내가 보낸 메시지인지
+
+
+class ChatThreadResponse(BaseModel):
+    consult_request_id: int
+    status: str               # consult_request.status — ACCEPTED일 때만 전송 가능
+    chat_enabled: bool        # status == ACCEPTED
+    messages: list[ChatMessageItem]
+
+
+# ── 청년농 본인 상담함 ────────────────────────────────────────────────────────
+
+class MyConsultRequestItem(BaseModel):
+    id: int
+    farm_id: int
+    farm_label: str           # 예: "충북 사과 농장"
+    address: str
+    est_value_min: Optional[int]
+    est_value_max: Optional[int]
+    status: str
+    created_at: str
+
+
 class FarmCreateResponse(BaseModel):
     farm_id: int
     valuation: Optional[ValuationResponse] = None

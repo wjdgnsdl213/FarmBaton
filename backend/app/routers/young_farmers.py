@@ -20,12 +20,14 @@ from backend.app.routers.auth import get_current_user_optional
 from backend.app.schemas import (
     MatchItem,
     MatchListResponse,
+    MyConsultRequestItem,
     SupportProgramItem,
     SupportProgramListResponse,
     YoungFarmerCreate,
     YoungFarmerCreateResponse,
 )
 from backend.app.services.report_ai import (
+    CROP_NAMES,
     MatchContext,
     ProgramPitchContext,
     fallback_match_explanation,
@@ -138,6 +140,41 @@ def create_young_farmer(
 
     conn.commit()
     return YoungFarmerCreateResponse(young_farmer_id=yf_id)
+
+
+@router.get("/me/consult-requests", response_model=list[MyConsultRequestItem])
+def my_consult_requests(conn=Depends(get_db), user=Depends(get_current_user_optional)):
+    """로그인한 청년농이 본인이 보낸 상담 신청 목록(농장 정보·상태 포함).
+
+    수락(ACCEPTED)된 건은 프론트에서 채팅으로 이어진다.
+    """
+    if user is None or user[1] != "YOUNG":
+        raise HTTPException(status_code=403, detail="청년농 계정으로 로그인이 필요합니다.")
+    user_id = user[0]
+
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT cr.id, f.id, f.sido, f.crop_code::TEXT, f.address,
+                   f.est_value_min, f.est_value_max, cr.status, cr.created_at
+            FROM consult_request cr
+            JOIN farm f ON f.id = cr.farm_id
+            JOIN young_farmer_profile yp ON yp.id = cr.young_farmer_id
+            WHERE yp.user_id = %s
+            ORDER BY cr.created_at DESC
+        """, (user_id,))
+        rows = cur.fetchall()
+
+    out = []
+    for (cid, fid, sido, crop, addr, vmin, vmax, status, created) in rows:
+        out.append(MyConsultRequestItem(
+            id=cid, farm_id=fid,
+            farm_label=f"{sido or ''} {CROP_NAMES.get(crop, crop)} 농장".strip(),
+            address=addr or "",
+            est_value_min=round(vmin / 10000) if vmin is not None else None,
+            est_value_max=round(vmax / 10000) if vmax is not None else None,
+            status=status, created_at=created.isoformat(),
+        ))
+    return out
 
 
 @router.get("/{yf_id}/matches", response_model=MatchListResponse)
