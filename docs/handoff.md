@@ -12,7 +12,8 @@
 
 - 마감: **2026-06-30**
 - CLAUDE.md 체크리스트 기준 P0~P3 완료, P4(배포) 운영 중. 베타 피드백 반영
-  + 마무리 단계. 적용된 마이그레이션: 001~008 (007 평년가, 008 채팅).
+  + 마무리 단계. 적용된 마이그레이션: 001~010 (007 평년가, 008 채팅,
+  009 발신구분, 010 자기소개).
 - production URL: **https://farmbaton.vercel.app** (백엔드:
   `https://backend-production-a7818.up.railway.app`)
 
@@ -54,10 +55,24 @@
      `ConversationsPage`(좌측 목록 + 우측 `ChatPanel`), nav "대화"(양 역할).
      상담 카드·`/my-requests`에서 인라인 채팅 제거 → "대화" 메뉴로 일원화.
      매칭 후보는 접기/펴기(기본 접힘)로 길이 문제 해소.
-   - **C0 데이터**: 익명 청년농 프로필 72개 정리 + 데모 계정 시딩(아래 섹션 8).
+   - **C0 데이터**: 익명 청년농 프로필 72개 정리 + 데모 계정 시딩(아래 섹션 4-1).
+6. **`a9976fd` 내 정보 + 검색/프로필 분리** — 청년농의 "탐색 검색"과 "농장주에게
+   보일 실제 프로필"을 분리(궁금해서 다른 조건으로 검색해도 상담 시엔 실제
+   프로필이 전달되도록).
+   - **E1 내 정보(`/profile`, 양 역할, nav "내 정보")**: 이름·연락처 수정
+     `PATCH /api/auth/me`, 비밀번호 변경 `POST /api/auth/password`(현재 비번
+     확인), 이메일·역할 읽기전용.
+   - **E2 분리**: 마이그레이션 010 `young_farmer_profile.intro`(한 줄 자기소개).
+     `GET/PUT /api/young-farmers/me/profile`(실제 프로필) 신설, 저장형
+     `create_young_farmer`(POST "") 폐지. 매칭은 `POST
+     /api/young-farmers/match-search`(**미저장 탐색**, 응답 young_farmer_id=본인
+     실제 프로필 id로 상담은 프로필 기준) — 기존 `GET /{id}/matches` 폐지.
+     상담함·매칭후보·대화에 `intro` 노출. 청년농 **가입 시 프로필 입력**(가입과
+     동시에 PUT profile).
 
 → 전부 production 배포·검증 완료(2페이지 PDF·만원 표기·채팅·익명 매칭 403·
-대화 라우트·폰트 임베딩 확인). pytest 55개 통과. 적용 마이그레이션 001~009.
+대화 라우트·폰트 임베딩·검색≠프로필·비번변경 확인). pytest 55개 통과.
+적용 마이그레이션 001~010.
 
 ## 2. 직전 세션(2026-06-24)에서 완료한 작업 (커밋 순)
 
@@ -132,17 +147,26 @@ vercel --prod --yes`)로 배포 완료, production URL에서 동작 확인까지
 - **포도 예외**: KAMIS 자체가 변동성 과다로 평년값을 "-"로 비워둠 →
   `normal_year_price=NULL` 유지, PDF엔 "산출하지 못했습니다" 문구로 명시.
 
-## 4. 인증·역할 모델 (커밋 `a06c9bb` 이후 현재 상태 — 완전 계정 기반)
+## 4. 인증·역할 모델 (커밋 `a9976fd` 이후 현재 상태 — 완전 계정 기반)
 
 청년농 측까지 **완전히 계정 기반**으로 정착. 익명 경로는 모두 폐지됨.
 
 - `app_user.role`(FARMER/YOUNG/ADMIN). 회원가입에 role 선택(`auth.py register`),
   로그인 역할 무관(응답에 `role`). `me`는 role/phone 반환.
+- **계정 수정**: `PATCH /api/auth/me`(이름·연락처), `POST /api/auth/password`
+  (현재 비번 확인 후 교체). 이메일·역할은 변경 불가. 프론트 `/profile`.
 - `get_current_user_optional`(auth.py) — 토큰 있으면 `(user_id, role)`, 없으면 None.
-- **매칭(`create_young_farmer`)·상담(`create_consult_request`) 모두 로그인 YOUNG
-  필수** (익명 경로 폐지). 매칭은 본인 프로필 1개 upsert, 상담은 본인 프로필
-  검증 + 계정 이름만 저장(전화번호 비저장·비노출). 같은 농장 재신청은 기존
-  대화 재사용(`uq_consult_farm_young`).
+- **검색 ↔ 프로필 분리 (중요, `a9976fd`)**:
+  - **청년농 실제 프로필** = `young_farmer_profile`(자본·경력·정책·승계·지역·작목
+    ·`intro`). `GET/PUT /api/young-farmers/me/profile`로 내 정보·가입에서 설정.
+    **농장주에게 노출되는 건 이 프로필**(상담함·매칭후보·대화).
+  - **매칭 검색** = `POST /api/young-farmers/match-search` — **미저장 탐색**.
+    입력값으로 농장을 점수화해 반환하되 프로필을 덮어쓰지 않음(다른 조건으로
+    둘러봐도 내 프로필 불변). 응답 `young_farmer_id`는 **본인 실제 프로필 id**.
+  - **상담**(`create_consult_request`)은 그 프로필 id로 생성 → 농장주는 검색값이
+    아니라 실제 프로필을 봄. 로그인 YOUNG 필수, 같은 농장 재신청은 기존 대화
+    재사용(`uq_consult_farm_young`).
+  - (폐지: 저장형 `create_young_farmer` POST "", `GET /{id}/matches`.)
 - **대화 모델**: `consult_request`가 곧 대화방. `initiated_by`(YOUNG=청년농 신청,
   FARMER=농장주 발신). 농장주 발신은 즉시 ACCEPTED. 상담 인박스
   (`list_consult_requests`)는 `initiated_by='YOUNG'`만, "대화"(`/api/conversations`)는
