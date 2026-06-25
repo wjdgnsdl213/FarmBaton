@@ -83,6 +83,7 @@ app.include_router(auth.router)
 app.include_router(farms.router)
 app.include_router(young_farmers.router)
 app.include_router(chat.router)
+app.include_router(chat.conv_router)
 
 
 @app.get("/health")

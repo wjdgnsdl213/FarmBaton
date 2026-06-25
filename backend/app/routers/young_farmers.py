@@ -91,12 +91,16 @@ def create_young_farmer(
     conn=Depends(get_db),
     user=Depends(get_current_user_optional),
 ):
-    """청년농 프로필 등록.
+    """청년농 프로필 등록/갱신 — **로그인한 YOUNG 계정만**.
 
-    - 로그인한 YOUNG 사용자: 본인 계정에 연결된 프로필을 1개 유지(upsert) —
-      재제출 시 같은 프로필을 갱신해 상담 신청이 본인 계정으로 귀속되게 한다.
-    - 익명(로그인 안 함): 기존대로 익명 app_user + 프로필 생성 (데모 플로우 보존).
+    매칭 풀을 계정 보유자로만 유지하기 위해 익명 생성 경로는 폐지했다(농장주가
+    매칭 후보에게 먼저 대화를 걸 수 있으려면 후보가 계정을 가져야 함). 본인
+    계정에 프로필 1개만 유지(재제출 시 갱신).
     """
+    if user is None or user[1] != "YOUNG":
+        raise HTTPException(status_code=403, detail="청년농 계정으로 로그인 후 이용할 수 있습니다.")
+    user_id = user[0]
+
     profile_vals = (
         data.pref_sido, data.pref_crop,
         data.available_capital, data.experience_years,
@@ -104,39 +108,30 @@ def create_young_farmer(
     )
 
     with conn.cursor() as cur:
-        if user is not None and user[1] == "YOUNG":
-            user_id = user[0]
-            cur.execute(
-                "SELECT id FROM young_farmer_profile WHERE user_id = %s ORDER BY id LIMIT 1",
-                (user_id,),
-            )
-            existing = cur.fetchone()
-            if existing is not None:
-                yf_id = existing[0]
-                cur.execute("""
-                    UPDATE young_farmer_profile SET
-                        pref_sido = %s, pref_crop = %s::crop_code_t,
-                        available_capital = %s, experience_years = %s,
-                        policy_fund = %s, pref_succession = %s::succession_type_t
-                    WHERE id = %s
-                """, (*profile_vals, yf_id))
-                conn.commit()
-                return YoungFarmerCreateResponse(young_farmer_id=yf_id)
+        cur.execute(
+            "SELECT id FROM young_farmer_profile WHERE user_id = %s ORDER BY id LIMIT 1",
+            (user_id,),
+        )
+        existing = cur.fetchone()
+        if existing is not None:
+            yf_id = existing[0]
+            cur.execute("""
+                UPDATE young_farmer_profile SET
+                    pref_sido = %s, pref_crop = %s::crop_code_t,
+                    available_capital = %s, experience_years = %s,
+                    policy_fund = %s, pref_succession = %s::succession_type_t
+                WHERE id = %s
+            """, (*profile_vals, yf_id))
         else:
-            cur.execute(
-                "INSERT INTO app_user (role, is_demo) VALUES ('YOUNG', FALSE) RETURNING id"
-            )
-            user_id = cur.fetchone()[0]
-
-        cur.execute("""
-            INSERT INTO young_farmer_profile (
-                user_id, pref_sido, pref_crop,
-                available_capital, experience_years,
-                policy_fund, pref_succession
-            ) VALUES (%s, %s, %s::crop_code_t, %s, %s, %s, %s::succession_type_t)
-            RETURNING id
-        """, (user_id, *profile_vals))
-        yf_id = cur.fetchone()[0]
+            cur.execute("""
+                INSERT INTO young_farmer_profile (
+                    user_id, pref_sido, pref_crop,
+                    available_capital, experience_years,
+                    policy_fund, pref_succession
+                ) VALUES (%s, %s, %s::crop_code_t, %s, %s, %s, %s::succession_type_t)
+                RETURNING id
+            """, (user_id, *profile_vals))
+            yf_id = cur.fetchone()[0]
 
     conn.commit()
     return YoungFarmerCreateResponse(young_farmer_id=yf_id)

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api, type ConsultRequestDetail, type FarmMatchItem, type FarmSummary } from '../api'
-import ChatPanel from '../components/ChatPanel'
 
 const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
 const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
@@ -22,12 +22,23 @@ function ScoreBar({ label, value, max }: { label: string; value: number; max: nu
 function MatchedYoungFarmers({ farmId }: { farmId: number }) {
   const [matches, setMatches] = useState<FarmMatchItem[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [convo, setConvo] = useState<Record<number, 'sending' | 'sent' | 'error'>>({})
 
   useEffect(() => {
     api.getFarmMatches(farmId)
       .then(res => setMatches(res.matches))
       .catch(err => setError(err.response?.data?.detail || '매칭 목록을 불러오지 못했습니다.'))
   }, [farmId])
+
+  const startConvo = async (yfId: number) => {
+    setConvo(c => ({ ...c, [yfId]: 'sending' }))
+    try {
+      await api.initiateConversation(farmId, yfId)
+      setConvo(c => ({ ...c, [yfId]: 'sent' }))
+    } catch {
+      setConvo(c => ({ ...c, [yfId]: 'error' }))
+    }
+  }
 
   if (error) return <div className="error-box">{error}</div>
   if (matches === null) return <div className="match-farm-meta">매칭 목록 불러오는 중...</div>
@@ -36,10 +47,11 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
   }
 
   return (
-    <div>
+    <div className="match-grid">
       {matches.map(m => {
         const score = Math.round(m.total_score)
         const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
+        const state = convo[m.young_farmer_id]
         return (
           <div key={m.young_farmer_id} className="match-item" style={{ cursor: 'default', borderLeftColor: circleColor }}>
             <div className="match-header">
@@ -71,6 +83,16 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
                 "{m.explanation}"
               </p>
             )}
+            <div style={{ marginTop: '.6rem' }}>
+              {state === 'sent' ? (
+                <div className="consult-success">대화를 시작했습니다 — <Link to="/conversations">대화 메뉴</Link>에서 이어가세요.</div>
+              ) : (
+                <button className="btn btn-primary" onClick={() => startConvo(m.young_farmer_id)} disabled={state === 'sending'}>
+                  {state === 'sending' ? <span className="spinner" /> : '대화 신청'}
+                </button>
+              )}
+              {state === 'error' && <div className="error-box" style={{ marginTop: '.4rem' }}>대화 신청에 실패했습니다.</div>}
+            </div>
           </div>
         )
       })}
@@ -81,7 +103,6 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
 function ConsultInbox({ farmId, onFarmStatusChange }: { farmId: number; onFarmStatusChange: (status: string) => void }) {
   const [requests, setRequests] = useState<ConsultRequestDetail[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [chatOpen, setChatOpen] = useState<number | null>(null)
 
   useEffect(() => {
     api.getConsultRequests(farmId)
@@ -134,18 +155,8 @@ function ConsultInbox({ farmId, onFarmStatusChange }: { farmId: number; onFarmSt
               </div>
             )}
             {r.status === 'ACCEPTED' && (
-              <div style={{ marginTop: '.6rem' }}>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => setChatOpen(o => o === r.id ? null : r.id)}
-                >
-                  {chatOpen === r.id ? '채팅 닫기' : '채팅 열기'}
-                </button>
-                {chatOpen === r.id && (
-                  <div style={{ marginTop: '.6rem' }}>
-                    <ChatPanel reqId={r.id} title={`${r.applicant_name || '청년농'} 님과의 대화`} />
-                  </div>
-                )}
+              <div className="consult-success" style={{ marginTop: '.6rem' }}>
+                수락됨 — <Link to="/conversations">대화 메뉴</Link>에서 대화하세요.
               </div>
             )}
             {r.status === 'DECLINED' && (
@@ -160,6 +171,7 @@ function ConsultInbox({ farmId, onFarmStatusChange }: { farmId: number; onFarmSt
 
 function FarmCard({ farm }: { farm: FarmSummary }) {
   const [open, setOpen] = useState(false)
+  const [candidatesOpen, setCandidatesOpen] = useState(false)
   const [status, setStatus] = useState(farm.status)
   const [publishing, setPublishing] = useState(false)
   const fmt = (n: number | null) => n === null ? '-' : n.toLocaleString('ko-KR')
@@ -207,11 +219,21 @@ function FarmCard({ farm }: { farm: FarmSummary }) {
           <p className="section-title" style={{ margin: '0 0 .6rem' }}>상담 신청</p>
           <ConsultInbox farmId={farm.id} onFarmStatusChange={setStatus} />
 
-          <p className="section-title" style={{ margin: '1.2rem 0 .6rem' }}>매칭 후보 (미신청)</p>
-          <p className="match-farm-meta" style={{ marginBottom: '.6rem' }}>
-            아직 신청하지 않았지만 이 농장과 조건이 맞는 청년농입니다. 점수 미리보기용이며 직접 연락은 상담 신청에서 가능합니다.
-          </p>
-          <MatchedYoungFarmers farmId={farm.id} />
+          <button
+            className="btn"
+            style={{ marginTop: '1.2rem', background: 'var(--gray-light)', color: 'var(--text)' }}
+            onClick={() => setCandidatesOpen(o => !o)}
+          >
+            {candidatesOpen ? '매칭 후보 접기' : '매칭 후보 (미신청) 보기'}
+          </button>
+          {candidatesOpen && (
+            <div style={{ marginTop: '.8rem' }}>
+              <p className="match-farm-meta" style={{ marginBottom: '.6rem' }}>
+                아직 신청하지 않았지만 이 농장과 조건이 맞는 청년농입니다. "대화 신청"으로 먼저 연락할 수 있습니다.
+              </p>
+              <MatchedYoungFarmers farmId={farm.id} />
+            </div>
+          )}
         </div>
       )}
     </div>

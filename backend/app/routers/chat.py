@@ -17,13 +17,72 @@ from backend.app.schemas import (
     ChatMessageCreate,
     ChatMessageItem,
     ChatThreadResponse,
+    ConversationItem,
 )
+from backend.app.services.report_ai import CROP_NAMES
 
 router = APIRouter(prefix="/api/consult-requests", tags=["chat"])
 
+# 별도 prefix 라우터 — 대화 목록(역할 무관)
+conv_router = APIRouter(prefix="/api/conversations", tags=["chat"])
+
+
+def _farm_label(sido: str | None, crop: str | None) -> str:
+    return f"{sido or ''} {CROP_NAMES.get(crop, crop or '')} 농장".strip()
+
+
+@conv_router.get("", response_model=list[ConversationItem])
+def list_conversations(conn=Depends(get_db), user=Depends(get_current_user_optional)):
+    """현재 사용자의 대화 목록(수락된 상담 = 대화방). 역할에 따라 자동 분기."""
+    if user is None:
+        raise HTTPException(status_code=401, detail="로그인이 필요합니다.")
+    user_id, role = user
+
+    if role == "FARMER":
+        where = "f.owner_id = %s"
+        # 상대 = 청년농 계정 이름
+        counterpart = "yau.name"
+    elif role == "YOUNG":
+        where = "yp.user_id = %s"
+        # 상대 = 농장주 계정 이름
+        counterpart = "fau.name"
+    else:
+        return []
+
+    with conn.cursor() as cur:
+        cur.execute(f"""
+            SELECT cr.id, f.id, f.sido, f.crop_code::TEXT, cr.initiated_by,
+                   {counterpart},
+                   (SELECT max(created_at) FROM chat_message WHERE consult_request_id = cr.id),
+                   (SELECT body FROM chat_message WHERE consult_request_id = cr.id
+                    ORDER BY created_at DESC, id DESC LIMIT 1)
+            FROM consult_request cr
+            JOIN farm f ON f.id = cr.farm_id
+            JOIN app_user fau ON fau.id = f.owner_id
+            JOIN young_farmer_profile yp ON yp.id = cr.young_farmer_id
+            JOIN app_user yau ON yau.id = yp.user_id
+            WHERE {where} AND cr.status = 'ACCEPTED'
+            ORDER BY COALESCE(
+                (SELECT max(created_at) FROM chat_message WHERE consult_request_id = cr.id),
+                cr.created_at
+            ) DESC
+        """, (user_id,))
+        rows = cur.fetchall()
+
+    return [
+        ConversationItem(
+            consult_request_id=r[0], farm_id=r[1],
+            farm_label=_farm_label(r[2], r[3]), initiated_by=r[4],
+            counterpart_name=r[5] or "상대방",
+            last_message_at=r[6].isoformat() if r[6] else None,
+            last_message_preview=r[7],
+        )
+        for r in rows
+    ]
+
 
 def _authorize(req_id: int, user, conn):
-    """이 상담의 당사자인지 검증 후 (consult_status, my_role) 반환.
+    """이 상담의 당사자인지 검증 후 (status, my_role, counterpart_name, farm_label) 반환.
 
     my_role: 'FARMER'(농장 소유주) | 'YOUNG'(신청 청년농).
     """
@@ -33,27 +92,31 @@ def _authorize(req_id: int, user, conn):
 
     with conn.cursor() as cur:
         cur.execute("""
-            SELECT cr.status, f.owner_id, yp.user_id
+            SELECT cr.status, f.owner_id, yp.user_id,
+                   f.sido, f.crop_code::TEXT, fau.name, yau.name
             FROM consult_request cr
             JOIN farm f ON f.id = cr.farm_id
+            JOIN app_user fau ON fau.id = f.owner_id
             JOIN young_farmer_profile yp ON yp.id = cr.young_farmer_id
+            JOIN app_user yau ON yau.id = yp.user_id
             WHERE cr.id = %s
         """, (req_id,))
         row = cur.fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="상담 신청을 찾을 수 없습니다.")
-    status, owner_id, yf_user_id = row
+    status, owner_id, yf_user_id, sido, crop, farmer_name, young_name = row
+    farm_label = _farm_label(sido, crop)
 
     if role == "FARMER" and owner_id == user_id:
-        return status, "FARMER"
+        return status, "FARMER", (young_name or "청년농"), farm_label
     if role == "YOUNG" and yf_user_id == user_id:
-        return status, "YOUNG"
+        return status, "YOUNG", (farmer_name or "농장주"), farm_label
     raise HTTPException(status_code=403, detail="이 대화의 당사자만 접근할 수 있습니다.")
 
 
 @router.get("/{req_id}/messages", response_model=ChatThreadResponse)
 def list_messages(req_id: int, conn=Depends(get_db), user=Depends(get_current_user_optional)):
-    status, my_role = _authorize(req_id, user, conn)
+    status, my_role, counterpart, farm_label = _authorize(req_id, user, conn)
     with conn.cursor() as cur:
         cur.execute("""
             SELECT id, sender_role, body, created_at
@@ -69,7 +132,8 @@ def list_messages(req_id: int, conn=Depends(get_db), user=Depends(get_current_us
     ]
     return ChatThreadResponse(
         consult_request_id=req_id, status=status,
-        chat_enabled=(status == "ACCEPTED"), messages=messages,
+        chat_enabled=(status == "ACCEPTED"),
+        counterpart_name=counterpart, farm_label=farm_label, messages=messages,
     )
 
 
@@ -78,7 +142,7 @@ def send_message(
     req_id: int, data: ChatMessageCreate,
     conn=Depends(get_db), user=Depends(get_current_user_optional),
 ):
-    status, my_role = _authorize(req_id, user, conn)
+    status, my_role, _counterpart, _farm = _authorize(req_id, user, conn)
     if status != "ACCEPTED":
         raise HTTPException(status_code=409, detail="상담이 수락된 후에 대화할 수 있습니다.")
 

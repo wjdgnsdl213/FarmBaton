@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, type MyConsultRequest } from '../api'
-import ChatPanel from '../components/ChatPanel'
 
 const STATUS_NAMES: Record<string, string> = { REQUESTED: '대기중', ACCEPTED: '수락됨', DECLINED: '거절됨' }
 
 export default function MyRequestsPage() {
   const [requests, setRequests] = useState<MyConsultRequest[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [chatOpen, setChatOpen] = useState<number | null>(null)
   const fmt = (n: number | null) => n === null ? '-' : n.toLocaleString('ko-KR')
 
   useEffect(() => {
@@ -40,15 +38,8 @@ export default function MyRequestsPage() {
             </div>
 
             {r.status === 'ACCEPTED' ? (
-              <div style={{ marginTop: '.6rem' }}>
-                <button className="btn btn-primary" onClick={() => setChatOpen(o => o === r.id ? null : r.id)}>
-                  {chatOpen === r.id ? '채팅 닫기' : '채팅 열기'}
-                </button>
-                {chatOpen === r.id && (
-                  <div style={{ marginTop: '.6rem' }}>
-                    <ChatPanel reqId={r.id} title="농장주와의 대화" />
-                  </div>
-                )}
+              <div className="consult-success" style={{ marginTop: '.6rem' }}>
+                수락됨 — <Link to="/conversations">대화 메뉴</Link>에서 대화하세요.
               </div>
             ) : r.status === 'REQUESTED' ? (
               <div className="match-farm-meta" style={{ marginTop: '.5rem' }}>농장주의 수락을 기다리고 있습니다.</div>

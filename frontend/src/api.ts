@@ -191,7 +191,19 @@ export interface ChatThread {
   consult_request_id: number
   status: string
   chat_enabled: boolean
+  counterpart_name: string
+  farm_label: string
   messages: ChatMessageItem[]
+}
+
+export interface ConversationItem {
+  consult_request_id: number
+  farm_id: number
+  farm_label: string
+  counterpart_name: string
+  initiated_by: string
+  last_message_at: string | null
+  last_message_preview: string | null
 }
 
 export interface MyConsultRequest {
@@ -322,4 +334,12 @@ export const api = {
   // ── 청년농 본인 상담함 ──
   getMyConsultRequests: () =>
     client.get<MyConsultRequest[]>('/young-farmers/me/consult-requests').then(r => r.data),
+
+  // ── 대화 목록 (역할 무관) ──
+  getConversations: () =>
+    client.get<ConversationItem[]>('/conversations').then(r => r.data),
+
+  // ── 농장주 발신 대화 시작 ──
+  initiateConversation: (farmId: number, youngFarmerId: number) =>
+    client.post<ConsultRequestResult>(`/farms/${farmId}/conversations`, { young_farmer_id: youngFarmerId }).then(r => r.data),
 }

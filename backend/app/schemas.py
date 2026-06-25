@@ -188,7 +188,24 @@ class ChatThreadResponse(BaseModel):
     consult_request_id: int
     status: str               # consult_request.status — ACCEPTED일 때만 전송 가능
     chat_enabled: bool        # status == ACCEPTED
+    counterpart_name: str     # 상대 표시명 (농장주↔청년농)
+    farm_label: str
     messages: list[ChatMessageItem]
+
+
+class ConversationItem(BaseModel):
+    """대화 목록 1건 — 역할 무관, 수락된 상담 = 대화방."""
+    consult_request_id: int
+    farm_id: int
+    farm_label: str
+    counterpart_name: str     # 농장주에겐 청년농 이름, 청년농에겐 농장주 이름
+    initiated_by: str         # YOUNG | FARMER
+    last_message_at: Optional[str]
+    last_message_preview: Optional[str]
+
+
+class FarmerInitiateConversation(BaseModel):
+    young_farmer_id: int
 
 
 # ── 청년농 본인 상담함 ────────────────────────────────────────────────────────

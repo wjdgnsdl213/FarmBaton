@@ -24,6 +24,7 @@ from backend.app.schemas import (
     ConsultRequestDetail,
     ConsultRequestResponse,
     ConsultRequestStatusUpdate,
+    FarmerInitiateConversation,
     FarmCreate,
     FarmCreateResponse,
     FarmDetail,
@@ -526,6 +527,16 @@ def create_consult_request(
         acct = cur.fetchone()
         applicant_name = acct[0] if acct else None
 
+        # 같은 농장에 이미 신청/대화가 있으면 재사용(중복 방지 — uq_consult_farm_young)
+        cur.execute(
+            "SELECT id, status FROM consult_request WHERE farm_id = %s AND young_farmer_id = %s",
+            (farm_id, data.young_farmer_id),
+        )
+        dup = cur.fetchone()
+        if dup is not None:
+            conn.commit()
+            return ConsultRequestResponse(id=dup[0], status=dup[1])
+
         cur.execute("""
             INSERT INTO consult_request (farm_id, young_farmer_id, message, contact_name)
             VALUES (%s, %s, %s, %s)
@@ -558,7 +569,8 @@ def list_consult_requests(farm_id: int, conn=Depends(get_db), owner_id: int = De
                    yp.experience_years, yp.policy_fund, yp.pref_succession::TEXT
             FROM consult_request cr
             JOIN young_farmer_profile yp ON yp.id = cr.young_farmer_id
-            WHERE cr.farm_id = %s ORDER BY cr.created_at DESC
+            WHERE cr.farm_id = %s AND cr.initiated_by = 'YOUNG'
+            ORDER BY cr.created_at DESC
         """, (farm_id,))
         rows = cur.fetchall()
 
@@ -632,6 +644,60 @@ def update_consult_request_status(
     conn.commit()
 
     return ConsultRequestResponse(id=updated[0], status=updated[1], farm_status=farm_status)
+
+
+@router.post("/{farm_id}/conversations", response_model=ConsultRequestResponse, status_code=201)
+def farmer_initiate_conversation(
+    farm_id: int, data: FarmerInitiateConversation,
+    conn=Depends(get_db), owner_id: int = Depends(get_current_farmer),
+):
+    """농장주가 매칭 후보(미신청) 청년농에게 먼저 대화를 건다.
+
+    consult_request를 status=ACCEPTED, initiated_by=FARMER로 생성해 즉시 채팅
+    가능. 이미 (농장, 청년농) 대화가 있으면 그 방을 그대로 반환(중복 방지).
+    상대 청년농은 계정 보유자여야 함(매칭 풀은 C1 이후 전부 계정 기반).
+    """
+    with conn.cursor() as cur:
+        cur.execute("SELECT owner_id FROM farm WHERE id = %s", (farm_id,))
+        row = cur.fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="farm not found")
+        if row[0] != owner_id:
+            raise HTTPException(status_code=403, detail="본인 농장만 이용할 수 있습니다.")
+
+        cur.execute(
+            "SELECT user_id FROM young_farmer_profile WHERE id = %s",
+            (data.young_farmer_id,),
+        )
+        prof = cur.fetchone()
+        if prof is None:
+            raise HTTPException(status_code=404, detail="young_farmer not found")
+        if prof[0] is None:
+            raise HTTPException(status_code=409, detail="계정이 없는 청년농에게는 대화를 걸 수 없습니다.")
+
+        # 기존 대화 있으면 재사용, 없으면 생성(농장주 발신 = 즉시 ACCEPTED)
+        cur.execute(
+            "SELECT id, status FROM consult_request WHERE farm_id = %s AND young_farmer_id = %s",
+            (farm_id, data.young_farmer_id),
+        )
+        existing = cur.fetchone()
+        if existing is not None:
+            req_id, status = existing
+            if status != "ACCEPTED":
+                cur.execute(
+                    "UPDATE consult_request SET status = 'ACCEPTED' WHERE id = %s RETURNING status",
+                    (req_id,),
+                )
+                status = cur.fetchone()[0]
+        else:
+            cur.execute("""
+                INSERT INTO consult_request (farm_id, young_farmer_id, status, initiated_by)
+                VALUES (%s, %s, 'ACCEPTED', 'FARMER')
+                RETURNING id, status
+            """, (farm_id, data.young_farmer_id))
+            req_id, status = cur.fetchone()
+    conn.commit()
+    return ConsultRequestResponse(id=req_id, status=status)
 
 
 @router.get("/{farm_id}/valuation", response_model=ValuationResponse)
