@@ -1,0 +1,21 @@
+# systemd 유닛 — 재부팅 시 프록시 자동 구동.
+# 설치: sudo cp vworld-proxy.service /etc/systemd/system/
+#       sudo systemctl daemon-reload && sudo systemctl enable --now vworld-proxy
+# 경로/사용자(User, WorkingDirectory)는 실제 환경에 맞게 수정한다.
+[Unit]
+Description=FarmBaton V-World geocoding proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/farmbaton-proxy
+EnvironmentFile=/home/pi/farmbaton-proxy/.env
+# Tailscale Funnel 이 127.0.0.1:8000 로 포워딩하므로 로컬에만 바인딩(안전)
+ExecStart=/home/pi/farmbaton-proxy/venv/bin/uvicorn vworld_proxy:app --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

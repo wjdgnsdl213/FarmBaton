@@ -17,7 +17,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.db import get_db
-from backend.app.routers import auth, farms, young_farmers
+from backend.app.routers import auth, chat, farms, young_farmers
 from backend.app.routers.farms import KNN_DISTANCE_WARN_KM
 
 _GEOCODE_FALLBACK_PATH = Path(__file__).resolve().parents[2] / "db" / "seed" / "geocode_fallback.csv"
@@ -36,6 +36,30 @@ def _load_geocode_fallback() -> dict[str, tuple[float, float]]:
 
 
 _GEOCODE_FALLBACK = _load_geocode_fallback()
+
+
+def _build_vworld_request(
+    address: str, addr_type: str, key: str, proxy_url: str, proxy_token: str
+) -> urllib.request.Request:
+    """V-World getcoord 요청 객체 생성.
+
+    VWORLD_PROXY_URL 이 설정돼 있으면 국내 우회 프록시(proxy/ 참고)를 경유하고,
+    아니면 기존처럼 V-World를 직접 호출한다. 두 경우 모두 응답 JSON 형식은
+    동일하므로 호출부 파싱 로직은 바뀌지 않는다. (proxy 미설정 시 = 기존 동작)
+    """
+    if proxy_url:
+        params = urllib.parse.urlencode({"address": address, "type": addr_type})
+        req = urllib.request.Request(f"{proxy_url}?{params}")
+        if proxy_token:
+            req.add_header("Authorization", f"Bearer {proxy_token}")
+        return req
+    params = urllib.parse.urlencode({
+        "service": "address", "request": "getcoord",
+        "crs": "EPSG:4326", "address": address,
+        "type": addr_type, "key": key,
+        "format": "json", "simple": "false",
+    })
+    return urllib.request.Request(f"https://api.vworld.kr/req/address?{params}")
 
 app = FastAPI(
     title="팜바톤 API",
@@ -58,6 +82,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(farms.router)
 app.include_router(young_farmers.router)
+app.include_router(chat.router)
 
 
 @app.get("/health")
@@ -74,22 +99,18 @@ def geocode(address: str, crop_code: str = "APPLE", conn=Depends(get_db)):
     반환: {lon, lat, area_m2?, sido?, sigungu?}
     """
     key = os.getenv("VWORLD_API_KEY", "")
-    if not key:
-        raise HTTPException(503, "VWORLD_API_KEY not configured")
+    # 국내 우회 프록시(proxy/) 설정 시 키는 프록시가 보유 → 백엔드 키 없어도 됨
+    proxy_url = os.getenv("VWORLD_PROXY_URL", "").strip()
+    proxy_token = os.getenv("VWORLD_PROXY_TOKEN", "").strip()
+    if not key and not proxy_url:
+        raise HTTPException(503, "VWORLD_API_KEY 또는 VWORLD_PROXY_URL 미설정")
 
     # ── 1. 지오코딩 ──────────────────────────────────────────────────
     lon = lat = None
     for addr_type in ("PARCEL", "ROAD"):
-        params = urllib.parse.urlencode({
-            "service": "address", "request": "getcoord",
-            "crs": "EPSG:4326", "address": address,
-            "type": addr_type, "key": key,
-            "format": "json", "simple": "false",
-        })
         try:
-            with urllib.request.urlopen(
-                f"https://api.vworld.kr/req/address?{params}", timeout=8
-            ) as resp:
+            req = _build_vworld_request(address, addr_type, key, proxy_url, proxy_token)
+            with urllib.request.urlopen(req, timeout=8) as resp:
                 data = json.loads(resp.read())
             status = data["response"]["status"]
             if status == "OK":
