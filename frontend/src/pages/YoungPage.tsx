@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { Link } from 'react-router-dom'
 import { api, getToken, getRole, type FarmDetail, type MatchItem, type SupportProgramItem } from '../api'
 import heroYoung from '../assets/hero-young.jpg'
 
@@ -33,8 +34,6 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
   const [detailLoading, setDetailLoading] = useState(false)
   const [programs, setPrograms] = useState<SupportProgramItem[] | null>(null)
   const [message, setMessage] = useState('')
-  const [contactName, setContactName] = useState('')
-  const [contactPhone, setContactPhone] = useState('')
   const [consultState, setConsultState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
   const toggle = async () => {
@@ -68,8 +67,6 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
       await api.createConsultRequest(item.farm_id, {
         young_farmer_id: yfId,
         message: message || null,
-        contact_name: contactName || null,
-        contact_phone: contactPhone || null,
       })
       setConsultState('sent')
     } catch {
@@ -184,35 +181,13 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
             </a>
 
             {consultState === 'sent' ? (
-              <div className="consult-success">상담 신청이 접수되었습니다.</div>
-            ) : (
+              <div className="consult-success">상담 신청이 접수되었습니다. 농장주가 수락하면 채팅으로 이어집니다.</div>
+            ) : account ? (
               <form className="consult-form" onSubmit={submitConsult}>
-                {account ? (
-                  <div className="consult-account">
-                    <div className="detail-row-title">{account.name}{account.phone ? ` · ${account.phone}` : ''}</div>
-                    <div className="detail-row-meta">내 계정 정보로 신청됩니다.</div>
-                  </div>
-                ) : (
-                  <>
-                    <input
-                      type="text"
-                      required
-                      placeholder="이름"
-                      value={contactName}
-                      onChange={e => setContactName(e.target.value)}
-                      disabled={consultState === 'sending'}
-                      style={{ marginBottom: '.5rem' }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="연락처 (선택)"
-                      value={contactPhone}
-                      onChange={e => setContactPhone(e.target.value)}
-                      disabled={consultState === 'sending'}
-                      style={{ marginBottom: '.5rem' }}
-                    />
-                  </>
-                )}
+                <div className="consult-account">
+                  <div className="detail-row-title">{account.name} 님 계정으로 신청</div>
+                  <div className="detail-row-meta">내 매칭 프로필이 농장주에게 함께 전달됩니다.</div>
+                </div>
                 <textarea
                   placeholder="농가에 전달할 메시지 (선택)"
                   value={message}
@@ -224,6 +199,11 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
                   {consultState === 'sending' ? <span className="spinner" /> : '상담 신청'}
                 </button>
               </form>
+            ) : (
+              <div className="consult-login-prompt">
+                <p>상담 신청은 청년농 로그인 후 가능합니다.</p>
+                <Link to="/login" className="btn btn-primary">로그인하고 신청하기</Link>
+              </div>
             )}
           </div>
         </div>,

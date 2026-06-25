@@ -300,6 +300,9 @@ textarea { resize: vertical; min-height: 60px; }
   background: var(--green-light); border: 1px solid var(--border);
   border-radius: var(--radius-sm); padding: .6rem .8rem; margin-bottom: .5rem;
 }
+.consult-login-prompt { margin-top: .6rem; text-align: center; }
+.consult-login-prompt p { font-size: .88rem; color: var(--gray); margin-bottom: .6rem; }
+.consult-login-prompt .btn { width: auto; padding: .7rem 1.4rem; }
 .consult-success {
   margin-top: .6rem; background: var(--green-light); color: var(--green);
   font-size: .9rem; font-weight: 700; padding: .8rem 1rem;

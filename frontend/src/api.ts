@@ -154,8 +154,6 @@ export interface FarmDetail {
 export interface ConsultRequestPayload {
   young_farmer_id: number
   message?: string | null
-  contact_name?: string | null
-  contact_phone?: string | null
 }
 
 export interface ConsultRequestResult {
@@ -167,11 +165,18 @@ export interface ConsultRequestResult {
 export interface ConsultRequestDetail {
   id: number
   farm_id: number
-  contact_name: string | null
-  contact_phone: string | null
+  young_farmer_id: number
+  applicant_name: string | null
   message: string | null
   status: string
   created_at: string
+  pref_sido: string | null
+  pref_crop: string | null
+  available_capital: number
+  experience_years: number
+  pref_succession: string
+  policy_fund: boolean
+  total_score: number
 }
 
 export interface FarmSummary {

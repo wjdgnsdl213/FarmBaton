@@ -496,36 +496,41 @@ def create_consult_request(
     farm_id: int, data: ConsultRequestCreate,
     conn=Depends(get_db), user=Depends(get_current_user_optional),
 ):
-    """청년농 → 농장 상담 신청.
+    """청년농 → 농장 상담 신청 (로그인한 YOUNG 계정만).
 
-    로그인한 YOUNG 사용자면 연락처를 폼이 아니라 계정 정보(이름/전화)에서
-    가져온다 — 청년농이 매번 입력할 필요 없이 본인 정보로 신청되고, 농장주는
-    실명 계정과 함께 신청을 받는다. 익명이면 기존대로 폼의 이름/연락처 사용.
+    신뢰도·개인정보 보호를 위해 익명 신청·전화번호 입력은 폐지했다. 신청은
+    본인 청년농 프로필로만 가능하며, 농장주는 실명 계정·매칭 정보와 함께
+    신청을 받고, 수락 시 인앱 채팅으로 이어진다(전화번호 비노출).
     """
-    contact_name = data.contact_name
-    contact_phone = data.contact_phone
+    if user is None or user[1] != "YOUNG":
+        raise HTTPException(status_code=403, detail="청년농 계정으로 로그인 후 신청할 수 있습니다.")
+    user_id = user[0]
 
     with conn.cursor() as cur:
         cur.execute("SELECT 1 FROM farm WHERE id = %s", (farm_id,))
         if cur.fetchone() is None:
             raise HTTPException(status_code=404, detail="farm not found")
 
-        cur.execute("SELECT 1 FROM young_farmer_profile WHERE id = %s", (data.young_farmer_id,))
-        if cur.fetchone() is None:
+        # 신청 프로필이 본인 계정 소유인지 검증 (타인 프로필로 신청 차단)
+        cur.execute(
+            "SELECT user_id FROM young_farmer_profile WHERE id = %s",
+            (data.young_farmer_id,),
+        )
+        prof = cur.fetchone()
+        if prof is None:
             raise HTTPException(status_code=404, detail="young_farmer not found")
+        if prof[0] != user_id:
+            raise HTTPException(status_code=403, detail="본인 프로필로만 신청할 수 있습니다.")
 
-        if user is not None and user[1] == "YOUNG":
-            cur.execute("SELECT name, phone FROM app_user WHERE id = %s", (user[0],))
-            acct = cur.fetchone()
-            if acct is not None:
-                contact_name = acct[0] or contact_name
-                contact_phone = acct[1] or contact_phone
+        cur.execute("SELECT name FROM app_user WHERE id = %s", (user_id,))
+        acct = cur.fetchone()
+        applicant_name = acct[0] if acct else None
 
         cur.execute("""
-            INSERT INTO consult_request (farm_id, young_farmer_id, message, contact_name, contact_phone)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO consult_request (farm_id, young_farmer_id, message, contact_name)
+            VALUES (%s, %s, %s, %s)
             RETURNING id, status
-        """, (farm_id, data.young_farmer_id, data.message, contact_name, contact_phone))
+        """, (farm_id, data.young_farmer_id, data.message, applicant_name))
         req_id, status = cur.fetchone()
     conn.commit()
 
@@ -534,28 +539,60 @@ def create_consult_request(
 
 @router.get("/{farm_id}/consult-requests", response_model=list[ConsultRequestDetail])
 def list_consult_requests(farm_id: int, conn=Depends(get_db), owner_id: int = Depends(get_current_farmer)):
-    """농가 상담함 — 본인 농장으로 들어온 상담 신청 목록."""
+    """농가 상담함 — 신청 청년농의 매칭 프로필·점수 포함 (전화번호 비노출)."""
     with conn.cursor() as cur:
-        cur.execute("SELECT owner_id FROM farm WHERE id = %s", (farm_id,))
+        cur.execute("""
+            SELECT owner_id, sido, crop_code::TEXT, succession_type::TEXT, est_value_min
+            FROM farm WHERE id = %s
+        """, (farm_id,))
         row = cur.fetchone()
         if row is None:
             raise HTTPException(status_code=404, detail="farm not found")
-        if row[0] != owner_id:
+        f_owner, f_sido, f_crop, f_succ, f_val_min = row
+        if f_owner != owner_id:
             raise HTTPException(status_code=403, detail="본인 농장만 조회할 수 있습니다.")
 
         cur.execute("""
-            SELECT id, farm_id, contact_name, contact_phone, message, status, created_at
-            FROM consult_request WHERE farm_id = %s ORDER BY created_at DESC
+            SELECT cr.id, cr.young_farmer_id, cr.contact_name, cr.message, cr.status, cr.created_at,
+                   yp.pref_sido, yp.pref_crop::TEXT, yp.available_capital,
+                   yp.experience_years, yp.policy_fund, yp.pref_succession::TEXT
+            FROM consult_request cr
+            JOIN young_farmer_profile yp ON yp.id = cr.young_farmer_id
+            WHERE cr.farm_id = %s ORDER BY cr.created_at DESC
         """, (farm_id,))
         rows = cur.fetchall()
 
-    return [
-        ConsultRequestDetail(
-            id=r[0], farm_id=r[1], contact_name=r[2], contact_phone=r[3],
-            message=r[4], status=r[5], created_at=r[6].isoformat(),
+    farm_profile = None
+    if f_val_min is not None:
+        farm_profile = FarmProfileForMatch(
+            sido=f_sido, crop_code=f_crop, succession_type=f_succ or "SALE",
+            est_value_min=float(f_val_min),
+            crop_difficulty_high=(f_crop in HIGH_DIFFICULTY_CROPS),
         )
-        for r in rows
-    ]
+
+    out = []
+    for r in rows:
+        (cid, yf_id, name, msg, status, created, pref_sido, pref_crop,
+         capital, exp_yrs, policy_fund, pref_succ) = r
+        score = 0.0
+        if farm_profile is not None:
+            score = calc_match_score(
+                YoungFarmerInput(
+                    pref_sido=pref_sido, pref_crop=pref_crop,
+                    available_capital=float(capital), experience_years=int(exp_yrs),
+                    policy_fund=bool(policy_fund), pref_succession=pref_succ,
+                ),
+                farm_profile,
+            ).total_score
+        out.append(ConsultRequestDetail(
+            id=cid, farm_id=farm_id, young_farmer_id=yf_id, applicant_name=name,
+            message=msg, status=status, created_at=created.isoformat(),
+            pref_sido=pref_sido, pref_crop=pref_crop,
+            available_capital=_to_만원(float(capital)), experience_years=int(exp_yrs),
+            pref_succession=pref_succ, policy_fund=bool(policy_fund),
+            total_score=round(score, 1),
+        ))
+    return out
 
 
 @router.patch("/{farm_id}/consult-requests/{req_id}", response_model=ConsultRequestResponse)

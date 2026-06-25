@@ -139,8 +139,6 @@ class FarmStatusUpdateResponse(BaseModel):
 class ConsultRequestCreate(BaseModel):
     young_farmer_id: int
     message: Optional[str] = None
-    contact_name: Optional[str] = None
-    contact_phone: Optional[str] = None
 
 
 class ConsultRequestResponse(BaseModel):
@@ -150,13 +148,22 @@ class ConsultRequestResponse(BaseModel):
 
 
 class ConsultRequestDetail(BaseModel):
+    """농장주 상담함 1건 — 신청한 청년농의 매칭 프로필·점수 포함."""
     id: int
     farm_id: int
-    contact_name: Optional[str]
-    contact_phone: Optional[str]
+    young_farmer_id: int
+    applicant_name: Optional[str]      # 청년농 계정 이름 (전화번호는 노출하지 않음)
     message: Optional[str]
     status: str
     created_at: str
+    # 매칭 프로필 (calc_match_score 재사용)
+    pref_sido: Optional[str]
+    pref_crop: Optional[str]
+    available_capital: int             # 만원
+    experience_years: int
+    pref_succession: str
+    policy_fund: bool
+    total_score: float
 
 
 class ConsultRequestStatusUpdate(BaseModel):

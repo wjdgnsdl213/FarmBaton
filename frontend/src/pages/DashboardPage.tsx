@@ -36,10 +36,6 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
 
   return (
     <div>
-      <p className="match-farm-meta" style={{ marginBottom: '.8rem' }}>
-        점수 미리보기용 목록입니다 — 청년농 프로필은 익명이라 여기서 먼저 연락할 수는 없습니다.
-        직접 연락은 아래 "상담 신청 보기"로 들어온 신청에서 가능합니다.
-      </p>
       {matches.map(m => {
         const score = Math.round(m.total_score)
         const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
@@ -103,36 +99,55 @@ function ConsultInbox({ farmId, onFarmStatusChange }: { farmId: number; onFarmSt
 
   return (
     <div>
-      {requests.map(r => (
-        <div key={r.id} className="match-item" style={{ cursor: 'default' }}>
-          <div className="match-farm-name">{r.contact_name || '익명'}</div>
-          <div className="match-farm-meta">
-            {r.contact_phone ? <a href={`tel:${r.contact_phone}`}>{r.contact_phone}</a> : '연락처 미입력'}
-          </div>
-          {r.message && <p style={{ fontSize: '.85rem', margin: '.4rem 0' }}>"{r.message}"</p>}
-          <div className="match-farm-meta" style={{ marginTop: '.3rem' }}>
-            <span className="tag">{STATUS_NAMES[r.status] || r.status}</span>
-            <span style={{ marginLeft: '.4rem' }}>{new Date(r.created_at).toLocaleString('ko-KR')}</span>
-          </div>
-          {r.status === 'REQUESTED' && (
-            <div style={{ display: 'flex', gap: '.5rem', marginTop: '.6rem' }}>
-              <button className="btn btn-primary" onClick={() => updateStatus(r.id, 'ACCEPTED')}>수락</button>
-              <button className="btn" style={{ background: 'var(--gray-light)', color: 'var(--text)' }} onClick={() => updateStatus(r.id, 'DECLINED')}>거절</button>
+      {requests.map(r => {
+        const score = Math.round(r.total_score)
+        const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
+        return (
+          <div key={r.id} className="match-item" style={{ cursor: 'default', borderLeftColor: circleColor }}>
+            <div className="match-header">
+              <div className="match-info">
+                <div className="match-farm-name">{r.applicant_name || '청년농'}</div>
+                <div className="match-farm-meta" style={{ marginTop: '.25rem' }}>
+                  <span className="tag">{r.pref_sido || '지역 무관'}</span>
+                  <span className="tag">{r.pref_crop ? CROP_NAMES[r.pref_crop] : '작목 무관'}</span>
+                  <span className="tag">{SUCC_NAMES[r.pref_succession]}</span>
+                  <span className="tag">자본 {r.available_capital.toLocaleString('ko-KR')}만원</span>
+                  <span className="tag">경력 {r.experience_years}년</span>
+                </div>
+                {r.message && <p style={{ fontSize: '.85rem', margin: '.5rem 0 0' }}>"{r.message}"</p>}
+                <div className="match-farm-meta" style={{ marginTop: '.4rem' }}>
+                  <span className="tag">{STATUS_NAMES[r.status] || r.status}</span>
+                  <span style={{ marginLeft: '.4rem' }}>{new Date(r.created_at).toLocaleString('ko-KR')}</span>
+                </div>
+              </div>
+              <div className="match-score-circle" style={{ background: circleColor }}>
+                <span className="match-score-num">{score}</span>
+                <span className="match-score-unit">/ 100</span>
+              </div>
             </div>
-          )}
-          {r.status === 'ACCEPTED' && r.contact_phone && (
-            <a href={`tel:${r.contact_phone}`} className="btn btn-primary" style={{ marginTop: '.6rem', textDecoration: 'none', display: 'block', textAlign: 'center' }}>
-              전화 연결 →
-            </a>
-          )}
-        </div>
-      ))}
+            {r.status === 'REQUESTED' && (
+              <div style={{ display: 'flex', gap: '.5rem', marginTop: '.6rem' }}>
+                <button className="btn btn-primary" onClick={() => updateStatus(r.id, 'ACCEPTED')}>수락</button>
+                <button className="btn" style={{ background: 'var(--gray-light)', color: 'var(--text)' }} onClick={() => updateStatus(r.id, 'DECLINED')}>거절</button>
+              </div>
+            )}
+            {r.status === 'ACCEPTED' && (
+              <div className="consult-success" style={{ marginTop: '.6rem' }}>
+                수락됨 — 채팅으로 대화를 이어가세요.
+              </div>
+            )}
+            {r.status === 'DECLINED' && (
+              <div className="match-farm-meta" style={{ marginTop: '.5rem' }}>거절한 신청입니다.</div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
 
 function FarmCard({ farm }: { farm: FarmSummary }) {
-  const [tab, setTab] = useState<'none' | 'consult' | 'matches'>('none')
+  const [open, setOpen] = useState(false)
   const [status, setStatus] = useState(farm.status)
   const [publishing, setPublishing] = useState(false)
   const fmt = (n: number | null) => n === null ? '-' : n.toLocaleString('ko-KR')
@@ -171,22 +186,19 @@ function FarmCard({ farm }: { farm: FarmSummary }) {
         </button>
       )}
 
-      <div style={{ display: 'flex', gap: '.5rem', marginTop: '.6rem' }}>
-        <button className="btn btn-primary" onClick={() => setTab(t => t === 'consult' ? 'none' : 'consult')}>
-          {tab === 'consult' ? '상담 신청 접기' : '상담 신청 보기'}
-        </button>
-        <button className="btn btn-primary" onClick={() => setTab(t => t === 'matches' ? 'none' : 'matches')}>
-          {tab === 'matches' ? '매칭 청년농 접기' : '매칭된 청년농 보기'}
-        </button>
-      </div>
+      <button className="btn btn-primary" style={{ marginTop: '.6rem' }} onClick={() => setOpen(o => !o)}>
+        {open ? '청년농 관리 접기' : '청년농 관리'}
+      </button>
 
-      {tab === 'consult' && (
+      {open && (
         <div style={{ marginTop: '.8rem', paddingTop: '.8rem', borderTop: '1px solid var(--border)' }}>
+          <p className="section-title" style={{ margin: '0 0 .6rem' }}>상담 신청</p>
           <ConsultInbox farmId={farm.id} onFarmStatusChange={setStatus} />
-        </div>
-      )}
-      {tab === 'matches' && (
-        <div style={{ marginTop: '.8rem', paddingTop: '.8rem', borderTop: '1px solid var(--border)' }}>
+
+          <p className="section-title" style={{ margin: '1.2rem 0 .6rem' }}>매칭 후보 (미신청)</p>
+          <p className="match-farm-meta" style={{ marginBottom: '.6rem' }}>
+            아직 신청하지 않았지만 이 농장과 조건이 맞는 청년농입니다. 점수 미리보기용이며 직접 연락은 상담 신청에서 가능합니다.
+          </p>
           <MatchedYoungFarmers farmId={farm.id} />
         </div>
       )}
