@@ -24,7 +24,7 @@ function ScoreBar({ label, value, max }: ScoreBarProps) {
   )
 }
 
-function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: number; yfId: number; account: Account | null }) {
+function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: number; yfId: number | null; account: Account | null }) {
   const fmt = (n: number) => n.toLocaleString('ko-KR')
   const score = Math.round(item.total_score)
   const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
@@ -50,7 +50,7 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
         setDetailLoading(false)
       }
     }
-    if (next && programs === null) {
+    if (next && programs === null && yfId) {
       try {
         const sp = await api.getSupportPrograms(yfId, item.farm_id)
         setPrograms(sp.programs)
@@ -62,6 +62,7 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
 
   const submitConsult = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!yfId) return
     setConsultState('sending')
     try {
       await api.createConsultRequest(item.farm_id, {
@@ -182,11 +183,21 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
 
             {consultState === 'sent' ? (
               <div className="consult-success">상담 신청이 접수되었습니다. 농장주가 수락하면 채팅으로 이어집니다.</div>
-            ) : account ? (
+            ) : !account ? (
+              <div className="consult-login-prompt">
+                <p>상담 신청은 청년농 로그인 후 가능합니다.</p>
+                <Link to="/login" className="btn btn-primary">로그인하고 신청하기</Link>
+              </div>
+            ) : !yfId ? (
+              <div className="consult-login-prompt">
+                <p>상담 신청 전에 내 프로필(자본·경력 등)을 먼저 작성해주세요.</p>
+                <Link to="/profile" className="btn btn-primary">내 정보에서 프로필 작성</Link>
+              </div>
+            ) : (
               <form className="consult-form" onSubmit={submitConsult}>
                 <div className="consult-account">
                   <div className="detail-row-title">{account.name} 님 계정으로 신청</div>
-                  <div className="detail-row-meta">내 매칭 프로필이 농장주에게 함께 전달됩니다.</div>
+                  <div className="detail-row-meta">검색 조건이 아니라 내 정보에 설정한 프로필이 농장주에게 전달됩니다.</div>
                 </div>
                 <textarea
                   placeholder="농가에 전달할 메시지 (선택)"
@@ -199,11 +210,6 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
                   {consultState === 'sending' ? <span className="spinner" /> : '상담 신청'}
                 </button>
               </form>
-            ) : (
-              <div className="consult-login-prompt">
-                <p>상담 신청은 청년농 로그인 후 가능합니다.</p>
-                <Link to="/login" className="btn btn-primary">로그인하고 신청하기</Link>
-              </div>
             )}
           </div>
         </div>,
@@ -229,12 +235,26 @@ export default function YoungPage() {
   const [account, setAccount] = useState<Account | null>(null)
   const resultRef = useRef<HTMLDivElement>(null)
 
-  // 청년농으로 로그인했으면 상담 신청에 쓸 계정 정보(이름/연락처)를 불러온다.
+  // 로그인 청년농: 계정(상담용 이름) + 실제 프로필(검색 폼 기본값)을 불러온다.
   useEffect(() => {
     if (!getToken() || getRole() !== 'YOUNG') return
     api.getMe()
       .then(me => setAccount({ name: me.name, phone: me.phone ?? null }))
       .catch(() => setAccount(null))
+    api.getMyProfile()
+      .then(p => {
+        if (p.young_farmer_id) setYfId(p.young_farmer_id)
+        setForm(f => ({
+          ...f,
+          pref_sido: p.pref_sido ?? f.pref_sido,
+          pref_crop: p.pref_crop ?? f.pref_crop,
+          available_capital: p.available_capital ? String(Math.round(p.available_capital / 10000)) : f.available_capital,
+          experience_years: String(p.experience_years ?? f.experience_years),
+          policy_fund: p.policy_fund,
+          pref_succession: p.pref_succession ?? f.pref_succession,
+        }))
+      })
+      .catch(() => {})
   }, [])
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -245,7 +265,8 @@ export default function YoungPage() {
     setError(null)
     setLoading(true)
     try {
-      const reg = await api.createYoungFarmer({
+      // 검색은 미저장 — 입력값은 탐색에만 쓰이고 내 프로필을 바꾸지 않는다.
+      const res = await api.matchSearch({
         pref_sido: form.pref_sido || null,
         pref_crop: form.pref_crop || null,
         available_capital: parseFloat(form.available_capital) * 10_000,
@@ -253,8 +274,7 @@ export default function YoungPage() {
         policy_fund: form.policy_fund,
         pref_succession: form.pref_succession,
       })
-      setYfId(reg.young_farmer_id)
-      const res = await api.getMatches(reg.young_farmer_id)
+      setYfId(res.young_farmer_id || null)   // 본인 실제 프로필 id (상담용)
       setMatches(res.matches)
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
     } catch (err: any) {
@@ -278,7 +298,10 @@ export default function YoungPage() {
 
       <div className="page-wrap-wide">
       <form className="card" onSubmit={handleSubmit}>
-        <div className="card-title">나의 영농 조건</div>
+        <div className="card-title">농장 검색 조건</div>
+        <p className="match-farm-meta" style={{ margin: '-.4rem 0 1rem' }}>
+          검색 조건은 저장되지 않습니다. 상담 신청 시 농장주에게는 <strong>내 정보</strong>에 설정한 프로필이 전달됩니다.
+        </p>
 
         {error && <div className="error-box">{error}</div>}
 
@@ -357,7 +380,7 @@ export default function YoungPage() {
             </div>
           ) : (
             <div className="match-grid">
-              {matches.map((m, i) => <MatchCard key={m.farm_id} item={m} rank={i + 1} yfId={yfId!} account={account} />)}
+              {matches.map((m, i) => <MatchCard key={m.farm_id} item={m} rank={i + 1} yfId={yfId} account={account} />)}
             </div>
           )}
 

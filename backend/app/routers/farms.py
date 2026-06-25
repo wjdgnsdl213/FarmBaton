@@ -383,13 +383,13 @@ def get_farm_matches(
     with conn.cursor() as cur:
         cur.execute("""
             SELECT id, pref_sido, pref_crop::TEXT, available_capital,
-                   experience_years, policy_fund, pref_succession::TEXT
+                   experience_years, policy_fund, pref_succession::TEXT, intro
             FROM young_farmer_profile
         """)
         young_rows = cur.fetchall()
 
     items: list[tuple[float, FarmMatchItem]] = []
-    for yf_id, pref_sido, pref_crop, capital, exp_yrs, policy_fund, pref_succ in young_rows:
+    for yf_id, pref_sido, pref_crop, capital, exp_yrs, policy_fund, pref_succ, intro in young_rows:
         young = YoungFarmerInput(
             pref_sido=pref_sido,
             pref_crop=pref_crop,
@@ -432,6 +432,7 @@ def get_farm_matches(
             policy_score=result.policy_score,
             risk_penalty=result.risk_penalty,
             explanation=explanation,
+            intro=intro,
         )
         items.append((result.total_score, item))
 
@@ -566,7 +567,7 @@ def list_consult_requests(farm_id: int, conn=Depends(get_db), owner_id: int = De
         cur.execute("""
             SELECT cr.id, cr.young_farmer_id, cr.contact_name, cr.message, cr.status, cr.created_at,
                    yp.pref_sido, yp.pref_crop::TEXT, yp.available_capital,
-                   yp.experience_years, yp.policy_fund, yp.pref_succession::TEXT
+                   yp.experience_years, yp.policy_fund, yp.pref_succession::TEXT, yp.intro
             FROM consult_request cr
             JOIN young_farmer_profile yp ON yp.id = cr.young_farmer_id
             WHERE cr.farm_id = %s AND cr.initiated_by = 'YOUNG'
@@ -585,7 +586,7 @@ def list_consult_requests(farm_id: int, conn=Depends(get_db), owner_id: int = De
     out = []
     for r in rows:
         (cid, yf_id, name, msg, status, created, pref_sido, pref_crop,
-         capital, exp_yrs, policy_fund, pref_succ) = r
+         capital, exp_yrs, policy_fund, pref_succ, intro) = r
         score = 0.0
         if farm_profile is not None:
             score = calc_match_score(
@@ -602,7 +603,7 @@ def list_consult_requests(farm_id: int, conn=Depends(get_db), owner_id: int = De
             pref_sido=pref_sido, pref_crop=pref_crop,
             available_capital=_to_만원(float(capital)), experience_years=int(exp_yrs),
             pref_succession=pref_succ, policy_fund=bool(policy_fund),
-            total_score=round(score, 1),
+            total_score=round(score, 1), intro=intro,
         ))
     return out
 

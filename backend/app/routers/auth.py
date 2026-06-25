@@ -12,7 +12,14 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Header, HTTPException
 
 from backend.app.db import get_db
-from backend.app.schemas import AuthResponse, LoginRequest, MeResponse, RegisterRequest
+from backend.app.schemas import (
+    AuthResponse,
+    ChangePasswordRequest,
+    LoginRequest,
+    MeResponse,
+    RegisterRequest,
+    UpdateMeRequest,
+)
 from backend.app.services.auth import create_token, decode_token, hash_password, verify_password
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -103,3 +110,39 @@ def me(authorization: str = Header(default=""), conn=Depends(get_db)):
         cur.execute("SELECT name, email, phone FROM app_user WHERE id = %s", (user_id,))
         name, email, phone = cur.fetchone()
     return MeResponse(user_id=user_id, name=name or "", email=email or "", role=role, phone=phone)
+
+
+@router.patch("/me", response_model=MeResponse)
+def update_me(data: UpdateMeRequest, authorization: str = Header(default=""), conn=Depends(get_db)):
+    """계정 정보 수정 (이름·연락처). 이메일·역할은 변경 불가."""
+    user = get_current_user_optional(authorization, conn)
+    if user is None:
+        raise HTTPException(status_code=401, detail="로그인이 필요합니다.")
+    user_id, role = user
+    with conn.cursor() as cur:
+        cur.execute(
+            "UPDATE app_user SET name = %s, phone = %s WHERE id = %s RETURNING email",
+            (data.name, data.phone, user_id),
+        )
+        email = cur.fetchone()[0]
+    conn.commit()
+    return MeResponse(user_id=user_id, name=data.name, email=email or "", role=role, phone=data.phone)
+
+
+@router.post("/password", status_code=204)
+def change_password(data: ChangePasswordRequest, authorization: str = Header(default=""), conn=Depends(get_db)):
+    """비밀번호 변경 — 현재 비밀번호 확인 후 교체."""
+    user = get_current_user_optional(authorization, conn)
+    if user is None:
+        raise HTTPException(status_code=401, detail="로그인이 필요합니다.")
+    user_id, _role = user
+    with conn.cursor() as cur:
+        cur.execute("SELECT password_hash FROM app_user WHERE id = %s", (user_id,))
+        row = cur.fetchone()
+        if row is None or row[0] is None or not verify_password(data.current_password, row[0]):
+            raise HTTPException(status_code=400, detail="현재 비밀번호가 올바르지 않습니다.")
+        cur.execute(
+            "UPDATE app_user SET password_hash = %s WHERE id = %s",
+            (hash_password(data.new_password), user_id),
+        )
+    conn.commit()

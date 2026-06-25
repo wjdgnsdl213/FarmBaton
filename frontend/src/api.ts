@@ -103,6 +103,7 @@ export interface FarmMatchItem {
   policy_score: number
   risk_penalty: number
   explanation: string | null
+  intro: string | null
 }
 
 export interface FarmMatchListResult {
@@ -117,6 +118,17 @@ export interface YoungFarmerPayload {
   experience_years: number
   policy_fund: boolean
   pref_succession: string
+}
+
+export interface YoungProfile {
+  young_farmer_id: number | null
+  pref_sido: string | null
+  pref_crop: string | null
+  available_capital: number   // 원
+  experience_years: number
+  policy_fund: boolean
+  pref_succession: string
+  intro: string | null
 }
 
 export interface GeocodeResult {
@@ -177,6 +189,7 @@ export interface ConsultRequestDetail {
   pref_succession: string
   policy_fund: boolean
   total_score: number
+  intro: string | null
 }
 
 export interface ChatMessageItem {
@@ -283,11 +296,16 @@ export const api = {
   getValuation: (farmId: number) =>
     client.get<ValuationResult>(`/farms/${farmId}/valuation`).then(r => r.data),
 
-  createYoungFarmer: (data: YoungFarmerPayload) =>
-    client.post<{ young_farmer_id: number }>('/young-farmers', data).then(r => r.data),
+  // 매칭 검색 (탐색용, 미저장). 응답 young_farmer_id = 본인 실제 프로필 id(상담용)
+  matchSearch: (data: YoungFarmerPayload) =>
+    client.post<MatchListResult>('/young-farmers/match-search', data).then(r => r.data),
 
-  getMatches: (yfId: number) =>
-    client.get<MatchListResult>(`/young-farmers/${yfId}/matches`).then(r => r.data),
+  // 청년농 실제 프로필 (내 정보)
+  getMyProfile: () =>
+    client.get<YoungProfile>('/young-farmers/me/profile').then(r => r.data),
+
+  putMyProfile: (data: Omit<YoungProfile, 'young_farmer_id'>) =>
+    client.put<YoungProfile>('/young-farmers/me/profile', data).then(r => r.data),
 
   getSupportPrograms: (yfId: number, farmId?: number) =>
     client.get<SupportProgramListResult>(`/young-farmers/${yfId}/support-programs`, {
@@ -308,6 +326,12 @@ export const api = {
 
   getMe: () =>
     client.get<MeResult>('/auth/me').then(r => r.data),
+
+  updateMe: (data: { name: string; phone?: string | null }) =>
+    client.patch<MeResult>('/auth/me', data).then(r => r.data),
+
+  changePassword: (current_password: string, new_password: string) =>
+    client.post('/auth/password', { current_password, new_password }).then(r => r.data),
 
   getMyFarms: () =>
     client.get<FarmSummary[]>('/farms/mine').then(r => r.data),

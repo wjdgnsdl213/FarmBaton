@@ -35,6 +35,16 @@ class MeResponse(BaseModel):
     phone: Optional[str] = None
 
 
+class UpdateMeRequest(BaseModel):
+    name: str = Field(min_length=1)
+    phone: Optional[str] = None
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=8)
+
+
 # ── 농가 등록 요청 ────────────────────────────────────────────────────────────
 
 class AssetCreate(BaseModel):
@@ -164,6 +174,7 @@ class ConsultRequestDetail(BaseModel):
     pref_succession: str
     policy_fund: bool
     total_score: float
+    intro: Optional[str] = None
 
 
 class ConsultRequestStatusUpdate(BaseModel):
@@ -230,6 +241,7 @@ class FarmCreateResponse(BaseModel):
 # ── 청년농 등록 요청 ──────────────────────────────────────────────────────────
 
 class YoungFarmerCreate(BaseModel):
+    # 매칭 검색 입력값 (미저장 — /match-search). 프로필을 덮어쓰지 않는다.
     pref_sido: Optional[str] = None    # None = 지역 상관없음
     pref_crop: Optional[str] = Field(default=None, pattern="^(APPLE|PEACH|GRAPE)$")  # None = 작목 상관없음
     available_capital: float = Field(ge=0)
@@ -240,6 +252,21 @@ class YoungFarmerCreate(BaseModel):
 
 class YoungFarmerCreateResponse(BaseModel):
     young_farmer_id: int
+
+
+class YoungProfileData(BaseModel):
+    """청년농 실제 프로필 (내 정보에서 설정 → 상담 시 농장주에게 노출).
+
+    매칭 '검색'과 분리된, 청년농의 진짜 정보. available_capital은 원 단위.
+    """
+    young_farmer_id: Optional[int] = None   # GET 응답용 (프로필 없으면 None)
+    pref_sido: Optional[str] = None
+    pref_crop: Optional[str] = Field(default=None, pattern="^(APPLE|PEACH|GRAPE)$")
+    available_capital: float = Field(default=0, ge=0)
+    experience_years: int = Field(default=0, ge=0)
+    policy_fund: bool = False
+    pref_succession: str = Field(default="SALE", pattern="^(SALE|LEASE|JOINT|MENTORING)$")
+    intro: Optional[str] = None
 
 
 # ── 매칭 결과 응답 ────────────────────────────────────────────────────────────
@@ -290,6 +317,7 @@ class FarmMatchItem(BaseModel):
     policy_score: float
     risk_penalty: float
     explanation: Optional[str] = None
+    intro: Optional[str] = None
 
 
 class FarmMatchListResponse(BaseModel):

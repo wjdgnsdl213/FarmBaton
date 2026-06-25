@@ -78,8 +78,11 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
               <ScoreBar label="승계" value={m.succession_score} max={15} />
               <ScoreBar label="정책금" value={m.policy_score} max={10} />
             </div>
+            {m.intro && (
+              <p style={{ fontSize: '.82rem', color: 'var(--green-deep)', margin: '.6rem 0 0' }}>“{m.intro}”</p>
+            )}
             {m.explanation && (
-              <p style={{ fontSize: '.8rem', color: 'var(--gray)', margin: '.6rem 0 0', fontStyle: 'italic' }}>
+              <p style={{ fontSize: '.8rem', color: 'var(--gray)', margin: '.4rem 0 0', fontStyle: 'italic' }}>
                 "{m.explanation}"
               </p>
             )}
@@ -137,6 +140,7 @@ function ConsultInbox({ farmId, onFarmStatusChange }: { farmId: number; onFarmSt
                   <span className="tag">자본 {r.available_capital.toLocaleString('ko-KR')}만원</span>
                   <span className="tag">경력 {r.experience_years}년</span>
                 </div>
+                {r.intro && <p style={{ fontSize: '.82rem', margin: '.45rem 0 0', color: 'var(--green-deep)' }}>“{r.intro}”</p>}
                 {r.message && <p style={{ fontSize: '.85rem', margin: '.5rem 0 0' }}>"{r.message}"</p>}
                 <div className="match-farm-meta" style={{ marginTop: '.4rem' }}>
                   <span className="tag">{STATUS_NAMES[r.status] || r.status}</span>

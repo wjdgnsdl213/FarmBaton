@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import MyRequestsPage from './pages/MyRequestsPage'
 import ConversationsPage from './pages/ConversationsPage'
+import ProfilePage from './pages/ProfilePage'
 import { getToken, getRole, clearToken } from './api'
 import './style.css'
 
@@ -66,6 +67,7 @@ function NavLinks({ loc, loggedIn, role, onLogout, onNavigate }: {
             <Link className={isActive('/my-requests')} to="/my-requests" onClick={onNavigate}>내 상담</Link>
           )}
           <Link className={isActive('/conversations')} to="/conversations" onClick={onNavigate}>대화</Link>
+          <Link className={isActive('/profile')} to="/profile" onClick={onNavigate}>내 정보</Link>
           <a href="#" onClick={e => { e.preventDefault(); onLogout(); onNavigate?.() }}>로그아웃</a>
         </>
       ) : (
@@ -136,6 +138,7 @@ function App() {
           <Route path="/dashboard" element={<RequireAuth role="FARMER"><DashboardPage /></RequireAuth>} />
           <Route path="/my-requests" element={<RequireAuth role="YOUNG"><MyRequestsPage /></RequireAuth>} />
           <Route path="/conversations" element={<RequireAuth><ConversationsPage /></RequireAuth>} />
+          <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
         </Routes>
       </main>
     </>

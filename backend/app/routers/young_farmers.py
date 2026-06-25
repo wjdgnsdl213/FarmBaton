@@ -24,7 +24,7 @@ from backend.app.schemas import (
     SupportProgramItem,
     SupportProgramListResponse,
     YoungFarmerCreate,
-    YoungFarmerCreateResponse,
+    YoungProfileData,
 )
 from backend.app.services.report_ai import (
     CROP_NAMES,
@@ -85,28 +85,42 @@ def _upsert_match_score(farm_id: int, yf_id: int, result, explanation: Optional[
 # 엔드포인트
 # ─────────────────────────────────────────────────────────────────────────────
 
-@router.post("", response_model=YoungFarmerCreateResponse, status_code=201)
-def create_young_farmer(
-    data: YoungFarmerCreate,
-    conn=Depends(get_db),
-    user=Depends(get_current_user_optional),
-):
-    """청년농 프로필 등록/갱신 — **로그인한 YOUNG 계정만**.
-
-    매칭 풀을 계정 보유자로만 유지하기 위해 익명 생성 경로는 폐지했다(농장주가
-    매칭 후보에게 먼저 대화를 걸 수 있으려면 후보가 계정을 가져야 함). 본인
-    계정에 프로필 1개만 유지(재제출 시 갱신).
-    """
+def _require_young(user):
     if user is None or user[1] != "YOUNG":
         raise HTTPException(status_code=403, detail="청년농 계정으로 로그인 후 이용할 수 있습니다.")
-    user_id = user[0]
+    return user[0]
 
-    profile_vals = (
-        data.pref_sido, data.pref_crop,
-        data.available_capital, data.experience_years,
-        data.policy_fund, data.pref_succession,
+
+@router.get("/me/profile", response_model=YoungProfileData)
+def get_my_profile(conn=Depends(get_db), user=Depends(get_current_user_optional)):
+    """로그인 청년농의 실제 프로필(내 정보). 농장주에게 노출되는 정보."""
+    user_id = _require_young(user)
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT id, pref_sido, pref_crop::TEXT, available_capital,
+                   experience_years, policy_fund, pref_succession::TEXT, intro
+            FROM young_farmer_profile WHERE user_id = %s ORDER BY id LIMIT 1
+        """, (user_id,))
+        row = cur.fetchone()
+    if row is None:
+        return YoungProfileData()  # 아직 프로필 없음 → 기본값
+    return YoungProfileData(
+        young_farmer_id=row[0], pref_sido=row[1], pref_crop=row[2],
+        available_capital=float(row[3] or 0), experience_years=int(row[4] or 0),
+        policy_fund=bool(row[5]), pref_succession=row[6] or "SALE", intro=row[7],
     )
 
+
+@router.put("/me/profile", response_model=YoungProfileData)
+def put_my_profile(
+    data: YoungProfileData, conn=Depends(get_db), user=Depends(get_current_user_optional),
+):
+    """청년농 실제 프로필 등록/갱신 (내 정보·가입 시). 1인 1프로필 upsert."""
+    user_id = _require_young(user)
+    vals = (
+        data.pref_sido, data.pref_crop, data.available_capital,
+        data.experience_years, data.policy_fund, data.pref_succession, data.intro,
+    )
     with conn.cursor() as cur:
         cur.execute(
             "SELECT id FROM young_farmer_profile WHERE user_id = %s ORDER BY id LIMIT 1",
@@ -119,22 +133,24 @@ def create_young_farmer(
                 UPDATE young_farmer_profile SET
                     pref_sido = %s, pref_crop = %s::crop_code_t,
                     available_capital = %s, experience_years = %s,
-                    policy_fund = %s, pref_succession = %s::succession_type_t
+                    policy_fund = %s, pref_succession = %s::succession_type_t, intro = %s
                 WHERE id = %s
-            """, (*profile_vals, yf_id))
+            """, (*vals, yf_id))
         else:
             cur.execute("""
                 INSERT INTO young_farmer_profile (
-                    user_id, pref_sido, pref_crop,
-                    available_capital, experience_years,
-                    policy_fund, pref_succession
-                ) VALUES (%s, %s, %s::crop_code_t, %s, %s, %s, %s::succession_type_t)
+                    user_id, pref_sido, pref_crop, available_capital,
+                    experience_years, policy_fund, pref_succession, intro
+                ) VALUES (%s, %s, %s::crop_code_t, %s, %s, %s, %s::succession_type_t, %s)
                 RETURNING id
-            """, (user_id, *profile_vals))
+            """, (user_id, *vals))
             yf_id = cur.fetchone()[0]
-
     conn.commit()
-    return YoungFarmerCreateResponse(young_farmer_id=yf_id)
+    return YoungProfileData(
+        young_farmer_id=yf_id, pref_sido=data.pref_sido, pref_crop=data.pref_crop,
+        available_capital=data.available_capital, experience_years=data.experience_years,
+        policy_fund=data.policy_fund, pref_succession=data.pref_succession, intro=data.intro,
+    )
 
 
 @router.get("/me/consult-requests", response_model=list[MyConsultRequestItem])
@@ -172,121 +188,77 @@ def my_consult_requests(conn=Depends(get_db), user=Depends(get_current_user_opti
     return out
 
 
-@router.get("/{yf_id}/matches", response_model=MatchListResponse)
-def get_matches(yf_id: int, conn=Depends(get_db)):
-    """청년농 프로필 기반 매칭 농장 리스트 (상위 10개, 점수 내림차순).
-
-    가치평가 캐시가 있는 ACTIVE 농장 전체를 대상으로 calc_match_score 산출.
-    결과는 match_score 테이블에 UPSERT 캐시. 설명문은 결정론적 폴백 — AI
-    설명은 PDF 리포트에서만 생성한다.
-    """
-    # ── 1. 청년농 프로필 로드 ─────────────────────────────────────────
-    with conn.cursor() as cur:
-        cur.execute("""
-            SELECT pref_sido, pref_crop::TEXT, available_capital,
-                   experience_years, policy_fund, pref_succession::TEXT
-            FROM young_farmer_profile
-            WHERE id = %s
-        """, (yf_id,))
-        row = cur.fetchone()
-
-    if row is None:
-        raise HTTPException(status_code=404, detail="young_farmer not found")
-
-    pref_sido, pref_crop, capital, exp_yrs, policy_fund, pref_succ = row
-    young = YoungFarmerInput(
-        pref_sido=pref_sido,
-        pref_crop=pref_crop,
-        available_capital=float(capital),
-        experience_years=int(exp_yrs),
-        policy_fund=bool(policy_fund),
-        pref_succession=pref_succ,
-    )
-
-    # ── 2. 매칭 대상 농장 목록 (가치평가 캐시 있는 ACTIVE) ───────────
+def _score_farms(young: YoungFarmerInput, conn) -> list[MatchItem]:
+    """검색 조건(young)으로 ACTIVE 농장을 점수화해 상위 TOP_N 반환 (미저장)."""
     with conn.cursor() as cur:
         cur.execute("""
             SELECT id, address, sido, crop_code::TEXT, tree_age,
-                   area_m2, succession_type::TEXT,
-                   est_value_min, est_value_max
-            FROM farm
-            WHERE status = 'ACTIVE'
-              AND est_value_min IS NOT NULL
+                   area_m2, succession_type::TEXT, est_value_min, est_value_max
+            FROM farm WHERE status = 'ACTIVE' AND est_value_min IS NOT NULL
         """)
         farms = cur.fetchall()
 
-    if not farms:
-        return MatchListResponse(young_farmer_id=yf_id, matches=[])
-
-    # ── 3. 매칭 점수 산출 + 설명문(결정론적 폴백) ────────────────────
     items: list[tuple[float, MatchItem]] = []
-    results_by_farm = {}  # farm_id -> MatchScoreResult (UPSERT에서 재사용)
-
     for (fid, address, sido, crop_code, tree_age,
          area_m2, succession_type, val_min, val_max) in farms:
-
         if val_min is None:
             continue
-
         farm_profile = FarmProfileForMatch(
-            sido=sido,
-            crop_code=crop_code,
-            succession_type=succession_type or "SALE",
+            sido=sido, crop_code=crop_code, succession_type=succession_type or "SALE",
             est_value_min=float(val_min),
             crop_difficulty_high=(crop_code in HIGH_DIFFICULTY_CROPS),
         )
         result = calc_match_score(young, farm_profile)
-        results_by_farm[fid] = result
-
         explanation = fallback_match_explanation(MatchContext(
-            pref_sido=young.pref_sido,
-            pref_crop=young.pref_crop,
-            farm_sido=sido,
-            farm_crop=crop_code,
-            pref_succession=young.pref_succession,
-            succession_type=succession_type or "SALE",
-            total_score=result.total_score,
-            region_score=result.region_score,
-            crop_score=result.crop_score,
-            capital_score=result.capital_score,
-            experience_score=result.experience_score,
-            succession_score=result.succession_score,
-            policy_score=result.policy_score,
-            risk_penalty=result.risk_penalty,
+            pref_sido=young.pref_sido, pref_crop=young.pref_crop,
+            farm_sido=sido, farm_crop=crop_code,
+            pref_succession=young.pref_succession, succession_type=succession_type or "SALE",
+            total_score=result.total_score, region_score=result.region_score,
+            crop_score=result.crop_score, capital_score=result.capital_score,
+            experience_score=result.experience_score, succession_score=result.succession_score,
+            policy_score=result.policy_score, risk_penalty=result.risk_penalty,
         ))
-
-        item = MatchItem(
-            farm_id=fid,
-            address=address,
-            sido=sido,
-            crop_code=crop_code,
-            tree_age=tree_age,
-            area_m2=float(area_m2),
-            succession_type=succession_type,
+        items.append((result.total_score, MatchItem(
+            farm_id=fid, address=address, sido=sido, crop_code=crop_code, tree_age=tree_age,
+            area_m2=float(area_m2), succession_type=succession_type,
             est_value_min=_to_만원(float(val_min)),
             est_value_max=_to_만원(float(val_max)) if val_max else 0,
-            total_score=result.total_score,
-            region_score=result.region_score,
-            crop_score=result.crop_score,
-            capital_score=result.capital_score,
-            experience_score=result.experience_score,
-            succession_score=result.succession_score,
-            policy_score=result.policy_score,
-            risk_penalty=result.risk_penalty,
+            total_score=result.total_score, region_score=result.region_score,
+            crop_score=result.crop_score, capital_score=result.capital_score,
+            experience_score=result.experience_score, succession_score=result.succession_score,
+            policy_score=result.policy_score, risk_penalty=result.risk_penalty,
             explanation=explanation,
-        )
-        items.append((result.total_score, item))
-
-    # ── 4. 점수 내림차순 정렬, 상위 TOP_N ────────────────────────────
+        )))
     items.sort(key=lambda x: x[0], reverse=True)
-    top_items = [item for _, item in items[:TOP_N]]
+    return [item for _, item in items[:TOP_N]]
 
-    # ── 5. match_score 테이블 UPSERT (3단계 계산 결과 재사용) ─────────
-    for item in top_items:
-        _upsert_match_score(item.farm_id, yf_id, results_by_farm[item.farm_id], item.explanation, conn)
-    conn.commit()
 
-    return MatchListResponse(young_farmer_id=yf_id, matches=top_items)
+@router.post("/match-search", response_model=MatchListResponse)
+def match_search(
+    data: YoungFarmerCreate, conn=Depends(get_db), user=Depends(get_current_user_optional),
+):
+    """매칭 검색 (탐색용, **미저장**) — 입력 조건으로 농장을 점수화해 반환.
+
+    검색값은 프로필에 저장하지 않는다(궁금해서 다른 조건으로 검색해도 내
+    프로필은 안 바뀜). 응답의 young_farmer_id는 **본인 실제 프로필 id**라,
+    상담 신청 시엔 검색값이 아니라 내 정보 프로필이 농장주에게 전달된다.
+    프로필이 아직 없으면 0 — 프론트는 내 정보 작성을 안내.
+    """
+    user_id = _require_young(user)
+    young = YoungFarmerInput(
+        pref_sido=data.pref_sido, pref_crop=data.pref_crop,
+        available_capital=float(data.available_capital),
+        experience_years=int(data.experience_years),
+        policy_fund=bool(data.policy_fund), pref_succession=data.pref_succession,
+    )
+    matches = _score_farms(young, conn)
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT id FROM young_farmer_profile WHERE user_id = %s ORDER BY id LIMIT 1",
+            (user_id,),
+        )
+        row = cur.fetchone()
+    return MatchListResponse(young_farmer_id=(row[0] if row else 0), matches=matches)
 
 
 @router.get("/{yf_id}/support-programs", response_model=SupportProgramListResponse)

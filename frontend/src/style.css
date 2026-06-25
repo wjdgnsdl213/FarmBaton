@@ -64,6 +64,12 @@ a { color: var(--green); }
 .role-notice-card p { font-size: .92rem; color: var(--gray); line-height: 1.6; margin-bottom: 1.4rem; }
 .role-notice-card .btn { width: auto; padding: .8rem 1.6rem; }
 
+/* 회원가입 섹션 구분선 */
+.role-divider {
+  font-size: .82rem; font-weight: 700; color: var(--green-deep);
+  border-top: 1px solid var(--border); padding-top: .8rem; margin-bottom: .8rem;
+}
+
 /* 회원가입 역할 선택 토글 */
 .role-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
 .role-toggle button {
