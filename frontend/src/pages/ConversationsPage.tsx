@@ -17,9 +17,26 @@ export default function ConversationsPage() {
       .catch(err => setError(err.response?.data?.detail || '대화 목록을 불러오지 못했습니다.'))
   }, [])
 
+  const formatLastAt = (value: string | null) => {
+    if (!value) return null
+    return new Date(value).toLocaleString('ko-KR', {
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
   return (
-    <div className="page-wrap-wide">
-      <p className="section-title">대화</p>
+    <div className="page-wrap-wide convo-page">
+      <header className="convo-page-head">
+        <div>
+          <p className="section-title">대화</p>
+        </div>
+        {convos && convos.length > 0 && (
+          <span className="convo-count">진행 {convos.length}건</span>
+        )}
+      </header>
       {error && <div className="error-box">{error}</div>}
       {convos === null ? (
         <div className="match-farm-meta">불러오는 중...</div>
@@ -34,11 +51,20 @@ export default function ConversationsPage() {
           <div className="convo-list">
             {convos.map(c => (
               <button
+                type="button"
                 key={c.consult_request_id}
                 className={`convo-item ${active?.consult_request_id === c.consult_request_id ? 'active' : ''}`}
+                aria-pressed={active?.consult_request_id === c.consult_request_id}
                 onClick={() => setActive(c)}
               >
-                <div className="convo-name">{c.counterpart_name}</div>
+                <div className="convo-item-top">
+                  <div className="convo-name">{c.counterpart_name}</div>
+                  {c.last_message_at && (
+                    <time className="convo-time" dateTime={c.last_message_at}>
+                      {formatLastAt(c.last_message_at)}
+                    </time>
+                  )}
+                </div>
                 <div className="convo-meta">{c.farm_label}{c.initiated_by === 'FARMER' ? ' · 농장주 발신' : ''}</div>
                 <div className="convo-preview">{c.last_message_preview || '아직 메시지가 없습니다'}</div>
               </button>
@@ -52,7 +78,7 @@ export default function ConversationsPage() {
                 title={`${active.counterpart_name} · ${active.farm_label}`}
               />
             ) : (
-              <div className="match-farm-meta">왼쪽에서 대화를 선택하세요.</div>
+              <div className="convo-chat-placeholder">대화를 선택하세요.</div>
             )}
           </div>
         </div>

@@ -124,7 +124,7 @@ function Nav() {
 
 function App() {
   const loc = useLocation()
-  const isWide = loc.pathname === '/' || loc.pathname === '/farmer' || loc.pathname === '/young'
+  const isWide = loc.pathname === '/' || loc.pathname === '/farmer' || loc.pathname === '/young' || loc.pathname === '/conversations'
 
   return (
     <>

@@ -57,8 +57,15 @@ export default function ChatPanel({ reqId, title }: { reqId: number; title?: str
 
   return (
     <div className="chat-panel">
-      {title && <div className="chat-title">{title}</div>}
-      <div className="chat-list" ref={listRef}>
+      {title && (
+        <div className="chat-title">
+          <span className="chat-title-text">{title}</span>
+          <span className={`chat-status ${enabled ? 'enabled' : 'disabled'}`}>
+            {enabled ? '대화 가능' : '수락 대기'}
+          </span>
+        </div>
+      )}
+      <div className="chat-list" ref={listRef} role="log" aria-live="polite">
         {messages.length === 0 ? (
           <div className="chat-empty">아직 대화가 없습니다. 먼저 인사를 건네보세요.</div>
         ) : (
@@ -70,16 +77,22 @@ export default function ChatPanel({ reqId, title }: { reqId: number; title?: str
           ))
         )}
       </div>
-      {error && <div className="error-box" style={{ marginTop: '.4rem' }}>{error}</div>}
+      {error && <div className="chat-error error-box">{error}</div>}
       <form className="chat-input" onSubmit={send}>
-        <input
-          type="text"
+        <textarea
+          rows={2}
           value={body}
           onChange={e => setBody(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              e.currentTarget.form?.requestSubmit()
+            }
+          }}
           placeholder={enabled ? '메시지를 입력하세요' : '수락된 후 대화할 수 있습니다'}
           disabled={!enabled || sending}
         />
-        <button type="submit" className="btn btn-primary" disabled={!enabled || sending || !body.trim()}>
+        <button type="submit" className="btn btn-primary chat-send" disabled={!enabled || sending || !body.trim()}>
           전송
         </button>
       </form>
