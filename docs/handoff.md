@@ -36,12 +36,28 @@
    1개. 마이그레이션 008 `chat_message`. `chat.py`: GET/POST
    `/api/consult-requests/{id}/messages` (당사자만, 수락 전 전송 409, 응답
    `mine` 플래그는 요청자 관점). 청년농 본인 상담함 `GET
-   /api/young-farmers/me/consult-requests`. 프론트: 공용 `ChatPanel`(4초 폴링),
-   농장주 대시보드 수락 카드 "채팅 열기", 청년농 신규 페이지 `/my-requests`
-   ("내 상담", nav 링크 YOUNG 전용).
+   /api/young-farmers/me/consult-requests`. 프론트: 공용 `ChatPanel`(4초 폴링).
+   (참고: 채팅 진입은 아래 5번에서 "대화" 메뉴로 이동함)
+5. **`a06c9bb` 양면 대화 — 매칭 후보 계정화 + 농장주 발신 + 채팅 별도 메뉴**
+   — "매칭 후보(미신청)"가 읽기전용 죽은 정보(후보 72명 전원 익명=연락 불가)
+   였던 문제 해결.
+   - **C1 매칭 로그인 필수화**: `create_young_farmer` 익명 경로 폐지(YOUNG
+     로그인만), `/young`을 `RequireAuth role="YOUNG"`로 게이트 → 게스트는
+     로그인, 농장주는 "청년농 전용" RoleNotice. **이슈3(농장주 재로그인 버그)
+     동시 해결.** 매칭 풀이 계정 보유자만 남음.
+   - **C2 농장주 발신 대화**: 마이그레이션 009 `consult_request.initiated_by`
+     (YOUNG/FARMER) + `(farm_id, young_farmer_id)` 유니크. `POST
+     /api/farms/{id}/conversations` → status=ACCEPTED·initiated_by=FARMER 대화방
+     생성(중복 시 같은 방, 계정 없는 후보는 409). 매칭 후보 카드 "대화 신청".
+     **상담 신청 인박스는 `initiated_by='YOUNG'`만** 표시(농장주 발신은 대화에만).
+   - **C3 채팅 별도 "대화" 메뉴**: `GET /api/conversations`(역할 무관 대화 목록),
+     `ConversationsPage`(좌측 목록 + 우측 `ChatPanel`), nav "대화"(양 역할).
+     상담 카드·`/my-requests`에서 인라인 채팅 제거 → "대화" 메뉴로 일원화.
+     매칭 후보는 접기/펴기(기본 접힘)로 길이 문제 해소.
+   - **C0 데이터**: 익명 청년농 프로필 72개 정리 + 데모 계정 시딩(아래 섹션 8).
 
-→ 전부 production 배포·검증 완료(2페이지 PDF·만원 표기·채팅 라우트·익명 상담
-403·폰트 임베딩 확인). pytest 55개 통과.
+→ 전부 production 배포·검증 완료(2페이지 PDF·만원 표기·채팅·익명 매칭 403·
+대화 라우트·폰트 임베딩 확인). pytest 55개 통과. 적용 마이그레이션 001~009.
 
 ## 2. 직전 세션(2026-06-24)에서 완료한 작업 (커밋 순)
 
@@ -116,28 +132,38 @@ vercel --prod --yes`)로 배포 완료, production URL에서 동작 확인까지
 - **포도 예외**: KAMIS 자체가 변동성 과다로 평년값을 "-"로 비워둠 →
   `normal_year_price=NULL` 유지, PDF엔 "산출하지 못했습니다" 문구로 명시.
 
-## 4. 인증·역할 모델 (커밋 `d34493a` 이후 현재 상태)
+## 4. 인증·역할 모델 (커밋 `a06c9bb` 이후 현재 상태 — 완전 계정 기반)
 
-지난 세션까진 "농가만 로그인, 청년농은 익명"이었으나 이번에 역할 기반으로
-확장. **단, 익명 청년농 매칭은 그대로 유지**(MVP 데모 핵심이라 비파괴).
+청년농 측까지 **완전히 계정 기반**으로 정착. 익명 경로는 모두 폐지됨.
 
-- `app_user.role`(FARMER/YOUNG/ADMIN) enum은 002부터 있었음. 이번에 회원가입에
-  role 선택을 붙이고(`auth.py register`), 로그인을 역할 무관으로 바꿈(응답에
-  `role` 포함). `me`도 role/phone 반환.
-- 새 의존성 `get_current_user_optional`(auth.py) — 토큰 있으면 `(user_id, role)`,
-  없으면 None. 로그인 없이도 동작해야 하는 엔드포인트(청년농 매칭·상담)에서 사용.
-- `create_young_farmer`: 로그인 YOUNG이면 **본인 계정에 프로필 1개 upsert**
-  (재제출 시 같은 id 갱신), 익명이면 기존대로 익명 app_user+프로필 생성.
-- `create_consult_request`: **로그인 YOUNG만**(익명 폐지, 423f850에서 변경).
-  본인 프로필 검증, 연락처는 계정 이름만 저장(전화번호 비저장·비노출).
-- 프론트: `farmbaton_role` localStorage 저장, `/farmer`·`/dashboard`는 FARMER
-  가드, `/my-requests`는 YOUNG 가드(`RequireAuth role=`). 로그인 후 role별
-  라우팅(FARMER→대시보드, YOUNG→매칭), nav에 role별 링크("내 농장"/"내 상담").
-  YoungPage 매칭 모달: 비로그인 시 "로그인하고 신청" 프롬프트, 로그인 시 계정
-  기반 상담 폼.
-- **채팅 권한**(`chat.py` `_authorize`): 상담의 농장 소유 FARMER 또는 신청
-  YOUNG 본인만 접근. 수락 전 전송 409. 양측 모두 `get_current_user_optional`로
-  식별.
+- `app_user.role`(FARMER/YOUNG/ADMIN). 회원가입에 role 선택(`auth.py register`),
+  로그인 역할 무관(응답에 `role`). `me`는 role/phone 반환.
+- `get_current_user_optional`(auth.py) — 토큰 있으면 `(user_id, role)`, 없으면 None.
+- **매칭(`create_young_farmer`)·상담(`create_consult_request`) 모두 로그인 YOUNG
+  필수** (익명 경로 폐지). 매칭은 본인 프로필 1개 upsert, 상담은 본인 프로필
+  검증 + 계정 이름만 저장(전화번호 비저장·비노출). 같은 농장 재신청은 기존
+  대화 재사용(`uq_consult_farm_young`).
+- **대화 모델**: `consult_request`가 곧 대화방. `initiated_by`(YOUNG=청년농 신청,
+  FARMER=농장주 발신). 농장주 발신은 즉시 ACCEPTED. 상담 인박스
+  (`list_consult_requests`)는 `initiated_by='YOUNG'`만, "대화"(`/api/conversations`)는
+  양쪽 ACCEPTED 전부.
+- **채팅 권한**(`chat.py _authorize`): 농장 소유 FARMER 또는 신청 YOUNG 본인만.
+  수락 전 전송 409. `mine` 플래그는 요청자 관점.
+- 프론트 라우트 가드: `/farmer`·`/dashboard` = FARMER, `/young`·`/my-requests` =
+  YOUNG, `/conversations` = 로그인 누구나(`RequireAuth`). 역할 불일치 시 RoleNotice
+  ("전용 메뉴"). nav: FARMER=내 농장/대화, YOUNG=청년농 매칭(/young)/내 상담/대화.
+
+## 4-1. 데모 계정 (production, 시연용 — 정리 대상 아님)
+
+공통 비밀번호 **`farmbaton!2026`**. C0(`a06c9bb`)에서 시딩, `demo.*@farmbaton.kr`.
+
+- `demo.farmer@farmbaton.kr` (정현우) — 충북 사과 농장 보유(ACTIVE).
+- `demo.young1@farmbaton.kr`(김서준, 충북/사과/2억/5년/매도),
+  `demo.young2`(이도윤, 경북/포도/1.2억/2년/임대),
+  `demo.young3`(박하은, 충남/복숭아/1.5억/3년/공동경영),
+  `demo.young4`(최지호, 충북/사과/3억/8년/멘토후독립).
+- 매칭 풀 = 이 청년농 4명(전원 계정 보유). 정현우↔김서준 사이에 농장주 발신
+  데모 대화 1건(메시지 2개) 존재.
 
 ## 5. 아직 안 한 것 / 다음 논의
 
@@ -153,7 +179,8 @@ vercel --prod --yes`)로 배포 완료, production URL에서 동작 확인까지
 - **PDF AI 추가 보강** — 관점별 차별화로 분량·AI 활용은 충분. 더 한다면 모델
   티어 업 정도. 우선순위 낮음.
 - **채팅 고도화(7월)** — 현재 4초 폴링·읽음표시 없음. 실서비스화하면 웹소켓·
-  읽음·알림 고려. 데모엔 현재로 충분.
+  읽음·알림 고려. 데모엔 현재로 충분. (농장주→매칭후보 발신 채팅은 a06c9bb로
+  완료 — 이전 "보류" 항목 해소됨.)
 
 ## 6. 검토했으나 안 하기로 한 것 (재논의 방지)
 
