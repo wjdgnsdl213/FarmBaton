@@ -328,15 +328,29 @@ textarea { resize: vertical; min-height: 60px; }
 }
 .convo-item {
   flex: 0 0 min(80vw, 320px); min-height: 106px; scroll-snap-align: start;
+  display: flex; gap: .7rem; align-items: flex-start;
   text-align: left; background: #fff; border: 1px solid var(--border);
-  border-radius: 8px; padding: .85rem .95rem; cursor: pointer;
+  border-radius: 14px; padding: .85rem .95rem; cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: border-color .15s, background .15s, box-shadow .15s, transform .12s;
 }
 .convo-item:hover { border-color: var(--green-mid); box-shadow: var(--shadow); transform: translateY(-1px); }
 .convo-item.active {
   border-color: var(--green); background: #f7faf3;
-  box-shadow: inset 3px 0 0 var(--green), var(--shadow-sm);
+  box-shadow: 0 0 0 1px var(--green), var(--shadow-sm);
+}
+.convo-avatar {
+  flex: none; width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--green-light); color: var(--green-deep);
+  font-weight: 800; font-size: 1.05rem; line-height: 1;
+}
+.convo-item.active .convo-avatar { background: var(--green); color: #fff; }
+.convo-item-body { min-width: 0; flex: 1; }
+.convo-tag {
+  margin-left: .4rem; padding: .08rem .42rem; border-radius: 999px;
+  background: var(--lime-soft); color: var(--green); font-size: .68rem; font-weight: 800;
+  vertical-align: middle;
 }
 .convo-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
 .convo-name {
@@ -366,17 +380,27 @@ textarea { resize: vertical; min-height: 60px; }
 /* ════════ 채팅 패널 ════════ */
 .chat-panel {
   display: flex; flex-direction: column; min-height: 520px;
-  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
   background: #fff; box-shadow: var(--shadow);
 }
 .chat-title {
   display: flex; align-items: center; justify-content: space-between; gap: .9rem;
-  padding: .95rem 1.05rem; border-bottom: 1px solid var(--border); background: #fff;
-  color: var(--green-deep);
+  padding: .8rem 1rem; border-bottom: 1px solid var(--border); background: #fff;
 }
-.chat-title-text {
+.chat-head-id { display: flex; align-items: center; gap: .6rem; min-width: 0; }
+.chat-avatar {
+  flex: none; width: 38px; height: 38px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--green); color: #fff; font-weight: 800; font-size: .95rem; line-height: 1;
+}
+.chat-head-text { min-width: 0; }
+.chat-head-name {
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-size: .96rem; font-weight: 800;
+  font-size: .96rem; font-weight: 800; color: var(--green-deep);
+}
+.chat-head-sub {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: .76rem; color: var(--gray); margin-top: .08rem;
 }
 .chat-status {
   flex: none; display: inline-flex; align-items: center; gap: .35rem;
@@ -388,25 +412,31 @@ textarea { resize: vertical; min-height: 60px; }
 .chat-status.disabled { background: var(--gray-light); color: var(--gray); }
 .chat-list {
   flex: 1; min-height: 360px; overflow-y: auto;
-  padding: 1rem 1.05rem; display: flex; flex-direction: column; gap: .72rem;
+  padding: 1rem 1.05rem; display: flex; flex-direction: column; gap: .5rem;
   background: linear-gradient(180deg, #fbfcf8 0%, #f3f6ef 100%);
 }
+.chat-day { align-self: center; margin: .45rem 0 .15rem; }
+.chat-day span {
+  display: inline-block; padding: .2rem .68rem; border-radius: 999px;
+  background: rgba(255,255,255,.82); border: 1px solid var(--border);
+  color: var(--gray); font-size: .72rem; font-weight: 700;
+}
 .chat-empty {
-  max-width: 26ch; color: var(--gray); font-size: .9rem; text-align: center;
-  margin: auto; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;
+  max-width: 26ch; color: var(--gray); font-size: .9rem; text-align: center; line-height: 1.6;
+  margin: auto; padding: 1.1rem 1.3rem; border: 1px solid var(--border); border-radius: 14px;
   background: rgba(255,255,255,.72);
 }
 .chat-bubble {
-  max-width: min(74%, 560px); padding: .7rem .85rem; border-radius: 14px;
-  font-size: .94rem; line-height: 1.55; box-shadow: 0 1px 2px rgba(21,53,31,.06);
+  max-width: min(72%, 520px); padding: .6rem .82rem; border-radius: 16px;
+  font-size: .93rem; line-height: 1.55;
 }
 .chat-bubble .chat-body { white-space: pre-wrap; word-break: break-word; }
-.chat-bubble .chat-time { font-size: .7rem; opacity: .68; margin-top: .28rem; }
+.chat-bubble .chat-time { font-size: .68rem; opacity: .6; margin-top: .22rem; text-align: right; }
 .chat-bubble.mine {
   align-self: flex-end; background: var(--green-deep); color: #fff;
   border-bottom-right-radius: 5px;
 }
-.chat-bubble.mine .chat-time { opacity: .72; }
+.chat-bubble.mine .chat-time { opacity: .7; }
 .chat-bubble.theirs {
   align-self: flex-start; background: #fff; border: 1px solid var(--border);
   color: var(--ink); border-bottom-left-radius: 5px;
@@ -417,16 +447,22 @@ textarea { resize: vertical; min-height: 60px; }
 }
 .chat-input {
   display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end;
-  gap: .65rem; padding: .8rem; border-top: 1px solid var(--border); background: #fff;
+  gap: .6rem; padding: .75rem .8rem; border-top: 1px solid var(--border); background: #fff;
 }
 .chat-input textarea {
-  min-height: 48px; max-height: 120px; resize: vertical;
-  padding: .72rem .85rem; border-radius: 8px; line-height: 1.45;
+  min-height: 46px; max-height: 120px; resize: none;
+  padding: .68rem .9rem; border-radius: 22px; line-height: 1.45;
 }
-.chat-input .chat-send {
-  width: 60px; min-width: 60px; height: 48px; padding: 0 .8rem;
-  border-radius: 8px; font-size: .9rem;
+.chat-send {
+  flex: none; width: 46px; min-width: 46px; height: 46px; padding: 0;
+  border: 0; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center;
+  background: var(--accent); color: #fff;
+  transition: background .15s, transform .12s, opacity .15s;
 }
+.chat-send:hover:not(:disabled) { background: var(--accent-dark); transform: translateY(-1px); }
+.chat-send:disabled { opacity: .45; cursor: not-allowed; }
+.chat-send svg { width: 19px; height: 19px; }
 
 @media (min-width: 760px) {
   .convo-layout {

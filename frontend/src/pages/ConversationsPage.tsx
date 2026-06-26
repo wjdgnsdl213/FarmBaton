@@ -57,16 +57,24 @@ export default function ConversationsPage() {
                 aria-pressed={active?.consult_request_id === c.consult_request_id}
                 onClick={() => setActive(c)}
               >
-                <div className="convo-item-top">
-                  <div className="convo-name">{c.counterpart_name}</div>
-                  {c.last_message_at && (
-                    <time className="convo-time" dateTime={c.last_message_at}>
-                      {formatLastAt(c.last_message_at)}
-                    </time>
-                  )}
+                <span className="convo-avatar" aria-hidden="true">
+                  {(c.counterpart_name || '?').trim().charAt(0) || '?'}
+                </span>
+                <div className="convo-item-body">
+                  <div className="convo-item-top">
+                    <div className="convo-name">{c.counterpart_name}</div>
+                    {c.last_message_at && (
+                      <time className="convo-time" dateTime={c.last_message_at}>
+                        {formatLastAt(c.last_message_at)}
+                      </time>
+                    )}
+                  </div>
+                  <div className="convo-meta">
+                    {c.farm_label}
+                    {c.initiated_by === 'FARMER' && <span className="convo-tag">농장주 발신</span>}
+                  </div>
+                  <div className="convo-preview">{c.last_message_preview || '아직 메시지가 없습니다'}</div>
                 </div>
-                <div className="convo-meta">{c.farm_label}{c.initiated_by === 'FARMER' ? ' · 농장주 발신' : ''}</div>
-                <div className="convo-preview">{c.last_message_preview || '아직 메시지가 없습니다'}</div>
               </button>
             ))}
           </div>
@@ -75,7 +83,8 @@ export default function ConversationsPage() {
               <ChatPanel
                 key={active.consult_request_id}
                 reqId={active.consult_request_id}
-                title={`${active.counterpart_name} · ${active.farm_label}`}
+                name={active.counterpart_name}
+                subtitle={active.farm_label}
               />
             ) : (
               <div className="convo-chat-placeholder">대화를 선택하세요.</div>
