@@ -633,6 +633,7 @@ textarea { resize: vertical; min-height: 60px; }
   display: flex; align-items: center; justify-content: center;
 }
 .lp-step-vis span { font: 600 12px/1 ui-monospace, 'SF Mono', monospace; color: var(--green); letter-spacing: .04em; background: rgba(255,255,255,.7); padding: 5px 9px; border-radius: 5px; }
+.lp-step-vis img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
 
 .lp-cta { padding: 0 0 clamp(40px, 7vw, 72px); }
 

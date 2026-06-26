@@ -1,6 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import heroFarm from '../assets/hero-farm.jpg'
+import stepInput from '../assets/step-1-input.png'
+import stepReport from '../assets/step-2-report.png'
+import stepMatch from '../assets/step-3-match.png'
 
 const INTRO_SESSION_KEY = 'fb_intro_shown'
 
@@ -130,7 +133,7 @@ export default function LandingPage() {
                 <p>지번 또는 도로명 주소와 작목·수령을 넣으면, 필지 면적이 자동으로 채워집니다.</p>
                 <span className="chip">소요 시간 약 1분</span>
               </div>
-              <div className="lp-step-vis"><span>입력 화면 / 농장 사진</span></div>
+              <div className="lp-step-vis"><img src={stepInput} alt="주소·작목 입력 화면" loading="lazy" /></div>
             </div>
 
             <div className="lp-step flip reveal">
@@ -140,7 +143,7 @@ export default function LandingPage() {
                 <p>예상 소득·토지·시설 가치를 정리한 인수 검토가 범위(참고용 추정)를 신뢰등급과 함께 확인합니다.</p>
                 <span className="chip">참고용 추정 · 신뢰등급 A~D</span>
               </div>
-              <div className="lp-step-vis"><span>리포트 결과 화면 / 사진</span></div>
+              <div className="lp-step-vis"><img src={stepReport} alt="인수 검토가 범위 리포트 결과 화면" loading="lazy" /></div>
             </div>
 
             <div className="lp-step reveal">
@@ -150,7 +153,7 @@ export default function LandingPage() {
                 <p>조건에 맞는 청년농을 매칭 점수순으로 추천받고, 승계 논의를 시작할 수 있습니다.</p>
                 <span className="chip">지역·작목·자본 기준 매칭</span>
               </div>
-              <div className="lp-step-vis"><span>매칭 리스트 화면 / 사진</span></div>
+              <div className="lp-step-vis"><img src={stepMatch} alt="청년농 매칭 리스트 화면" loading="lazy" /></div>
             </div>
           </div>
         </div>
