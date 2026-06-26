@@ -196,10 +196,11 @@ vercel --prod --yes`)로 배포 완료, production URL에서 동작 확인까지
   비권장(CLAUDE.md 스코프 밖, 가치평가/매칭 엔진 재사용 불가한 다른 도메인,
   마감 리스크). 역할 계정·매칭 인프라는 좋은 토대라 대회 후 확장 후보. 결정
   전까지 구현 보류.
-- **V-World 프록시 국내 기기 실제 가동** — 코드(`proxy/`)·백엔드 연동은 완료
-  (6e1641e). 남은 건 **국내 기기에서 `proxy/` 실행 + Tailscale Funnel 등으로
-  노출 + Railway 환경변수 `VWORLD_PROXY_URL`/`VWORLD_PROXY_TOKEN` 설정**(물리
-  세팅, 사용자 몫). 설정 전까지는 정적 폴백으로 데모 동작(섹션 7).
+- **[완료 2026-06-26] V-World 프록시 국내 기기 실가동** — 라즈베리파이
+  (`openclaw`, `/home/openclaw/farmbaton-proxy`)에서 `proxy/` 구동 + Tailscale
+  Funnel 노출 + Railway 환경변수 설정까지 완료. 전 구간(Railway→파이→V-World)
+  검증됨: 폴백에 없는 임의 주소(`충북 청주시 상당구 용암동`)가 실시간 좌표·면적
+  반환. 상세는 섹션 7.
 - **PDF AI 추가 보강** — 관점별 차별화로 분량·AI 활용은 충분. 더 한다면 모델
   티어 업 정도. 우선순위 낮음.
 - **채팅 고도화(7월)** — 현재 4초 폴링·읽음표시 없음. 실서비스화하면 웹소켓·
@@ -226,14 +227,25 @@ vercel --prod --yes`)로 배포 완료, production URL에서 동작 확인까지
 - **Vercel 배포**: Root Directory가 `.`여야 로컬 CLI 배포
   (`cd frontend && vercel --prod --yes`)가 정상. `frontend`로 바꾸면 경로가
   두 번 겹쳐 깨짐.
-- **V-World 지오코딩 — IP 차단 + 프록시 우회 준비됨.** Railway IP를 502 차단
-  (V-World 공식 답변: 국외반출 제한, 국내 서버 필요). **우회 프록시 구현 완료**
-  (`proxy/`, 6e1641e): 국내 기기에서 V-World 중계 FastAPI를 띄우고 Tailscale
-  Funnel로 노출 → Railway에 `VWORLD_PROXY_URL`/`VWORLD_PROXY_TOKEN` 설정 시
-  프록시 경유 호출(키는 프록시 기기에만). **환경변수 미설정 시 기존 직접호출
-  그대로**. 셋업 가이드 `proxy/README.md`. 아직 국내 기기 미가동이라, 현재는
-  정적 폴백(`db/seed/geocode_fallback.csv`, 9개 데모 주소)으로 데모 동작 —
-  대회 제출까지 충분.
+- **V-World 지오코딩 — IP 차단 + 프록시 우회 가동 중(2026-06-26~).** Railway IP를
+  502 차단(V-World 공식 답변: 국외반출 제한, 국내 서버 필요). **우회 프록시
+  실가동 완료**(`proxy/`, 6e1641e): 라즈베리파이에서 V-World 중계 FastAPI를
+  systemd(`vworld-proxy.service`)로 상시 구동 + Tailscale Funnel로 외부 노출 →
+  Railway에 `VWORLD_PROXY_URL`/`VWORLD_PROXY_TOKEN` 설정해 프록시 경유 호출
+  (V-World 키는 파이에만). **환경변수 미설정 시 기존 직접호출 그대로**. 셋업
+  가이드 `proxy/README.md`.
+  - 파이: 사용자 `openclaw`, 폴더 `/home/openclaw/farmbaton-proxy`, venv `./venv`.
+  - 공개주소: `https://openclaw.tailef881f.ts.net` (Funnel). Railway
+    `VWORLD_PROXY_URL`은 끝에 **`/geocode` 포함** 필수(백엔드가 `URL?address=`
+    형태로 호출, `main.py:_build_vworld_request`).
+  - **운영 주의**: 파이 전원·집 인터넷·Funnel이 살아있어야 임의 주소 지오코딩
+    동작. 파이가 죽으면 자동으로 정적 폴백(`db/seed/geocode_fallback.csv`, 9개
+    데모 주소)으로 떨어져 데모 자체는 안 죽음. **시연 중 파이 켜둘 것.**
+  - **함정 기록**: `.env`에 토큰을 `$TOKEN`처럼 미치환 문자로 저장하면 `source`
+    (bash 치환)로는 우연히 되지만 **systemd `EnvironmentFile`은 글자 그대로**
+    읽어 401. 반드시 실제 64자리 값을 박을 것. 또 4단계 수동 `uvicorn &`가
+    포트 8000에 남아 systemd가 못 뜨면(`MainPID=0`) 옛 토큰으로 401 — 잔여
+    프로세스 `pkill -f "uvicorn vworld_proxy"` 후 `systemctl restart`.
 - **로컬 backend 포트 "유령 LISTEN"** — PID가 죽었는데 OS가 포트(8000)를
   안 놔주는 경우 있음. 같은 포트 재시도 대신 `taskkill //PID <pid> //F`로
   죽이거나 다른 포트로 띄울 것.
