@@ -522,7 +522,7 @@ textarea { resize: vertical; min-height: 60px; }
 /* 로고 이미지 — 투명 심볼 그대로 노출(흰 배지 없음) */
 .lp-logo-img { display: block; height: 36px; width: auto; }
 .lp-logo-word { color: #fff; font-weight: 800; font-size: 20px; letter-spacing: -.02em; }
-.lp-foot-logo-img { display: block; height: 64px; width: auto; }
+.lp-foot-logo-img { display: block; height: 64px; width: auto; align-self: flex-start; }
 .lp-pill {
   display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px;
   border-radius: 999px; font-size: 15px; font-weight: 700; border: none;
