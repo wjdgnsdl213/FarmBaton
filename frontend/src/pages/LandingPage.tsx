@@ -4,18 +4,37 @@ import heroFarm from '../assets/hero-farm.jpg'
 import stepInput from '../assets/step-1-input.png'
 import stepReport from '../assets/step-2-report.png'
 import stepMatch from '../assets/step-3-match.png'
+import logoImg from '../assets/logo.png'
 
 const INTRO_SESSION_KEY = 'fb_intro_shown'
 
+// 인트로는 자동으로 넘어가지 않고, 사용자가 아래로 스크롤(휠·터치·키)하면 닫힌다.
 function useIntro() {
   const [show, setShow] = useState(() => !sessionStorage.getItem(INTRO_SESSION_KEY))
+  const [out, setOut] = useState(false)
   useEffect(() => {
     if (!show) return
     sessionStorage.setItem(INTRO_SESSION_KEY, '1')
-    const t = setTimeout(() => setShow(false), 3000)
-    return () => clearTimeout(t)
+    let done = false
+    const dismiss = () => {
+      if (done) return
+      done = true
+      setOut(true)
+      setTimeout(() => setShow(false), 420)
+    }
+    const opts: AddEventListenerOptions = { passive: true }
+    window.addEventListener('wheel', dismiss, opts)
+    window.addEventListener('touchmove', dismiss, opts)
+    window.addEventListener('scroll', dismiss, opts)
+    window.addEventListener('keydown', dismiss)
+    return () => {
+      window.removeEventListener('wheel', dismiss)
+      window.removeEventListener('touchmove', dismiss)
+      window.removeEventListener('scroll', dismiss)
+      window.removeEventListener('keydown', dismiss)
+    }
   }, [show])
-  return show
+  return { show, out }
 }
 
 function useHashScroll() {
@@ -51,17 +70,24 @@ function useScrollReveal() {
 
 export default function LandingPage() {
   const rootRef = useScrollReveal()
-  const showIntro = useIntro()
+  const intro = useIntro()
   useHashScroll()
   return (
     <div ref={rootRef}>
-      {showIntro && (
-        <div className="lp-intro" aria-hidden="true">
+      {intro.show && (
+        <div className={`lp-intro ${intro.out ? 'out' : ''}`} aria-hidden="true">
           <img src={heroFarm} alt="" className="lp-intro-photo" />
           <div className="lp-intro-overlay" />
           <div className="lp-intro-text">
             <p>떠나는 농장의 가치를 이어갑니다</p>
             <p className="lime">경험은 남기고, 청년의 꿈은 자라납니다.</p>
+          </div>
+          <div className="lp-intro-hint">
+            <span>아래로 스크롤</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+              <polyline points="6 14 12 20 18 14" />
+            </svg>
           </div>
         </div>
       )}
@@ -73,7 +99,7 @@ export default function LandingPage() {
           <div className="lp-hero-content">
             <div className="lp-hero-text">
               <span className="lp-eyebrow" style={{ background: 'rgba(168,198,108,.18)', color: 'var(--lime)' }}>
-                <span className="dot" style={{ background: 'var(--lime)' }}></span>농장 승계 진단 플랫폼
+                농장 승계 진단 플랫폼
               </span>
               <h1>떠나는 농장과<br />시작하는 청년을 잇다</h1>
               <p className="lp-hero-lead">주소만 입력하면 농장의 인수 검토가 범위를 산출하고, 조건에 맞는 청년농과 연결합니다. 승계의 첫 숫자를 팜바톤에서.</p>
@@ -83,7 +109,7 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="lp-glass">
-              <h4><span className="dot"></span>우리의 미션</h4>
+              <h4>우리의 미션</h4>
               <p>고령화로 멈추는 농장이 다음 세대로 이어지도록, 가치 산정부터 매칭까지 데이터로 돕습니다.</p>
             </div>
           </div>
@@ -94,22 +120,40 @@ export default function LandingPage() {
       <section className="lp-features" id="features">
         <div className="lp-wrap">
           <div className="lp-sec-head">
-            <span className="lp-eyebrow"><span className="dot"></span>WHAT WE DO</span>
             <h2>팜바톤이 하는 일</h2>
           </div>
           <div className="lp-feat-cards">
             <div className="lp-feat-card reveal">
-              <div className="ic"><i></i></div>
+              <div className="ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10Z" />
+                  <circle cx="12" cy="11" r="2.3" />
+                </svg>
+              </div>
               <h3>주소 한 줄로 진단</h3>
               <p>지번·도로명 주소만 입력하면 필지 면적을 자동으로 가져와 평가에 반영합니다.</p>
             </div>
             <div className="lp-feat-card lime reveal" style={{ transitionDelay: '.1s' }}>
-              <div className="ic"><i></i></div>
+              <div className="ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="20" x2="5" y2="13" />
+                  <line x1="12" y1="20" x2="12" y2="8" />
+                  <line x1="19" y1="20" x2="19" y2="4" />
+                  <line x1="3" y1="20" x2="21" y2="20" />
+                </svg>
+              </div>
               <h3>인수 검토가 범위</h3>
               <p>예상 소득·토지·시설 가치를 범위로 정리한 참고용 추정 리포트를 받습니다.</p>
             </div>
             <div className="lp-feat-card reveal" style={{ transitionDelay: '.2s' }}>
-              <div className="ic"><i></i></div>
+              <div className="ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="8" r="3" />
+                  <path d="M3.5 20a5.5 5.5 0 0 1 11 0" />
+                  <circle cx="17.5" cy="9.5" r="2.3" />
+                  <path d="M16 14.6a4.7 4.7 0 0 1 4.5 5" />
+                </svg>
+              </div>
               <h3>청년농 매칭</h3>
               <p>지역·작목·자본 조건에 맞춰 승계 가능한 농장을 점수순으로 추천합니다.</p>
             </div>
@@ -121,7 +165,7 @@ export default function LandingPage() {
       <section className="lp-steps" id="steps">
         <div className="lp-wrap">
           <div className="lp-sec-head">
-            <span className="lp-eyebrow"><span className="dot"></span>3단계면 충분합니다</span>
+            <span className="lp-eyebrow">3단계면 충분합니다</span>
             <h2>주소 입력부터 매칭까지, 이렇게 진행됩니다</h2>
           </div>
 
@@ -131,7 +175,6 @@ export default function LandingPage() {
                 <div className="idx">01</div>
                 <h3>주소·작목을 입력합니다</h3>
                 <p>지번 또는 도로명 주소와 작목·수령을 넣으면, 필지 면적이 자동으로 채워집니다.</p>
-                <span className="chip">소요 시간 약 1분</span>
               </div>
               <div className="lp-step-vis"><img src={stepInput} alt="주소·작목 입력 화면" loading="lazy" /></div>
             </div>
@@ -175,7 +218,7 @@ export default function LandingPage() {
       {/* ════════ FOOTER ════════ */}
       <footer className="lp-foot">
         <div className="lp-wrap" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <span className="lp-logo"><span className="mark"><i></i></span>팜바톤</span>
+          <img src={logoImg} className="lp-foot-logo-img" alt="팜바톤" />
           <p className="legal">본 서비스가 제공하는 모든 금액(인수 검토가 범위 포함)은 공개 통계와 입력 정보에 기반한 참고용 추정이며, 실제 거래가·감정평가액과 다를 수 있고 법적 효력이 없습니다.</p>
         </div>
       </footer>

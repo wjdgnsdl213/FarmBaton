@@ -290,7 +290,7 @@ export default function YoungPage() {
         <img src={heroYoung} alt="" className="hero-photo" />
         <div className="hero-overlay" />
         <div className="hero-inner">
-          <span className="hero-eyebrow"><span className="dot"></span>청년농 매칭</span>
+          <span className="hero-eyebrow">청년농 매칭</span>
           <h1>내 조건에 맞는 농장을<br />점수로 만나보세요</h1>
           <p>희망 지역·작목·자본을 입력하면 승계 가능한 농장을 매칭하고, 점수순으로 추천해 드립니다.</p>
         </div>

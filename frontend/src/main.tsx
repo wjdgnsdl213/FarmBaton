@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
@@ -10,6 +10,7 @@ import MyRequestsPage from './pages/MyRequestsPage'
 import ConversationsPage from './pages/ConversationsPage'
 import ProfilePage from './pages/ProfilePage'
 import { getToken, getRole, clearToken } from './api'
+import logoImg from './assets/logo.png'
 import './style.css'
 
 function RoleNotice({ requiredRole }: { requiredRole: 'FARMER' | 'YOUNG' }) {
@@ -43,20 +44,23 @@ function RequireAuth({ children, role }: { children: React.ReactNode; role?: 'FA
   return <>{children}</>
 }
 
-function NavLinks({ loc, loggedIn, role, onLogout, onNavigate }: {
+function NavLinks({ loc, activeSection, loggedIn, role, onLogout, onNavigate }: {
   loc: ReturnType<typeof useLocation>
+  activeSection: string | null
   loggedIn: boolean
   role: string | null
   onLogout: () => void
   onNavigate?: () => void
 }) {
   const isActive = (path: string) => loc.pathname === path ? 'active' : ''
+  const isSection = (id: string) => loc.pathname === '/' && activeSection === id ? 'active' : ''
   return (
     <>
-      <Link to="/#features" onClick={onNavigate}>서비스 소개</Link>
-      <Link to="/#steps" onClick={onNavigate}>작동 방식</Link>
-      <Link className={isActive('/farmer')} to="/farmer" onClick={onNavigate}>농가 등록</Link>
-      <Link className={isActive('/young')} to="/young" onClick={onNavigate}>청년농 매칭</Link>
+      <Link className={`lp-nav-scroll ${isSection('features')}`} to="/#features" onClick={onNavigate}>서비스 소개</Link>
+      <Link className={`lp-nav-scroll ${isSection('steps')}`} to="/#steps" onClick={onNavigate}>작동 방식</Link>
+      <span className="lp-nav-divider" aria-hidden="true" />
+      <Link className={`lp-nav-page ${isActive('/farmer')}`} to="/farmer" onClick={onNavigate}>농가 등록</Link>
+      <Link className={`lp-nav-page ${isActive('/young')}`} to="/young" onClick={onNavigate}>청년농 매칭</Link>
       <span className="lp-nav-divider" aria-hidden="true" />
       {loggedIn ? (
         <>
@@ -83,6 +87,27 @@ function Nav() {
   const loggedIn = !!getToken()
   const role = getRole()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+
+  // 랜딩 페이지에서 스크롤 위치에 따라 현재 보고 있는 섹션을 메뉴에 표시 (스크롤스파이)
+  useEffect(() => {
+    if (loc.pathname !== '/') { setActiveSection(null); return }
+    const ids = ['features', 'steps']
+    const visible = new Set<string>()
+    let obs: IntersectionObserver | null = null
+    let raf = 0
+    const setup = () => {
+      const els = ids.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[]
+      if (els.length === 0) { raf = requestAnimationFrame(setup); return }
+      obs = new IntersectionObserver(entries => {
+        entries.forEach(e => { e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id) })
+        setActiveSection(ids.find(id => visible.has(id)) ?? null)
+      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 })
+      els.forEach(el => obs!.observe(el))
+    }
+    setup()
+    return () => { cancelAnimationFrame(raf); obs?.disconnect() }
+  }, [loc.pathname])
 
   const logout = () => {
     clearToken()
@@ -92,11 +117,11 @@ function Nav() {
   return (
     <nav className="lp-nav">
       <div className="lp-wrap lp-nav-inner">
-        <Link className="lp-logo" to="/" style={{ color: '#fff' }} onClick={() => setMobileOpen(false)}>
-          <span className="mark"><i></i></span>팜바톤
+        <Link className="lp-logo" to="/" onClick={() => setMobileOpen(false)}>
+          <img src={logoImg} className="lp-logo-img" alt="팜바톤" />
         </Link>
         <div className="lp-nav-links">
-          <NavLinks loc={loc} loggedIn={loggedIn} role={role} onLogout={logout} />
+          <NavLinks loc={loc} activeSection={activeSection} loggedIn={loggedIn} role={role} onLogout={logout} />
         </div>
         <div className="lp-nav-right">
           {!loggedIn && <Link className="lp-pill lp-pill-warm" to="/farmer">시작하기 →</Link>}
@@ -115,7 +140,7 @@ function Nav() {
       </div>
       {mobileOpen && (
         <div className="lp-nav-mobile-panel">
-          <NavLinks loc={loc} loggedIn={loggedIn} role={role} onLogout={logout} onNavigate={() => setMobileOpen(false)} />
+          <NavLinks loc={loc} activeSection={activeSection} loggedIn={loggedIn} role={role} onLogout={logout} onNavigate={() => setMobileOpen(false)} />
         </div>
       )}
     </nav>

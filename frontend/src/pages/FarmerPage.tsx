@@ -121,7 +121,7 @@ export default function FarmerPage() {
         <img src={heroFarmer} alt="" className="hero-photo" />
         <div className="hero-overlay" />
         <div className="hero-inner">
-          <span className="hero-eyebrow"><span className="dot"></span>농가 승계 진단</span>
+          <span className="hero-eyebrow">농가 승계 진단</span>
           <h1>내 농장의 인수 검토가<br />범위로 정리됩니다</h1>
           <p>주소와 작목만 입력하면 예상 소득·토지·시설 가치를 한눈에 확인할 수 있습니다.</p>
         </div>
