@@ -90,23 +90,26 @@ function Nav() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
 
   // 랜딩 페이지에서 스크롤 위치에 따라 현재 보고 있는 섹션을 메뉴에 표시 (스크롤스파이)
+  // 메뉴 클릭 시 scrollIntoView('start')로 섹션이 상단에 붙으므로, 감지 기준도
+  // nav 바로 아래(line)를 통과한 마지막 섹션으로 잡아 도착 위치와 일치시킨다.
   useEffect(() => {
     if (loc.pathname !== '/') { setActiveSection(null); return }
     const ids = ['features', 'steps']
-    const visible = new Set<string>()
-    let obs: IntersectionObserver | null = null
-    let raf = 0
-    const setup = () => {
-      const els = ids.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[]
-      if (els.length === 0) { raf = requestAnimationFrame(setup); return }
-      obs = new IntersectionObserver(entries => {
-        entries.forEach(e => { e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id) })
-        setActiveSection(ids.find(id => visible.has(id)) ?? null)
-      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 })
-      els.forEach(el => obs!.observe(el))
+    const line = 80 // nav 높이(64px) + 여유
+    let ticking = false
+    const compute = () => {
+      ticking = false
+      let current: string | null = null
+      for (const id of ids) {
+        const el = document.getElementById(id)
+        if (el && el.getBoundingClientRect().top <= line) current = id
+      }
+      setActiveSection(current)
     }
-    setup()
-    return () => { cancelAnimationFrame(raf); obs?.disconnect() }
+    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(compute) } }
+    compute()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [loc.pathname])
 
   const logout = () => {
