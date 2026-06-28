@@ -121,7 +121,8 @@ function Nav() {
     <nav className="lp-nav">
       <div className="lp-wrap lp-nav-inner">
         <Link className="lp-logo" to="/" onClick={() => setMobileOpen(false)}>
-          <img src={logoImg} className="lp-logo-img" alt="팜바톤" />
+          <img src={logoImg} className="lp-logo-img" alt="" />
+          <span className="lp-logo-word">팜바톤</span>
         </Link>
         <div className="lp-nav-links">
           <NavLinks loc={loc} activeSection={activeSection} loggedIn={loggedIn} role={role} onLogout={logout} />

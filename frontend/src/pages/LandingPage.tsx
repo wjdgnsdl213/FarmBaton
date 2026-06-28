@@ -4,7 +4,7 @@ import heroFarm from '../assets/hero-farm.jpg'
 import stepInput from '../assets/step-1-input.png'
 import stepReport from '../assets/step-2-report.png'
 import stepMatch from '../assets/step-3-match.png'
-import logoImg from '../assets/logo.png'
+import logoFull from '../assets/logo_full.png'
 
 const INTRO_SESSION_KEY = 'fb_intro_shown'
 
@@ -218,7 +218,7 @@ export default function LandingPage() {
       {/* ════════ FOOTER ════════ */}
       <footer className="lp-foot">
         <div className="lp-wrap" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <img src={logoImg} className="lp-foot-logo-img" alt="팜바톤" />
+          <img src={logoFull} className="lp-foot-logo-img" alt="팜바톤" />
           <p className="legal">본 서비스가 제공하는 모든 금액(인수 검토가 범위 포함)은 공개 통계와 입력 정보에 기반한 참고용 추정이며, 실제 거래가·감정평가액과 다를 수 있고 법적 효력이 없습니다.</p>
         </div>
       </footer>

@@ -519,9 +519,10 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-logo { font-weight: 800; font-size: 19px; letter-spacing: -.02em; display: inline-flex; align-items: center; gap: 9px; text-decoration: none; }
 .lp-logo .mark { width: 27px; height: 27px; border-radius: 9px; background: var(--green-deep); display: inline-flex; align-items: center; justify-content: center; flex: none; }
 .lp-logo .mark i { width: 10px; height: 10px; border-radius: 50%; background: var(--lime); display: block; }
-/* 로고 이미지 — 어두운 네비에선 흰 라운드 배지로, 밝은 푸터에선 그대로 노출 */
-.lp-logo-img { display: block; height: 42px; width: auto; border-radius: 11px; background: #fff; padding: 4px 7px; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
-.lp-foot-logo-img { display: block; height: 56px; width: auto; }
+/* 로고 이미지 — 투명 심볼 그대로 노출(흰 배지 없음) */
+.lp-logo-img { display: block; height: 36px; width: auto; }
+.lp-logo-word { color: #fff; font-weight: 800; font-size: 20px; letter-spacing: -.02em; }
+.lp-foot-logo-img { display: block; height: 64px; width: auto; }
 .lp-pill {
   display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px;
   border-radius: 999px; font-size: 15px; font-weight: 700; border: none;
