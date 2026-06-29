@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, type ConsultRequestDetail, type FarmMatchItem, type FarmSummary } from '../api'
+import { formatArea } from '../format'
 
 const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
 const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
@@ -196,7 +197,7 @@ function FarmCard({ farm }: { farm: FarmSummary }) {
   return (
     <div className="card">
       <div className="card-title">
-        {CROP_NAMES[farm.crop_code] || farm.crop_code} 농장 ({farm.sido}) · {(farm.area_m2 / 10000).toFixed(2)}ha
+        {CROP_NAMES[farm.crop_code] || farm.crop_code} 농장 ({farm.sido}) · {formatArea(farm.area_m2)}
       </div>
       <div className="match-farm-meta">{farm.address}</div>
       <div className="value-range-small">

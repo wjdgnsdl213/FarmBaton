@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { api, getToken, getRole, type FarmDetail, type MatchItem, type SupportProgramItem } from '../api'
+import { formatArea } from '../format'
 import heroYoung from '../assets/hero-young.jpg'
 
 interface Account { name: string; phone: string | null }
@@ -89,7 +90,7 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
           <div className="match-farm-meta" style={{ marginTop: '.25rem' }}>
             <span className="tag">{CROP_NAMES[item.crop_code]}</span>
             <span className="tag">{item.tree_age ? `${item.tree_age}년생` : '-'}</span>
-            <span className="tag">{(item.area_m2 / 10000).toFixed(2)}ha</span>
+            <span className="tag">{formatArea(item.area_m2)}</span>
             {item.succession_type && <span className="tag">{SUCC_NAMES[item.succession_type]}</span>}
           </div>
           <div className="value-range-small">
