@@ -71,7 +71,7 @@ function NavLinks({ loc, activeSection, loggedIn, role, onLogout, onNavigate }: 
           {role === 'YOUNG' && (
             <Link className={isActive('/my-requests')} to="/my-requests" onClick={onNavigate}>내 상담</Link>
           )}
-          <Link className={isActive('/conversations')} to="/conversations" onClick={onNavigate}>대화</Link>
+          <Link className={isActive('/conversations')} to="/conversations" onClick={onNavigate}>채팅</Link>
           <Link className={isActive('/profile')} to="/profile" onClick={onNavigate}>내 정보</Link>
           <a href="#" onClick={e => { e.preventDefault(); onLogout(); onNavigate?.() }}>로그아웃</a>
         </>

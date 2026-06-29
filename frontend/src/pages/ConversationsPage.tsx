@@ -31,7 +31,7 @@ export default function ConversationsPage() {
     <div className="page-wrap-wide convo-page">
       <header className="convo-page-head">
         <div>
-          <p className="section-title">대화</p>
+          <p className="section-title">채팅</p>
         </div>
         {convos && convos.length > 0 && (
           <span className="convo-count">진행 {convos.length}건</span>

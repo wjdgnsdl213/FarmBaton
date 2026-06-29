@@ -145,6 +145,7 @@ export default function LandingPage() {
                 농장 승계 진단 플랫폼
               </span>
               <h1>떠나는 농장과<br />시작하는 청년을 잇다</h1>
+              <p className="lp-hero-tagline">고령 농가의 농장을 청년농에게 잇는 승계 진단·매칭 서비스</p>
               <p className="lp-hero-lead">주소만 입력하면 농장의 인수 검토가 범위를 산출하고, 조건에 맞는 청년농과 연결합니다. 승계의 첫 숫자를 팜바톤에서.</p>
               <div className="lp-hero-actions">
                 <Link className="lp-pill lp-pill-warm" to="/farmer">농가 등록하기 →</Link>

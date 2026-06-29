@@ -38,7 +38,8 @@ def list_conversations(conn=Depends(get_db), user=Depends(get_current_user_optio
         raise HTTPException(status_code=401, detail="로그인이 필요합니다.")
     user_id, role = user
 
-    if role == "FARMER":
+    # ADMIN은 농장 소유자(=농장주) 입장으로 대화를 본다(운영/시연용).
+    if role in ("FARMER", "ADMIN"):
         where = "f.owner_id = %s"
         # 상대 = 청년농 계정 이름
         counterpart = "yau.name"
@@ -107,9 +108,10 @@ def _authorize(req_id: int, user, conn):
     status, owner_id, yf_user_id, sido, crop, farmer_name, young_name = row
     farm_label = _farm_label(sido, crop)
 
-    if role == "FARMER" and owner_id == user_id:
+    # ADMIN은 소유 관계로 당사자를 판별(농장 소유 → 농장주, 청년농 본인 → 청년농).
+    if owner_id == user_id and role in ("FARMER", "ADMIN"):
         return status, "FARMER", (young_name or "청년농"), farm_label
-    if role == "YOUNG" and yf_user_id == user_id:
+    if yf_user_id == user_id and role in ("YOUNG", "ADMIN"):
         return status, "YOUNG", (farmer_name or "농장주"), farm_label
     raise HTTPException(status_code=403, detail="이 대화의 당사자만 접근할 수 있습니다.")
 
