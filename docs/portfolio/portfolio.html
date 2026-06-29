@@ -3,108 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <title>팜바톤 포트폴리오</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
   :root{
     --green:#1f6b3a; --green-mid:#2a8049; --green-deep:#15351f;
-    --lime:#a8c66c; --lime-soft:#eef3e0; --accent:#2e9e57;
-    --cream:#f6f5f0; --gray:#5e6a61; --border:#e3e6dd; --ink:#1c2620;
+    --lime:#a8c66c; --lime-soft:#eef3e0; --green-light:#e8f3ea; --accent:#2e9e57;
+    --cream:#f7f6f1; --gray:#5e6a61; --gray-soft:#8a948b; --border:#e4e7de; --ink:#1c2620;
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
+  *{ box-sizing:border-box; margin:0; padding:0; }
   html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-  body{ font-family:'Malgun Gothic','맑은 고딕',sans-serif; color:var(--ink); }
+  body{
+    font-family:'Pretendard','Pretendard Variable',-apple-system,'Malgun Gothic',sans-serif;
+    color:var(--ink); -webkit-font-smoothing:antialiased; letter-spacing:-.01em;
+  }
   @page{ size:A4; margin:0; }
   .page{
-    width:210mm; min-height:297mm; padding:18mm 16mm; position:relative;
+    width:210mm; height:297mm; padding:20mm 18mm 16mm; position:relative;
     page-break-after:always; overflow:hidden; background:#fff;
   }
   .page:last-child{ page-break-after:auto; }
 
   /* ── 공통 ── */
-  .eyebrow{ display:inline-flex; align-items:center; gap:6px; font-size:10.5pt; font-weight:800;
-    color:var(--green); background:var(--lime-soft); padding:5px 12px; border-radius:999px; letter-spacing:.02em; }
+  .eyebrow{ display:inline-flex; align-items:center; gap:7px; font-size:10pt; font-weight:700;
+    color:var(--green); background:var(--lime-soft); padding:6px 14px; border-radius:999px; letter-spacing:.01em; }
   .eyebrow .dot{ width:7px; height:7px; border-radius:50%; background:var(--green); }
-  h2.sec{ font-size:19pt; font-weight:800; color:var(--green-deep); margin:12px 0 14px; letter-spacing:-.02em; }
-  .lead{ font-size:10.5pt; color:var(--gray); line-height:1.65; }
-  .foot{ position:absolute; bottom:10mm; left:16mm; right:16mm; display:flex; justify-content:space-between;
-    font-size:8.5pt; color:#9aa49b; border-top:1px solid var(--border); padding-top:6px; }
+  h2.sec{ font-size:21pt; font-weight:800; color:var(--green-deep); margin:14px 0 0; line-height:1.32; letter-spacing:-.03em; }
+  .sub{ font-size:10.5pt; color:var(--gray); line-height:1.7; margin-top:12px; max-width:165mm; }
+  .lead{ font-size:10.5pt; color:var(--gray); line-height:1.75; }
+  .lead b, .sub b{ color:var(--green); font-weight:700; }
+  .divider{ height:1px; background:var(--border); margin:22px 0; }
+  .foot{ position:absolute; bottom:11mm; left:18mm; right:18mm; display:flex; justify-content:space-between;
+    font-size:8.5pt; color:var(--gray-soft); border-top:1px solid var(--border); padding-top:8px; }
 
   /* ── 표지 ── */
   .cover{ padding:0; color:#fff; }
   .cover .bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .cover .ov{ position:absolute; inset:0; background:linear-gradient(160deg,rgba(21,53,31,.82),rgba(31,107,58,.72)); }
-  .cover .inner{ position:relative; padding:30mm 18mm; height:297mm; display:flex; flex-direction:column; }
-  .cover .brand{ font-size:15pt; font-weight:800; letter-spacing:.03em; display:flex; align-items:center; gap:9px; }
-  .cover .brand .mk{ width:26px; height:26px; border-radius:8px; background:var(--green); display:grid; place-items:center; }
-  .cover .brand .mk i{ width:11px; height:11px; border-radius:50%; background:var(--lime); display:block; }
-  .cover h1{ font-size:40pt; font-weight:800; line-height:1.18; letter-spacing:-.03em; margin-top:auto; }
+  .cover .ov{ position:absolute; inset:0; background:linear-gradient(158deg,rgba(21,53,31,.86),rgba(31,107,58,.70)); }
+  .cover .inner{ position:relative; padding:32mm 20mm; height:297mm; display:flex; flex-direction:column; }
+  .cover .brand{ font-size:14pt; font-weight:800; letter-spacing:.02em; display:flex; align-items:center; gap:10px; }
+  .cover .brand .mk{ width:28px; height:28px; border-radius:9px; background:var(--green); display:grid; place-items:center; }
+  .cover .brand .mk i{ width:12px; height:12px; border-radius:50%; background:var(--lime); display:block; }
+  .cover h1{ font-size:42pt; font-weight:800; line-height:1.22; letter-spacing:-.035em; margin-top:auto; }
   .cover h1 .hl{ color:var(--lime); }
-  .cover .tag{ font-size:13pt; margin-top:18px; line-height:1.6; max-width:155mm; color:#eef5e6; }
-  .cover .meta{ margin-top:26px; display:flex; gap:26px; flex-wrap:wrap; font-size:10pt; }
-  .cover .meta b{ color:var(--lime); display:block; font-size:8.5pt; font-weight:800; letter-spacing:.06em; margin-bottom:3px; }
-  .cover .url{ margin-top:auto; font-size:11pt; font-weight:700; }
+  .cover .tag{ font-size:13.5pt; margin-top:22px; line-height:1.75; max-width:150mm; color:#eef5e6; font-weight:500; }
+  .cover .meta{ margin-top:30px; display:flex; gap:30px; flex-wrap:wrap; font-size:10pt; }
+  .cover .meta b{ color:var(--lime); display:block; font-size:8.5pt; font-weight:700; letter-spacing:.05em; margin-bottom:5px; }
+  .cover .url{ margin-top:auto; font-size:12pt; font-weight:700; display:inline-flex; align-items:center; gap:8px; }
 
   /* ── 통계 ── */
-  .stats{ display:flex; gap:12px; margin:6px 0 22px; }
-  .stat{ flex:1; border:1px solid var(--border); border-radius:14px; padding:16px 14px; background:var(--cream); }
-  .stat .n{ font-size:25pt; font-weight:800; color:var(--green); line-height:1; }
-  .stat .n small{ font-size:12pt; }
-  .stat .l{ font-size:9pt; color:var(--gray); margin-top:8px; line-height:1.45; }
-  .src{ font-size:8pt; color:#9aa49b; margin-top:-10px; margin-bottom:22px; }
+  .stats{ display:flex; gap:14px; margin:4px 0 12px; }
+  .stat{ flex:1; border:1px solid var(--border); border-radius:16px; padding:20px 16px; background:var(--cream); }
+  .stat .n{ font-size:27pt; font-weight:800; color:var(--green); line-height:1; letter-spacing:-.03em; }
+  .stat .n small{ font-size:13pt; font-weight:700; }
+  .stat .l{ font-size:9pt; color:var(--gray); margin-top:11px; line-height:1.55; }
+  .src{ font-size:8pt; color:var(--gray-soft); }
 
-  /* ── 솔루션 카드 ── */
-  .feat{ display:flex; gap:14px; }
-  .fcard{ flex:1; border:1px solid var(--border); border-radius:16px; padding:18px; background:#fff; }
-  .fcard .tag{ font-size:8.5pt; font-weight:800; color:var(--green); background:var(--green-light,#e8f3ea); padding:4px 10px; border-radius:999px; }
-  .fcard h3{ font-size:13pt; font-weight:800; color:var(--green-deep); margin:12px 0 8px; }
-  .fcard p{ font-size:9.5pt; color:var(--gray); line-height:1.6; }
-  .fcard ul{ margin:10px 0 0 0; padding:0; list-style:none; }
-  .fcard li{ font-size:9pt; color:var(--ink); padding:4px 0 4px 16px; position:relative; line-height:1.45; }
-  .fcard li:before{ content:""; position:absolute; left:0; top:9px; width:6px; height:6px; border-radius:50%; background:var(--lime); }
+  /* ── 두 사용자 관점 ── */
+  .persona{ display:flex; gap:16px; margin-top:18px; }
+  .pcol{ flex:1; border:1px solid var(--border); border-radius:18px; overflow:hidden; background:#fff; }
+  .pcol .head{ padding:15px 18px; color:#fff; }
+  .pcol.farmer .head{ background:var(--green-deep); }
+  .pcol.young .head{ background:var(--green-mid); }
+  .pcol .who{ font-size:8.5pt; font-weight:700; letter-spacing:.03em; opacity:.85; display:flex; align-items:center; gap:6px; }
+  .pcol .ttl{ font-size:14pt; font-weight:800; margin-top:6px; letter-spacing:-.02em; }
+  .pcol .body{ padding:16px 18px 18px; }
+  .steps{ list-style:none; counter-reset:s; }
+  .steps li{ counter-increment:s; position:relative; padding:0 0 13px 30px; font-size:9.5pt; color:var(--ink); line-height:1.5; }
+  .steps li:last-child{ padding-bottom:2px; }
+  .steps li:before{ content:counter(s); position:absolute; left:0; top:-1px; width:20px; height:20px; border-radius:50%;
+    background:var(--lime-soft); color:var(--green); font-size:8.5pt; font-weight:800; display:grid; place-items:center; }
+  .steps li b{ color:var(--green-deep); font-weight:700; }
+  .pcol .gain{ margin-top:6px; padding:11px 13px; background:var(--lime-soft); border-radius:11px;
+    font-size:9pt; font-weight:600; color:var(--green-deep); line-height:1.5; }
+  .pcol .gain span{ color:var(--green); }
+  .persona-note{ margin-top:16px; text-align:center; font-size:9.5pt; color:var(--gray); line-height:1.6; }
+  .persona-note b{ color:var(--green); }
 
   /* ── 화면 ── */
-  .flow{ display:flex; gap:10px; align-items:flex-start; margin-top:4px; }
+  .flow{ display:flex; gap:12px; align-items:flex-start; margin-top:6px; }
   .shot{ flex:1; }
-  .shot .cap{ font-size:9pt; font-weight:800; color:var(--green-deep); margin-bottom:6px; }
-  .shot .cap span{ color:var(--lime); font-weight:800; }
-  .shot img{ width:100%; border:1px solid var(--border); border-radius:10px; }
-  .arrow{ align-self:center; color:var(--lime); font-size:18pt; font-weight:800; padding-top:30px; }
-  .wide-shot{ margin-top:16px; }
-  .wide-shot img{ width:100%; border:1px solid var(--border); border-radius:10px; }
+  .shot .cap{ font-size:9pt; font-weight:700; color:var(--green-deep); margin-bottom:8px; line-height:1.4; }
+  .shot .cap span{ color:var(--green); font-weight:800; margin-right:4px; }
+  .shot img{ width:100%; border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 14px rgba(21,53,31,.07); }
+  .arrow{ align-self:center; color:var(--lime); font-size:17pt; font-weight:800; padding-top:34px; }
+  .wide-shot{ margin-top:20px; }
+  .wide-shot .cap{ font-size:9pt; font-weight:700; color:var(--green-deep); margin-bottom:8px; }
+  .wide-shot .cap span{ color:var(--green); font-weight:800; margin-right:4px; }
+  .wide-shot img{ width:74%; border:1px solid var(--border); border-radius:12px; box-shadow:0 4px 14px rgba(21,53,31,.07); display:block; margin:0 auto; }
 
   /* ── 아키텍처 ── */
-  .arch{ display:flex; align-items:center; gap:8px; margin:6px 0 18px; flex-wrap:wrap; }
-  .node{ border:1.5px solid var(--green); border-radius:12px; padding:10px 12px; background:#fff; text-align:center; min-width:0; flex:1; }
+  .arch{ display:flex; align-items:stretch; gap:9px; margin:6px 0 16px; flex-wrap:nowrap; }
+  .node{ border:1.5px solid var(--green); border-radius:13px; padding:12px 10px; background:#fff; text-align:center; flex:1; display:flex; flex-direction:column; justify-content:center; }
   .node .t{ font-size:9.5pt; font-weight:800; color:var(--green-deep); }
-  .node .s{ font-size:7.8pt; color:var(--gray); margin-top:3px; }
-  .arch .ar{ color:var(--lime); font-weight:800; font-size:14pt; }
-  .side{ display:flex; gap:8px; margin-bottom:18px; }
-  .chip{ flex:1; border:1px dashed var(--green-mid); border-radius:10px; padding:9px 10px; background:var(--lime-soft); text-align:center; }
+  .node .s{ font-size:7.6pt; color:var(--gray); margin-top:4px; line-height:1.3; }
+  .arch .ar{ align-self:center; color:var(--lime); font-weight:800; font-size:14pt; }
+  .side{ display:flex; gap:10px; margin-bottom:18px; }
+  .chip{ flex:1; border:1px dashed var(--green-mid); border-radius:12px; padding:11px 12px; background:var(--lime-soft); text-align:center; }
   .chip .t{ font-size:9pt; font-weight:800; color:var(--green); }
-  .chip .s{ font-size:7.6pt; color:var(--gray); margin-top:2px; }
+  .chip .s{ font-size:7.6pt; color:var(--gray); margin-top:3px; line-height:1.35; }
 
-  table.data{ width:100%; border-collapse:collapse; font-size:8.6pt; margin-top:4px; }
-  table.data th{ background:var(--green-deep); color:#fff; padding:7px 8px; text-align:left; font-weight:700; }
-  table.data td{ border-bottom:1px solid var(--border); padding:6px 8px; color:var(--ink); vertical-align:top; }
+  table.data{ width:100%; border-collapse:collapse; font-size:9pt; margin-top:6px; border-radius:12px; overflow:hidden; }
+  table.data th{ background:var(--green-deep); color:#fff; padding:9px 12px; text-align:left; font-weight:700; }
+  table.data td{ border-bottom:1px solid var(--border); padding:8px 12px; color:var(--ink); vertical-align:top; }
+  table.data tr:last-child td{ border-bottom:none; }
   table.data tr:nth-child(even) td{ background:#fafbf7; }
 
-  .callout{ border-left:4px solid var(--accent); background:var(--cream); border-radius:0 12px 12px 0;
-    padding:14px 16px; margin:16px 0; }
-  .callout .h{ font-size:10.5pt; font-weight:800; color:var(--green-deep); margin-bottom:6px; }
-  .callout p{ font-size:9.2pt; color:var(--gray); line-height:1.6; }
-  .callout b{ color:var(--green); }
+  .callout{ border-left:4px solid var(--accent); background:var(--cream); border-radius:0 14px 14px 0;
+    padding:16px 18px; margin-top:20px; }
+  .callout .h{ font-size:11pt; font-weight:800; color:var(--green-deep); margin-bottom:8px; }
+  .callout p{ font-size:9.5pt; color:var(--gray); line-height:1.7; }
+  .callout b{ color:var(--green); font-weight:700; }
 
-  .two{ display:flex; gap:14px; margin-top:10px; }
-  .box{ flex:1; border:1px solid var(--border); border-radius:14px; padding:14px 16px; }
-  .box .h{ font-size:10.5pt; font-weight:800; color:var(--green-deep); margin-bottom:8px; }
+  /* ── 효과·차별성·팀 ── */
+  .two{ display:flex; gap:16px; margin-top:18px; }
+  .box{ flex:1; border:1px solid var(--border); border-radius:16px; padding:18px 20px; }
+  .box .h{ font-size:11pt; font-weight:800; color:var(--green-deep); margin-bottom:12px; display:flex; align-items:center; gap:7px; }
+  .box .h:before{ content:""; width:9px; height:9px; border-radius:3px; background:var(--lime); }
   .box ul{ list-style:none; }
-  .box li{ font-size:9pt; color:var(--ink); padding:4px 0 4px 15px; position:relative; line-height:1.45; }
-  .box li:before{ content:""; position:absolute; left:0; top:8px; width:6px; height:6px; border-radius:50%; background:var(--lime); }
-  .team{ display:flex; gap:10px; margin-top:10px; }
-  .member{ flex:1; border:1px solid var(--border); border-radius:12px; padding:12px; text-align:center; background:var(--cream); }
-  .member .av{ width:38px; height:38px; border-radius:50%; background:var(--green); color:#fff; font-weight:800;
-    display:grid; place-items:center; margin:0 auto 8px; font-size:13pt; }
-  .member .nm{ font-size:10pt; font-weight:800; color:var(--green-deep); }
-  .member .rl{ font-size:8pt; color:var(--gray); margin-top:4px; line-height:1.4; }
+  .box li{ font-size:9.5pt; color:var(--ink); padding:6px 0 6px 17px; position:relative; line-height:1.55; }
+  .box li:before{ content:""; position:absolute; left:0; top:11px; width:6px; height:6px; border-radius:50%; background:var(--lime); }
+  .team{ display:flex; gap:12px; margin-top:24px; }
+  .member{ flex:1; border:1px solid var(--border); border-radius:14px; padding:16px 12px; text-align:center; background:var(--cream); }
+  .member .av{ width:42px; height:42px; border-radius:50%; background:var(--green); color:#fff; font-weight:800;
+    display:grid; place-items:center; margin:0 auto 10px; font-size:14pt; }
+  .member .nm{ font-size:10.5pt; font-weight:800; color:var(--green-deep); }
+  .member .rl{ font-size:8.5pt; color:var(--gray); margin-top:5px; line-height:1.45; }
+  .closing{ margin-top:26px; text-align:center; padding:20px; background:var(--green-deep); border-radius:16px; color:#fff; }
+  .closing .c1{ font-size:13pt; font-weight:800; letter-spacing:-.02em; }
+  .closing .c2{ font-size:10.5pt; font-weight:700; color:var(--lime); margin-top:9px; }
 </style>
 </head>
 <body>
@@ -116,137 +142,183 @@
   <div class="inner">
     <div class="brand"><span class="mk"><i></i></span>팜바톤 · FarmBaton</div>
     <h1>떠나는 농장과<br><span class="hl">시작하는 청년</span>을 잇다</h1>
-    <p class="tag">고령 농가의 농장(농지·작목·시설·판로)을 청년농에게 잇는<br>농장 승계 진단·매칭 플랫폼</p>
+    <p class="tag">고령 농가의 농장(농지·작목·시설·판로)을<br>청년농에게 잇는 <b style="color:#fff;font-weight:700">농장 승계 진단·매칭 플랫폼</b></p>
     <div class="meta">
       <div><b>출품 부문</b>제품 및 서비스 개발 (웹)</div>
       <div><b>팀</b>김정훈 · 윤채원 · 유수민</div>
-      <div><b>대회</b>제11회 농업·농촌 공공데이터+AI 활용 창업경진대회</div>
+      <div><b>대회</b>제11회 농업·농촌 공공데이터+AI 창업경진대회</div>
     </div>
-    <div class="url">▶ https://farmbaton.vercel.app</div>
+    <div class="url">▶ &nbsp;https://farmbaton.vercel.app</div>
   </div>
 </section>
 
-<!-- ════════ 2. 문제 & 솔루션 ════════ -->
+<!-- ════════ 2. 문제 인식 ════════ -->
 <section class="page">
   <span class="eyebrow"><span class="dot"></span>문제 인식</span>
-  <h2 class="sec">농장은 멈추는데, 이어받을 통로가 없습니다</h2>
+  <h2 class="sec">농장은 멈추는데,<br>이어받을 통로가 없습니다</h2>
+  <p class="sub">농촌 고령화는 역대 최고치를 경신하고, 들어오려는 청년농은 역대 최저로 줄었습니다.<br>세대 사이를 이어줄 다리가 없는 것이 가장 큰 문제입니다.</p>
+
+  <div class="divider"></div>
+
   <div class="stats">
-    <div class="stat"><div class="n">55.8<small>%</small></div><div class="l">65세 이상 농가인구 비율<br>(처음 55% 돌파, 역대 최고)</div></div>
-    <div class="stat"><div class="n">50.8<small>%</small></div><div class="l">70세 이상 경영주 비중<br>(과반·49.5만 가구)</div></div>
+    <div class="stat"><div class="n">55.8<small>%</small></div><div class="l">65세 이상 농가인구 비율<br>(처음 55% 돌파 · 역대 최고)</div></div>
+    <div class="stat"><div class="n">50.8<small>%</small></div><div class="l">70세 이상 경영주 비중<br>(과반 · 약 49.5만 가구)</div></div>
     <div class="stat"><div class="n">4,601<small>가구</small></div><div class="l">40세 미만 청년 경영주<br>(2020년 12,426 → 역대 최저)</div></div>
   </div>
   <div class="src">출처: 통계청 「2024년 농림어업조사」</div>
-  <p class="lead">수십만 농가가 은퇴를 앞두고 있지만 후계자가 없고, 들어오려는 청년농과 연결할 통로가 없습니다.
-  농장의 가치를 객관적으로 평가하기도 어려워(감정평가는 비용·시간 부담), <b>정보 비대칭으로 영농 기반이 그대로 사라집니다.</b></p>
 
-  <span class="eyebrow" style="margin-top:24px;"><span class="dot"></span>솔루션</span>
-  <h2 class="sec">공공데이터로 가치를 산정하고, AI로 설명하고, 점수로 잇습니다</h2>
-  <div class="feat">
-    <div class="fcard">
-      <span class="tag">기능 ① 농장주</span>
-      <h3>농가 등록 → 인수 검토 리포트</h3>
-      <p>주소만 입력하면 팜맵으로 필지 면적을 자동 취득하고, 공공데이터를 결합해 가치를 추정합니다.</p>
-      <ul>
-        <li>예상 연소득 · 토지 기준가 · 시설 잔존가 산출</li>
-        <li><b>인수 검토가 범위(참고용 추정)</b> + 신뢰등급(A~D)</li>
-        <li>생성형 AI가 농장주/청년농 관점별 PDF 리포트 생성</li>
-      </ul>
-    </div>
-    <div class="fcard">
-      <span class="tag">기능 ② 청년농</span>
-      <h3>프로필 → 매칭 리스트</h3>
-      <p>희망 지역·작목·자본·경력을 입력하면 승계 가능 농장을 점수순으로 추천받습니다.</p>
-      <ul>
-        <li>지역·작목·자본·경험·승계·정책 6요인 매칭(100점)</li>
-        <li>맞춤 지원사업·시설 현황 확인</li>
-        <li>인앱 상담 신청 → 농장주 수락 시 양방향 채팅</li>
-      </ul>
-    </div>
-  </div>
+  <div class="divider"></div>
+
+  <p class="lead">수십만 농가가 은퇴를 앞두고 있지만 <b>후계자가 없고</b>, 농장을 이어받으려는 청년농과 연결할 통로도 없습니다.</p>
+  <p class="lead" style="margin-top:14px;">게다가 농장의 가치를 객관적으로 매기기 어렵습니다. 감정평가는 비용과 시간이 들고, 토지·과수·시설·판로가 얽힌 영농 기반은 더욱 그렇습니다.</p>
+  <p class="lead" style="margin-top:14px;">그 결과 <b>정보 비대칭으로 멀쩡한 영농 기반이 그대로 사라집니다.</b> 팜바톤은 이 승계의 사각지대를 공공데이터로 잇습니다.</p>
+
   <div class="foot"><span>팜바톤 · FarmBaton</span><span>02</span></div>
 </section>
 
-<!-- ════════ 3. 작동 화면 ════════ -->
+<!-- ════════ 3. 핵심 기능 (두 사용자 관점) ════════ -->
 <section class="page">
-  <span class="eyebrow"><span class="dot"></span>작동 화면</span>
-  <h2 class="sec">주소 입력부터 매칭·대화까지, 한 흐름으로</h2>
-  <div class="flow">
-    <div class="shot"><div class="cap"><span>01</span> 주소·작목 입력</div><img src="img/input.png" alt="입력 화면"></div>
-    <div class="arrow">→</div>
-    <div class="shot"><div class="cap"><span>02</span> 인수 검토 리포트</div><img src="img/report.png" alt="리포트 결과"></div>
-    <div class="arrow">→</div>
-    <div class="shot"><div class="cap"><span>03</span> 청년농 매칭</div><img src="img/match.png" alt="매칭 리스트"></div>
-  </div>
-  <p class="lead" style="margin-top:16px;">팜맵 필지 면적 자동 취득(좌), 4분할 가치 그리드와 신뢰등급(중), 6요인 점수와 설명이 담긴 매칭 카드(우).
-  모든 단계가 실제 운영 중인 production에서 동작합니다.</p>
+  <span class="eyebrow"><span class="dot"></span>핵심 기능</span>
+  <h2 class="sec">농장주와 청년농,<br>양쪽 입장에서 설계했습니다</h2>
+  <p class="sub">같은 공공데이터·가치평가 결과를 두 사용자의 <b>언어와 목적에 맞춰 다르게</b> 제공합니다.</p>
 
-  <div class="wide-shot">
-    <div class="shot"><div class="cap"><span>04</span> 매칭 후 인앱 채팅 — 농장주 ↔ 청년농 승계 논의</div></div>
-    <img src="img/chat.png" alt="대화 화면">
+  <div class="persona">
+    <div class="pcol farmer">
+      <div class="head">
+        <div class="who">◤ 농장을 넘기려는 고령 농가</div>
+        <div class="ttl">농가 등록 → 인수 검토 리포트</div>
+      </div>
+      <div class="body">
+        <ul class="steps">
+          <li>주소·작목·수령을 입력하면 <b>팜맵으로 필지 면적을 자동 취득</b></li>
+          <li>예상 연소득·토지·시설·영업권을 결합해 <b>인수 검토가 범위</b>와 신뢰등급(A~D) 산출</li>
+          <li><b>농장주 관점 AI 리포트</b>(매도 준비·시설 가치 어필)를 PDF로</li>
+          <li>매칭 풀에 공개해 조건 맞는 청년농 후보를 추천받기</li>
+        </ul>
+        <div class="gain"><span>✓</span> 감정평가 없이 <b>무료·수십 초</b>로 내 농장 값을 가늠합니다</div>
+      </div>
+    </div>
+
+    <div class="pcol young">
+      <div class="head">
+        <div class="who">◤ 농장을 찾는 청년농</div>
+        <div class="ttl">프로필 → 매칭 리스트</div>
+      </div>
+      <div class="body">
+        <ul class="steps">
+          <li>희망 지역·작목·보유 자본·경력·정책자금을 입력</li>
+          <li><b>6요인</b>(지역·작목·자본·경험·승계·정책) <b>점수순</b>으로 승계 가능 농장 추천</li>
+          <li><b>청년농 관점 AI 리포트</b>(자본 회수·정책자금·체크리스트)와 맞춤 지원사업 확인</li>
+          <li>인앱 상담 신청 → 농장주 수락 시 <b>양방향 채팅</b></li>
+        </ul>
+        <div class="gain"><span>✓</span> 조건에 맞는 <b>승계 농장을 점수로</b> 발견합니다</div>
+      </div>
+    </div>
   </div>
+
+  <p class="persona-note">두 사용자가 보는 숫자는 <b>같은 결정론적 가치평가 결과</b>입니다. 생성형 AI가 이를 매도·인수 각자의 관점으로 번역해, 고령 농가와 청년농의 정보 격차를 좁힙니다.</p>
+
   <div class="foot"><span>팜바톤 · FarmBaton</span><span>03</span></div>
 </section>
 
-<!-- ════════ 4. 기술 · 데이터 · AI ════════ -->
+<!-- ════════ 4. 작동 화면 ════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="dot"></span>작동 화면</span>
+  <h2 class="sec">실제 운영 중인 화면입니다</h2>
+  <p class="sub">아래 모든 단계가 production(<b>farmbaton.vercel.app</b>)에서 실시간으로 동작합니다.</p>
+
+  <div class="flow" style="margin-top:18px;">
+    <div class="shot"><div class="cap"><span>01</span>주소·작목 입력</div><img src="img/input.png" alt="입력 화면"></div>
+    <div class="arrow">→</div>
+    <div class="shot"><div class="cap"><span>02</span>인수 검토 리포트</div><img src="img/report.png" alt="리포트 결과"></div>
+    <div class="arrow">→</div>
+    <div class="shot"><div class="cap"><span>03</span>청년농 매칭</div><img src="img/match.png" alt="매칭 리스트"></div>
+  </div>
+  <p class="lead" style="margin-top:16px; font-size:9.5pt;">팜맵 필지 면적 자동 취득<b>(좌)</b> · 가치 구성과 신뢰등급을 담은 인수 검토 리포트<b>(중)</b> · 6요인 점수와 설명이 붙은 매칭 카드<b>(우)</b>.</p>
+
+  <div class="wide-shot">
+    <div class="cap"><span>04</span>매칭 후 인앱 채팅 — 농장주 ↔ 청년농이 승계를 논의합니다</div>
+    <img src="img/chat.png" alt="채팅 화면">
+  </div>
+  <div class="foot"><span>팜바톤 · FarmBaton</span><span>04</span></div>
+</section>
+
+<!-- ════════ 5. 기술 · 공공데이터 · AI ════════ -->
 <section class="page">
   <span class="eyebrow"><span class="dot"></span>기술 · 공공데이터 · AI</span>
-  <h2 class="sec">재현 가능한 계산 + 책임 있는 AI</h2>
+  <h2 class="sec">재현 가능한 계산 +<br>책임 있는 AI</h2>
 
-  <div class="arch">
+  <div class="arch" style="margin-top:18px;">
     <div class="node"><div class="t">사용자</div><div class="s">농장주 · 청년농</div></div>
     <span class="ar">→</span>
     <div class="node"><div class="t">프런트엔드</div><div class="s">React(Vite)+Leaflet</div></div>
     <span class="ar">→</span>
     <div class="node"><div class="t">백엔드</div><div class="s">FastAPI · 결정론 엔진</div></div>
     <span class="ar">→</span>
-    <div class="node"><div class="t">DB</div><div class="s">PostgreSQL/PostGIS</div></div>
+    <div class="node"><div class="t">데이터베이스</div><div class="s">PostgreSQL/PostGIS</div></div>
   </div>
   <div class="side">
     <div class="chip"><div class="t">공공데이터 ETL</div><div class="s">팜맵 SHP · 소득조사 · 공시지가 · 실거래가</div></div>
     <div class="chip"><div class="t">V-World 국내 우회 프록시</div><div class="s">국외반출 제한 대응 (Tailscale Funnel)</div></div>
-    <div class="chip"><div class="t">생성형 AI</div><div class="s">Claude API · 리포트 서술</div></div>
+    <div class="chip"><div class="t">생성형 AI</div><div class="s">Claude API · 관점별 리포트</div></div>
   </div>
 
   <table class="data">
-    <tr><th>구분</th><th>공공데이터 (제공기관)</th><th>활용</th></tr>
+    <tr><th style="width:18%">구분</th><th style="width:48%">공공데이터 (출처)</th><th>활용</th></tr>
     <tr><td>실시간 API</td><td>V-World 지오코딩 (국토부)</td><td>주소 → 좌표 변환</td></tr>
-    <tr><td>적재(공간)</td><td>팜맵 (V-World 취득 · 원천 농정원/EPIS)</td><td>필지 면적·위치 자동 취득</td></tr>
+    <tr><td>적재 (공간)</td><td>팜맵 — V-World 취득 (원천 농정원/EPIS)</td><td>필지 면적·위치 자동 취득</td></tr>
     <tr><td>적재</td><td>농산물 소득조사 (농촌진흥청)</td><td>예상 연소득 기준계수</td></tr>
     <tr><td>적재</td><td>KAMIS 가격·평년가 (aT)</td><td>시세 보정·참고</td></tr>
-    <tr><td>적재</td><td>개별공시지가 (V-World) · 토지 실거래가 (국토부)</td><td>토지 기준가 산정·보정</td></tr>
+    <tr><td>적재</td><td>개별공시지가 — V-World · 실거래가 (국토부)</td><td>토지 기준가 산정·보정</td></tr>
   </table>
 
   <div class="callout">
     <div class="h">🤖 “숫자는 알고리즘, 설명은 AI” — 책임 있는 AI 설계</div>
-    <p>금전 추정치(가치·매칭 점수)는 <b>100% 결정론적 함수</b>로 계산해 재현·검증이 가능하고 <b>환각으로 인한 잘못된 금액 제시를 원천 차단</b>합니다.
-    생성형 AI는 그 수치를 <b>농장주·청년농 각자의 언어로 번역</b>하는 설명 생성에만 사용 — 고령 농가와 청년농의 정보 격차를 해소합니다.</p>
+    <p>금전 추정치(가치·매칭 점수)는 <b>100% 결정론적 함수</b>로 계산해 재현·검증이 가능하고, <b>환각으로 인한 잘못된 금액 제시를 원천 차단</b>합니다. 생성형 AI는 그 수치를 <b>농장주·청년농 각자의 언어로 번역</b>하는 설명 생성에만 사용합니다.</p>
   </div>
+
+  <div class="foot"><span>팜바톤 · FarmBaton</span><span>05</span></div>
+</section>
+
+<!-- ════════ 6. 기대효과 · 차별성 · 팀 ════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="dot"></span>기대효과 · 차별성</span>
+  <h2 class="sec">데이터로 잇는 농업 세대 전환</h2>
 
   <div class="two">
     <div class="box">
       <div class="h">기대효과</div>
       <ul>
-        <li>사라지던 영농 기반을 다음 세대로 연결(식량안보·지역소멸 대응)</li>
-        <li>승계 검토: 감정평가(비용·수일) → 무료·수십 초</li>
-        <li>공공데이터 기반 객관적 매칭으로 탐색비용 절감</li>
+        <li>사라지던 영농 기반을 다음 세대로 연결 — 식량안보·지역소멸 대응</li>
+        <li>승계 검토 진입장벽: 감정평가(비용·수일) → <b>무료·수십 초</b></li>
+        <li>공공데이터 기반 객관적 매칭으로 후보 탐색비용 절감</li>
       </ul>
     </div>
     <div class="box">
       <div class="h">차별성</div>
       <ul>
-        <li>토지+과수 수령+시설+영업권 통합 승계 가치 모델</li>
+        <li>토지 + 과수 수령 + 시설 + 영업권을 묶은 <b>통합 승계 가치 모델</b></li>
         <li>관점별 AI 리포트 + 6요인 매칭 + 정책자금 연계</li>
-        <li>국외반출 제약을 푼 국내 우회 인프라</li>
+        <li>공공데이터 국외반출 제약을 푼 <b>국내 우회 인프라</b></li>
       </ul>
     </div>
   </div>
 
+  <div class="divider" style="margin:26px 0;"></div>
+
+  <span class="eyebrow"><span class="dot"></span>팀</span>
   <div class="team">
     <div class="member"><div class="av">김</div><div class="nm">김정훈</div><div class="rl">대표 · 기획/풀스택 개발 총괄</div></div>
-    <div class="member"><div class="av">윤</div><div class="nm">윤채원</div><div class="rl">UI/UX 디자인 (컴퓨터공학)</div></div>
-    <div class="member"><div class="av">유</div><div class="nm">유수민</div><div class="rl">농업 도메인 자문 (농업 계열)</div></div>
+    <div class="member"><div class="av">윤</div><div class="nm">윤채원</div><div class="rl">UI/UX 디자인<br>(컴퓨터공학)</div></div>
+    <div class="member"><div class="av">유</div><div class="nm">유수민</div><div class="rl">농업 도메인 자문<br>(농업 계열)</div></div>
   </div>
-  <div class="foot"><span>팜바톤 · FarmBaton · https://farmbaton.vercel.app</span><span>04</span></div>
+
+  <div class="closing">
+    <div class="c1">승계의 첫 숫자를, 팜바톤에서.</div>
+    <div class="c2">▶ https://farmbaton.vercel.app</div>
+  </div>
+
+  <div class="foot"><span>팜바톤 · FarmBaton</span><span>06</span></div>
 </section>
 
 </body>
