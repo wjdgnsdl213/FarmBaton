@@ -1,0 +1,11 @@
+# Railway 백엔드 배포 시 런타임에 불필요한 대용량/무관 디렉터리 제외.
+# 백엔드(uvicorn backend.app.main:app)는 backend/ · db/seed · requirements.txt만 필요하다.
+data/
+frontend/
+docs/
+etl/
+proxy/
+.git/
+.pytest_cache/
+**/__pycache__/
+*.pyc
