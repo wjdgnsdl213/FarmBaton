@@ -82,6 +82,21 @@ def list_conversations(conn=Depends(get_db), user=Depends(get_current_user_optio
     ]
 
 
+@conv_router.delete("/{req_id}", status_code=204)
+def delete_conversation(req_id: int, conn=Depends(get_db), user=Depends(get_current_user_optional)):
+    """채팅(대화) 삭제 — 당사자만 가능.
+
+    consult_request 를 삭제하면 chat_message 는 ON DELETE CASCADE 로 함께
+    삭제된다. 양쪽 모두에서 사라지는 하드 삭제(데모 단순화). 같은 (농장,
+    청년농)은 이후 다시 대화를 시작할 수 있다.
+    """
+    _authorize(req_id, user, conn)  # 당사자 아니면 403/404
+    with conn.cursor() as cur:
+        cur.execute("DELETE FROM consult_request WHERE id = %s", (req_id,))
+    conn.commit()
+    return None
+
+
 def _authorize(req_id: int, user, conn):
     """이 상담의 당사자인지 검증 후 (status, my_role, counterpart_name, farm_label) 반환.
 

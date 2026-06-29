@@ -17,6 +17,18 @@ export default function ConversationsPage() {
       .catch(err => setError(err.response?.data?.detail || '대화 목록을 불러오지 못했습니다.'))
   }, [])
 
+  const handleDelete = async (c: ConversationItem, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!window.confirm(`${c.counterpart_name}님과의 채팅을 삭제할까요?\n양쪽 모두에서 영구 삭제되며 되돌릴 수 없습니다.`)) return
+    try {
+      await api.deleteConversation(c.consult_request_id)
+      setConvos(prev => (prev ?? []).filter(x => x.consult_request_id !== c.consult_request_id))
+      setActive(a => (a?.consult_request_id === c.consult_request_id ? null : a))
+    } catch {
+      setError('채팅을 삭제하지 못했습니다.')
+    }
+  }
+
   const formatLastAt = (value: string | null) => {
     if (!value) return null
     return new Date(value).toLocaleString('ko-KR', {
@@ -50,9 +62,9 @@ export default function ConversationsPage() {
         <div className="convo-layout">
           <div className="convo-list">
             {convos.map(c => (
+              <div className="convo-item-wrap" key={c.consult_request_id}>
               <button
                 type="button"
-                key={c.consult_request_id}
                 className={`convo-item ${active?.consult_request_id === c.consult_request_id ? 'active' : ''}`}
                 aria-pressed={active?.consult_request_id === c.consult_request_id}
                 onClick={() => setActive(c)}
@@ -76,6 +88,21 @@ export default function ConversationsPage() {
                   <div className="convo-preview">{c.last_message_preview || '아직 메시지가 없습니다'}</div>
                 </div>
               </button>
+              <button
+                type="button"
+                className="convo-del"
+                aria-label="채팅 삭제"
+                title="채팅 삭제"
+                onClick={e => handleDelete(c, e)}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+              </button>
+              </div>
             ))}
           </div>
           <div className="convo-chat">

@@ -376,4 +376,7 @@ export const api = {
   // ── 농장주 발신 대화 시작 ──
   initiateConversation: (farmId: number, youngFarmerId: number) =>
     client.post<ConsultRequestResult>(`/farms/${farmId}/conversations`, { young_farmer_id: youngFarmerId }).then(r => r.data),
+
+  deleteConversation: (reqId: number) =>
+    client.delete(`/conversations/${reqId}`).then(r => r.data),
 }
