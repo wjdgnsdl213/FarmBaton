@@ -263,11 +263,33 @@ export default function FarmerPage() {
             type="button"
             onClick={() => setShowOptional(s => !s)}
             style={{
-              background: 'none', border: 'none', padding: '.4rem 0',
-              color: 'var(--green)', fontWeight: 600, cursor: 'pointer', fontSize: '.88rem',
+              width: '100%', display: 'flex', alignItems: 'center', gap: '.7rem',
+              padding: '.85rem 1rem', borderRadius: '12px', cursor: 'pointer',
+              fontFamily: 'inherit', textAlign: 'left',
+              border: `1.5px ${showOptional ? 'solid' : 'dashed'} var(--green)`,
+              background: showOptional ? 'var(--green-light)' : '#fff',
+              transition: 'background .15s, border-color .15s',
             }}
           >
-            {showOptional ? '▾' : '▸'} 시설·판로 입력 (선택) — 입력하면 영업권·시설 가치까지 반영돼요
+            <span style={{
+              flex: '0 0 auto', width: '26px', height: '26px', borderRadius: '50%',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              background: 'var(--green)', color: '#fff', fontSize: '1.1rem',
+              fontWeight: 700, lineHeight: 1,
+            }}>
+              {showOptional ? '−' : '+'}
+            </span>
+            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '.1rem' }}>
+              <span style={{ fontWeight: 700, fontSize: '.92rem', color: 'var(--green-deep)' }}>
+                시설·판로 정보 추가 <span style={{ fontWeight: 500, color: 'var(--gray)' }}>(선택)</span>
+              </span>
+              <span style={{ fontSize: '.76rem', color: 'var(--gray)' }}>
+                입력하면 영업권·시설 가치까지 반영돼 더 정확해져요
+              </span>
+            </span>
+            <span style={{ flex: '0 0 auto', color: 'var(--green)', fontSize: '.8rem' }}>
+              {showOptional ? '▲' : '▼'}
+            </span>
           </button>
 
           {showOptional && (
