@@ -8,33 +8,71 @@ import logoFull from '../assets/logo_full.png'
 
 const INTRO_SESSION_KEY = 'fb_intro_shown'
 
-// 인트로는 자동으로 넘어가지 않고, 사용자가 아래로 스크롤(휠·터치·키)하면 닫힌다.
+// 인트로는 자동으로 넘어가지 않는다.
+// 마우스를 누른 채 위로 끌면 끌리는 만큼 실시간으로 따라 올라오고(다시 내리면 따라 내려옴),
+// 충분히(THRESHOLD) 끌어올린 채 손을 떼면 닫힌다. 휠·터치·키는 즉시 닫는다.
 function useIntro() {
   const [show, setShow] = useState(() => !sessionStorage.getItem(INTRO_SESSION_KEY))
-  const [out, setOut] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!show) return
     sessionStorage.setItem(INTRO_SESSION_KEY, '1')
+    const el = ref.current
+    if (!el) return
+
+    const THRESHOLD = 110 // 이만큼 끌어올린 채 놓으면 닫힘
+    const SNAP = 'transform .42s cubic-bezier(.4,0,.2,1), opacity .42s ease'
     let done = false
-    const dismiss = () => {
+
+    // y만큼 위로 이동 + 진행도에 따라 살짝 페이드. transition을 켜면 부드럽게 미끄러진다.
+    const apply = (y: number, smooth: boolean) => {
+      el.style.transition = smooth ? SNAP : 'none'
+      el.style.transform = `translateY(${y}px)`
+      el.style.opacity = String(Math.max(0, 1 + y / window.innerHeight))
+    }
+
+    const finish = () => {
       if (done) return
       done = true
-      setOut(true)
+      apply(-window.innerHeight, true) // 위로 완전히 밀어내고
       setTimeout(() => setShow(false), 420)
     }
+
+    // 마우스 드래그(실시간 추적) — 리렌더 없이 DOM 직접 제어
+    let startY: number | null = null
+    let current = 0
+    const onDown = (e: MouseEvent) => { startY = e.clientY; current = 0; el.style.transition = 'none' }
+    const onMove = (e: MouseEvent) => {
+      if (startY === null || done) return
+      current = Math.min(0, e.clientY - startY) // 위로만 따라감
+      apply(current, false)
+    }
+    const onUp = () => {
+      if (startY === null) return
+      startY = null
+      if (current <= -THRESHOLD) finish()
+      else apply(0, true) // 모자라면 제자리로 부드럽게 복귀
+    }
+
     const opts: AddEventListenerOptions = { passive: true }
-    window.addEventListener('wheel', dismiss, opts)
-    window.addEventListener('touchmove', dismiss, opts)
-    window.addEventListener('scroll', dismiss, opts)
-    window.addEventListener('keydown', dismiss)
+    window.addEventListener('wheel', finish, opts)
+    window.addEventListener('touchmove', finish, opts)
+    window.addEventListener('scroll', finish, opts)
+    window.addEventListener('keydown', finish)
+    window.addEventListener('mousedown', onDown, opts)
+    window.addEventListener('mousemove', onMove, opts)
+    window.addEventListener('mouseup', onUp, opts)
     return () => {
-      window.removeEventListener('wheel', dismiss)
-      window.removeEventListener('touchmove', dismiss)
-      window.removeEventListener('scroll', dismiss)
-      window.removeEventListener('keydown', dismiss)
+      window.removeEventListener('wheel', finish)
+      window.removeEventListener('touchmove', finish)
+      window.removeEventListener('scroll', finish)
+      window.removeEventListener('keydown', finish)
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
     }
   }, [show])
-  return { show, out }
+  return { show, ref }
 }
 
 function useHashScroll() {
@@ -75,7 +113,12 @@ export default function LandingPage() {
   return (
     <div ref={rootRef}>
       {intro.show && (
-        <div className={`lp-intro ${intro.out ? 'out' : ''}`} aria-hidden="true">
+        <div
+          ref={intro.ref}
+          className="lp-intro"
+          aria-hidden="true"
+          style={{ cursor: 'grab', userSelect: 'none' }}
+        >
           <img src={heroFarm} alt="" className="lp-intro-photo" />
           <div className="lp-intro-overlay" />
           <div className="lp-intro-text">
@@ -83,7 +126,7 @@ export default function LandingPage() {
             <p className="lime">경험은 남기고, 청년의 꿈은 자라납니다.</p>
           </div>
           <div className="lp-intro-hint">
-            <span>아래로 스크롤</span>
+            <span>끌어올리거나 스크롤</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9" />
               <polyline points="6 14 12 20 18 14" />
