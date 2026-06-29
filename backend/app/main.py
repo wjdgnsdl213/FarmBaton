@@ -205,3 +205,30 @@ def _extract_sido_from_address(address: str) -> str | None:
         if k in address:
             return v
     return None
+
+
+@app.get("/api/facilities")
+def facilities(conn=Depends(get_db)):
+    """시설 종류 목록 (facility_std 기준) — 농가 등록 폼의 시설 드롭다운용.
+
+    단가·내용연수 등 기준값은 서버(DB)에만 두고, 프런트엔드에는 선택용
+    code·표시라벨만 내려준다(코드 5번 규칙: 기준값 프런트 하드코딩 금지).
+    """
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT facility_code, facility_name, facility_variant
+                FROM facility_std
+                ORDER BY facility_name, facility_variant
+            """)
+            rows = cur.fetchall()
+    except Exception:
+        conn.rollback()
+        raise HTTPException(503, "시설 기준표를 불러오지 못했습니다.")
+    return [
+        {
+            "facility_code": code,
+            "label": f"{name} · {variant}" if variant else name,
+        }
+        for code, name, variant in rows
+    ]

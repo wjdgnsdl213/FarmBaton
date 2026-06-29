@@ -34,7 +34,14 @@ export interface FarmCreatePayload {
   area_m2?: number
   succession_type?: string
   timing?: string
+  annual_revenue?: number          // 원 단위 (선택) — 영업권·숙련도 보정
+  sales_channel?: string           // 계약재배 / 직거래 / 공판장 (선택)
   assets?: { facility_code: string; area_m2: number; installed_year?: number; condition_grade: string }[]
+}
+
+export interface FacilityOption {
+  facility_code: string
+  label: string
 }
 
 export interface ValuationResult {
@@ -292,6 +299,9 @@ export const api = {
 
   createFarm: (data: FarmCreatePayload) =>
     client.post<FarmCreateResult>('/farms', data).then(r => r.data),
+
+  facilities: () =>
+    client.get<FacilityOption[]>('/facilities').then(r => r.data),
 
   getValuation: (farmId: number) =>
     client.get<ValuationResult>(`/farms/${farmId}/valuation`).then(r => r.data),
