@@ -86,7 +86,8 @@ def _upsert_match_score(farm_id: int, yf_id: int, result, explanation: Optional[
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _require_young(user):
-    if user is None or user[1] != "YOUNG":
+    # ADMIN은 청년농 플로우도 이용할 수 있다(운영/시연용).
+    if user is None or user[1] not in ("YOUNG", "ADMIN"):
         raise HTTPException(status_code=403, detail="청년농 계정으로 로그인 후 이용할 수 있습니다.")
     return user[0]
 
@@ -159,7 +160,7 @@ def my_consult_requests(conn=Depends(get_db), user=Depends(get_current_user_opti
 
     수락(ACCEPTED)된 건은 프론트에서 채팅으로 이어진다.
     """
-    if user is None or user[1] != "YOUNG":
+    if user is None or user[1] not in ("YOUNG", "ADMIN"):
         raise HTTPException(status_code=403, detail="청년농 계정으로 로그인이 필요합니다.")
     user_id = user[0]
 

@@ -36,7 +36,8 @@ def get_current_farmer(authorization: str = Header(default=""), conn=Depends(get
         raise HTTPException(status_code=401, detail="유효하지 않거나 만료된 토큰입니다.")
 
     with conn.cursor() as cur:
-        cur.execute("SELECT 1 FROM app_user WHERE id = %s AND role = 'FARMER'", (user_id,))
+        # ADMIN은 농가·청년농 양쪽 플로우를 모두 이용할 수 있다(운영/시연용).
+        cur.execute("SELECT 1 FROM app_user WHERE id = %s AND role IN ('FARMER','ADMIN')", (user_id,))
         if cur.fetchone() is None:
             raise HTTPException(status_code=403, detail="농가 계정만 이용할 수 있습니다.")
     return user_id

@@ -37,8 +37,9 @@ function RoleNotice({ requiredRole }: { requiredRole: 'FARMER' | 'YOUNG' }) {
 
 function RequireAuth({ children, role }: { children: React.ReactNode; role?: 'FARMER' | 'YOUNG' }) {
   if (!getToken()) return <Navigate to="/login" replace />
-  // 역할이 지정된 라우트인데 다른 역할로 로그인했으면 전용 메뉴 안내 표시
-  if (role && getRole() && getRole() !== role) {
+  // 역할이 지정된 라우트인데 다른 역할로 로그인했으면 전용 메뉴 안내 표시.
+  // ADMIN은 농가·청년농 양쪽 라우트를 모두 통과한다(운영/시연용).
+  if (role && getRole() && getRole() !== role && getRole() !== 'ADMIN') {
     return <RoleNotice requiredRole={role} />
   }
   return <>{children}</>
