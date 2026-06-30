@@ -1,153 +1,132 @@
-<svg viewBox="0 0 960 736" xmlns="http://www.w3.org/2000/svg" role="img" font-family="'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif">
+<svg viewBox="0 0 1000 664" xmlns="http://www.w3.org/2000/svg" role="img" font-family="'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif">
   <title>팜바톤 시스템 아키텍처</title>
   <desc>고령 농가 승계 진단·매칭 플랫폼의 전체 시스템 구조도</desc>
 
   <defs>
-    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1f3d2b" flood-opacity="0.10"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0e1730"/>
+      <stop offset="1" stop-color="#0a1124"/>
+    </linearGradient>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#1b2a4a"/>
+    </pattern>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.40"/>
     </filter>
   </defs>
 
-  <!-- Background -->
-  <rect width="960" height="736" fill="#f6f7f4"/>
+  <rect width="1000" height="664" fill="url(#bg)"/>
+  <rect width="1000" height="664" fill="url(#dots)" opacity="0.5"/>
 
   <!-- Header -->
-  <text x="32" y="42" font-size="22" font-weight="800" fill="#1f3d2b">🌾 팜바톤 · 시스템 아키텍처</text>
-  <text x="34" y="66" font-size="12" fill="#6b7565">고령 농가의 농장을 청년농에게 잇는 승계 진단·매칭 플랫폼</text>
-  <text x="34" y="88" font-size="11.5" fill="#3f5a48">
-    <tspan font-weight="700" fill="#2f7d4f">①  농가</tspan>  농장 등록 → 인수 검토 리포트      <tspan font-weight="700" fill="#2f7d4f">②  청년농</tspan>  프로필 → 매칭 리스트
-  </text>
-  <line x1="32" y1="104" x2="928" y2="104" stroke="#e2e4dd" stroke-width="1"/>
+  <text x="32" y="46" font-size="22" font-weight="800" fill="#f1f5f9">🌾 팜바톤 · 시스템 아키텍처</text>
+  <text x="34" y="68" font-size="11.5" fill="#8a99b8">공공데이터로 농장 가치를 진단하고 청년농을 잇는 승계 매칭 플랫폼</text>
 
-  <!-- ===== FRONTEND tab ===== -->
-  <rect x="28" y="124" width="40" height="120" rx="10" fill="#3b82a8"/>
-  <text transform="rotate(-90 48 184)" x="48" y="184" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" letter-spacing="2">FRONTEND</text>
+  <!-- pipeline caption -->
+  <text x="32" y="100" font-size="10.5" font-weight="700" fill="#5d6f93" letter-spacing="1">요청 흐름   USER → FRONTEND → API → SERVICES</text>
 
-  <!-- FE cards -->
-  <g filter="url(#sh)">
-    <rect x="84" y="124" width="200" height="92" rx="10" fill="#fff" stroke="#e7e7e1"/>
-    <rect x="300" y="124" width="200" height="92" rx="10" fill="#fff" stroke="#e7e7e1"/>
-    <rect x="516" y="124" width="200" height="92" rx="10" fill="#fff" stroke="#e7e7e1"/>
-    <rect x="732" y="124" width="200" height="92" rx="10" fill="#fff" stroke="#e7e7e1"/>
+  <!-- ===== Top pipeline cards ===== -->
+  <!-- Card 1: User (slate) -->
+  <g filter="url(#soft)"><rect x="24" y="110" width="200" height="140" rx="14" fill="#13203c" stroke="#2b3a5e"/></g>
+  <rect x="24" y="110" width="200" height="6" rx="3" fill="#64748b"/>
+  <text x="44" y="146" font-size="14" font-weight="800" fill="#e7edf7">👤 사용자</text>
+  <text x="44" y="174" font-size="11" fill="#9fb0cd">모바일 퍼스트 웹</text>
+  <text x="44" y="196" font-size="11" fill="#9fb0cd">농가 · 청년농</text>
+  <text x="44" y="226" font-size="9.5" fill="#5d6f93">farmbaton.vercel.app</text>
+
+  <!-- Card 2: Frontend (sky) -->
+  <g filter="url(#soft)"><rect x="275" y="110" width="200" height="140" rx="14" fill="#13203c" stroke="#1e3a52"/></g>
+  <rect x="275" y="110" width="200" height="6" rx="3" fill="#38bdf8"/>
+  <text x="295" y="146" font-size="14" font-weight="800" fill="#7dd3fc">Frontend</text>
+  <text x="295" y="172" font-size="10.5" fill="#9fb0cd">React · Vite · Leaflet</text>
+  <text x="295" y="192" font-size="10.5" fill="#9fb0cd">Vercel 배포</text>
+  <text x="295" y="222" font-size="9.5" fill="#5d6f93">등록 · 리포트 · 매칭 · 지도</text>
+
+  <!-- Card 3: API (teal) -->
+  <g filter="url(#soft)"><rect x="526" y="110" width="200" height="140" rx="14" fill="#13203c" stroke="#194a44"/></g>
+  <rect x="526" y="110" width="200" height="6" rx="3" fill="#2dd4bf"/>
+  <text x="546" y="146" font-size="14" font-weight="800" fill="#5eead4">API · FastAPI</text>
+  <text x="546" y="172" font-size="10.5" fill="#9fb0cd">/api/farms</text>
+  <text x="546" y="191" font-size="10.5" fill="#9fb0cd">/api/young-farmers</text>
+  <text x="546" y="210" font-size="10.5" fill="#9fb0cd">/api/auth · conversations</text>
+  <text x="546" y="234" font-size="9.5" fill="#5d6f93">Railway</text>
+
+  <!-- Card 4: Services (violet) -->
+  <g filter="url(#soft)"><rect x="777" y="110" width="200" height="140" rx="14" fill="#13203c" stroke="#352d5e"/></g>
+  <rect x="777" y="110" width="200" height="6" rx="3" fill="#a78bfa"/>
+  <text x="797" y="146" font-size="14" font-weight="800" fill="#c4b5fd">Services</text>
+  <text x="797" y="172" font-size="10.5" fill="#9fb0cd">🔒 valuation · 매칭</text>
+  <text x="797" y="191" font-size="10.5" fill="#9fb0cd">결정론적 수치 계산</text>
+  <text x="797" y="212" font-size="10.5" fill="#9fb0cd">✍️ report_ai · 📄 pdf</text>
+  <text x="797" y="234" font-size="9.5" fill="#5d6f93">LLM은 설명문 전용</text>
+
+  <!-- pipeline arrows -->
+  <g stroke="#46577d" stroke-width="2" fill="#46577d">
+    <line x1="224" y1="180" x2="271" y2="180"/><polygon points="271,175 281,180 271,185"/>
+    <line x1="475" y1="180" x2="522" y2="180"/><polygon points="522,175 532,180 522,185"/>
+    <line x1="726" y1="180" x2="773" y2="180"/><polygon points="773,175 783,180 773,185"/>
   </g>
-  <rect x="84" y="124" width="5" height="92" rx="2" fill="#3b82a8"/>
-  <rect x="300" y="124" width="5" height="92" rx="2" fill="#3b82a8"/>
-  <rect x="516" y="124" width="5" height="92" rx="2" fill="#3b82a8"/>
-  <rect x="732" y="124" width="5" height="92" rx="2" fill="#3b82a8"/>
-  <text x="104" y="153" font-size="13" font-weight="700" fill="#243027">🏠 LandingPage</text>
-  <text x="104" y="176" font-size="10.5" fill="#7a8278">인트로 애니메이션</text>
-  <text x="104" y="194" font-size="10.5" fill="#7a8278">서비스 소개 · CTA</text>
-  <text x="320" y="153" font-size="13" font-weight="700" fill="#243027">🌾 농가 플로우</text>
-  <text x="320" y="176" font-size="10.5" fill="#7a8278">농장 등록</text>
-  <text x="320" y="194" font-size="10.5" fill="#7a8278">인수 검토 리포트 · PDF</text>
-  <text x="536" y="153" font-size="13" font-weight="700" fill="#243027">🧑‍🌾 청년농 플로우</text>
-  <text x="536" y="176" font-size="10.5" fill="#7a8278">프로필 등록</text>
-  <text x="536" y="194" font-size="10.5" fill="#7a8278">조건 기반 매칭 리스트</text>
-  <text x="752" y="153" font-size="13" font-weight="700" fill="#243027">🗺 지도 뷰</text>
-  <text x="752" y="176" font-size="10.5" fill="#7a8278">Leaflet 필지 표시</text>
-  <text x="752" y="194" font-size="10.5" fill="#7a8278">V-World 배경지도</text>
+  <text x="237" y="172" font-size="9" fill="#6b7da3">REST</text>
+  <text x="486" y="172" font-size="9" fill="#6b7da3">JSON</text>
 
-  <!-- FE -> BE -->
-  <line x1="508" y1="216" x2="508" y2="250" stroke="#9aa39a" stroke-width="1.6"/>
-  <polygon points="503,247 513,247 508,255" fill="#9aa39a"/>
-  <text x="520" y="237" font-size="10.5" fill="#7a8278">REST API · JWT 인증</text>
-
-  <!-- ===== BACKEND tab ===== -->
-  <rect x="28" y="258" width="40" height="186" rx="10" fill="#2f7d4f"/>
-  <text transform="rotate(-90 48 351)" x="48" y="351" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" letter-spacing="2">BACKEND</text>
-
-  <!-- BE outer panel -->
-  <g filter="url(#sh)">
-    <rect x="84" y="258" width="848" height="186" rx="12" fill="#fff" stroke="#e7e7e1"/>
+  <!-- drops to lower region -->
+  <g stroke="#46577d" stroke-width="2" fill="#46577d">
+    <line x1="626" y1="250" x2="290" y2="306"/><polygon points="293,297 283,308 304,307" fill="#46577d"/>
+    <line x1="877" y1="250" x2="745" y2="306"/><polygon points="757,300 742,308 760,311" fill="#46577d"/>
   </g>
-  <text x="104" y="282" font-size="12.5" font-weight="800" fill="#2f7d4f">FastAPI · Railway</text>
-  <text x="104" y="300" font-size="10" font-weight="700" fill="#9aa39a" letter-spacing="0.5">API 라우터</text>
-
-  <!-- router pills -->
-  <g font-size="11.5" font-weight="700" fill="#2f7d4f" text-anchor="middle">
-    <rect x="104" y="308" width="195" height="38" rx="19" fill="#eaf4ee" stroke="#bcdcc7"/>
-    <text x="201" y="332">/api/farms</text>
-    <rect x="314" y="308" width="195" height="38" rx="19" fill="#eaf4ee" stroke="#bcdcc7"/>
-    <text x="411" y="332">/api/young-farmers</text>
-    <rect x="524" y="308" width="195" height="38" rx="19" fill="#eaf4ee" stroke="#bcdcc7"/>
-    <text x="621" y="332">/api/auth</text>
-    <rect x="734" y="308" width="178" height="38" rx="19" fill="#eaf4ee" stroke="#bcdcc7"/>
-    <text x="823" y="332">/api/conversations</text>
-  </g>
-
-  <text x="104" y="372" font-size="10" font-weight="700" fill="#9aa39a">서비스 계층  ·  🔒 수치 계산은 결정론적 Python (LLM은 설명문 생성에만 사용)</text>
-
-  <!-- service cards -->
-  <rect x="104" y="380" width="262" height="54" rx="9" fill="#f3f8f4" stroke="#cfe6d6"/>
-  <text x="120" y="403" font-size="12" font-weight="700" fill="#243027">🔒 valuation.py</text>
-  <text x="120" y="421" font-size="10" fill="#7a8278">소득 · 시설 잔존가 · 검토가 범위</text>
-  <rect x="377" y="380" width="262" height="54" rx="9" fill="#f3f8f4" stroke="#cfe6d6"/>
-  <text x="393" y="403" font-size="12" font-weight="700" fill="#243027">🔒 매칭 엔진</text>
-  <text x="393" y="421" font-size="10" fill="#7a8278">조건 기반 결정론적 점수</text>
-  <rect x="650" y="380" width="262" height="54" rx="9" fill="#f3f8f4" stroke="#cfe6d6"/>
-  <text x="666" y="403" font-size="12" font-weight="700" fill="#243027">report_ai · pdf_render</text>
-  <text x="666" y="421" font-size="10" fill="#7a8278">✍️ 설명문(Claude) · 📄 PDF(Playwright)</text>
-
-  <!-- BE -> DATA / EXTERNAL -->
-  <line x1="243" y1="444" x2="243" y2="478" stroke="#9aa39a" stroke-width="1.6"/>
-  <polygon points="238,475 248,475 243,483" fill="#9aa39a"/>
-  <text x="255" y="465" font-size="10.5" fill="#7a8278">SQL · PostGIS</text>
-  <line x1="703" y1="444" x2="703" y2="478" stroke="#9aa39a" stroke-width="1.6"/>
-  <polygon points="698,475 708,475 703,483" fill="#9aa39a"/>
-  <text x="560" y="465" font-size="10.5" fill="#7a8278">외부 호출 · 정적 폴백</text>
+  <text x="430" y="288" font-size="9.5" fill="#6b7da3">SQL · PostGIS</text>
+  <text x="792" y="290" font-size="9.5" fill="#6b7da3">외부 호출 · 폴백</text>
 
   <!-- ===== DATA panel ===== -->
-  <g filter="url(#sh)">
-    <rect x="28" y="486" width="430" height="222" rx="12" fill="#fff" stroke="#e7e7e1"/>
-  </g>
-  <rect x="28" y="486" width="6" height="222" rx="3" fill="#c98a2e"/>
-  <text x="48" y="512" font-size="12.5" font-weight="800" fill="#b5791f">🗄  DATA · Supabase (PostgreSQL + PostGIS)</text>
+  <g filter="url(#soft)"><rect x="24" y="312" width="466" height="328" rx="14" fill="#12203b" stroke="#3d3320"/></g>
+  <rect x="24" y="312" width="6" height="328" rx="3" fill="#fbbf24"/>
+  <text x="46" y="342" font-size="13" font-weight="800" fill="#fcd34d">🗄  DATA · Supabase (PostgreSQL + PostGIS)</text>
 
-  <text x="48" y="536" font-size="10" font-weight="700" fill="#c98a2e">운영 테이블</text>
-  <g font-size="10" fill="#243027" text-anchor="middle">
-    <rect x="48" y="542" width="110" height="26" rx="6" fill="#fdf6e9" stroke="#f0d8ab"/><text x="103" y="559">farms</text>
-    <rect x="166" y="542" width="135" height="26" rx="6" fill="#fdf6e9" stroke="#f0d8ab"/><text x="233" y="559">young_farmers</text>
-    <rect x="309" y="542" width="135" height="26" rx="6" fill="#fdf6e9" stroke="#f0d8ab"/><text x="376" y="559">consult_requests</text>
+  <text x="46" y="372" font-size="10" font-weight="700" fill="#caa14a" letter-spacing="0.5">운영 테이블</text>
+  <g font-size="10.5" fill="#e7edf7" text-anchor="middle">
+    <rect x="46" y="380" width="112" height="28" rx="7" fill="#1d2b49" stroke="#37456b"/><text x="102" y="398">farms</text>
+    <rect x="168" y="380" width="140" height="28" rx="7" fill="#1d2b49" stroke="#37456b"/><text x="238" y="398">young_farmers</text>
+    <rect x="318" y="380" width="148" height="28" rx="7" fill="#1d2b49" stroke="#37456b"/><text x="392" y="398">consult_requests</text>
   </g>
 
-  <text x="48" y="592" font-size="10" font-weight="700" fill="#c98a2e">기준 테이블  ·  하드코딩 금지 → DB 참조</text>
-  <g font-size="10" fill="#243027" text-anchor="middle">
-    <rect x="48" y="598" width="105" height="26" rx="6" fill="#fdf6e9" stroke="#f0d8ab"/><text x="100" y="615">facility_std</text>
-    <rect x="161" y="598" width="145" height="26" rx="6" fill="#fdf6e9" stroke="#f0d8ab"/><text x="233" y="615">orchard_age_coef</text>
-    <rect x="314" y="598" width="120" height="26" rx="6" fill="#fdf6e9" stroke="#f0d8ab"/><text x="374" y="615">income_coef</text>
+  <text x="46" y="434" font-size="10" font-weight="700" fill="#caa14a">기준 테이블  ·  하드코딩 금지 → DB 참조</text>
+  <g font-size="10.5" fill="#e7edf7" text-anchor="middle">
+    <rect x="46" y="442" width="108" height="28" rx="7" fill="#1d2b49" stroke="#37456b"/><text x="100" y="460">facility_std</text>
+    <rect x="164" y="442" width="150" height="28" rx="7" fill="#1d2b49" stroke="#37456b"/><text x="239" y="460">orchard_age_coef</text>
+    <rect x="324" y="442" width="122" height="28" rx="7" fill="#1d2b49" stroke="#37456b"/><text x="385" y="460">income_coef</text>
   </g>
-  <text x="48" y="644" font-size="9.5" fill="#a59a87">공간 데이터 EPSG:4326 통일 (SHP 5186 → 변환 적재)</text>
+  <text x="46" y="492" font-size="9.5" fill="#7e88a0">공간 데이터 EPSG:4326 통일 (SHP 5186 → 변환 적재)</text>
 
-  <line x1="40" y1="656" x2="446" y2="656" stroke="#f0e4cb" stroke-width="1"/>
-  <text x="48" y="676" font-size="10" font-weight="700" fill="#c98a2e">정적 시드 / 폴백  ·  데모 무중단</text>
-  <g font-size="10" fill="#243027" text-anchor="middle">
-    <rect x="48" y="682" width="110" height="22" rx="6" fill="#f7f8f4" stroke="#dfe1d8"/><text x="103" y="697">실거래가 CSV</text>
-    <rect x="166" y="682" width="100" height="22" rx="6" fill="#f7f8f4" stroke="#dfe1d8"/><text x="216" y="697">팜맵 SHP</text>
-    <rect x="274" y="682" width="170" height="22" rx="6" fill="#f7f8f4" stroke="#dfe1d8"/><text x="359" y="697">geocode_fallback.csv</text>
+  <line x1="40" y1="508" x2="474" y2="508" stroke="#2a3a5c" stroke-width="1"/>
+  <text x="46" y="532" font-size="10" font-weight="700" fill="#caa14a">정적 시드 / 폴백  ·  데모 무중단</text>
+  <g font-size="10.5" fill="#cdd6e8" text-anchor="middle">
+    <rect x="46" y="540" width="116" height="28" rx="7" fill="#161f38" stroke="#2c3a5a"/><text x="104" y="558">실거래가 CSV</text>
+    <rect x="172" y="540" width="104" height="28" rx="7" fill="#161f38" stroke="#2c3a5a"/><text x="224" y="558">팜맵 SHP</text>
+    <rect x="286" y="540" width="180" height="28" rx="7" fill="#161f38" stroke="#2c3a5a"/><text x="376" y="558">geocode_fallback.csv</text>
   </g>
+  <text x="46" y="596" font-size="9.5" fill="#7e88a0">실거래가는 API 호출 금지 · DB 적재본만 사용</text>
 
   <!-- ===== EXTERNAL panel ===== -->
-  <g filter="url(#sh)">
-    <rect x="474" y="486" width="458" height="222" rx="12" fill="#fff" stroke="#e7e7e1"/>
-  </g>
-  <rect x="474" y="486" width="6" height="222" rx="3" fill="#5b6b7a"/>
-  <text x="494" y="512" font-size="12.5" font-weight="800" fill="#4a5a69">🔌  EXTERNAL APIs · 정적 폴백 보장</text>
+  <g filter="url(#soft)"><rect x="510" y="312" width="466" height="328" rx="14" fill="#12203b" stroke="#3e2630"/></g>
+  <rect x="510" y="312" width="6" height="328" rx="3" fill="#fb7185"/>
+  <text x="532" y="342" font-size="13" font-weight="800" fill="#fda4af">🔌  EXTERNAL APIs · 정적 폴백 보장</text>
 
-  <rect x="494" y="524" width="418" height="54" rx="9" fill="#f1f4f6" stroke="#d5dde3"/>
-  <text x="510" y="545" font-size="12" font-weight="700" fill="#243027">🌐 V-World</text>
-  <text x="510" y="562" font-size="9.5" fill="#7a8278">지오코딩 · 공시지가 · 배경지도</text>
-  <text x="700" y="545" font-size="9.5" font-weight="700" fill="#5b6b7a">🇰🇷 국내 우회 프록시</text>
-  <text x="700" y="562" font-size="9.5" fill="#7a8278">Pi + Tailscale Funnel 경유</text>
+  <rect x="532" y="358" width="422" height="66" rx="10" fill="#1a2540" stroke="#3a2c3a"/>
+  <text x="550" y="382" font-size="12.5" font-weight="700" fill="#e7edf7">🌐 V-World</text>
+  <text x="550" y="402" font-size="10" fill="#9fb0cd">지오코딩 · 공시지가 · 배경지도</text>
+  <text x="550" y="418" font-size="10" fill="#fda4af">🇰🇷 국내 우회 프록시 (Pi + Tailscale Funnel) 경유</text>
 
-  <rect x="494" y="586" width="418" height="36" rx="9" fill="#f1f4f6" stroke="#d5dde3"/>
-  <text x="510" y="609" font-size="11.5" font-weight="700" fill="#243027">📈 KAMIS</text>
-  <text x="610" y="609" font-size="9.5" fill="#7a8278">과수 도매 시세 → 가치평가 시세보정</text>
+  <rect x="532" y="434" width="422" height="44" rx="10" fill="#1a2540" stroke="#3a2c3a"/>
+  <text x="550" y="458" font-size="12" font-weight="700" fill="#e7edf7">📈 KAMIS</text>
+  <text x="652" y="458" font-size="10" fill="#9fb0cd">과수 도매 시세 → 가치평가 시세보정</text>
 
-  <rect x="494" y="630" width="418" height="36" rx="9" fill="#f1f4f6" stroke="#d5dde3"/>
-  <text x="510" y="653" font-size="11.5" font-weight="700" fill="#243027">🗂 팜맵</text>
-  <text x="610" y="653" font-size="9.5" fill="#7a8278">data.go.kr · B552895 — 필지/경지 정보 적재</text>
+  <rect x="532" y="488" width="422" height="44" rx="10" fill="#1a2540" stroke="#3a2c3a"/>
+  <text x="550" y="512" font-size="12" font-weight="700" fill="#e7edf7">🗂 팜맵</text>
+  <text x="652" y="512" font-size="10" fill="#9fb0cd">data.go.kr · B552895 — 필지/경지 정보 적재</text>
 
-  <rect x="494" y="674" width="418" height="34" rx="9" fill="#f1f4f6" stroke="#d5dde3"/>
-  <text x="510" y="696" font-size="11.5" font-weight="700" fill="#243027">🤖 Claude API</text>
-  <text x="610" y="696" font-size="9.5" fill="#7a8278">리포트 설명문 생성 전용 · 수치 계산 미사용</text>
+  <rect x="532" y="542" width="422" height="44" rx="10" fill="#1a2540" stroke="#3a2c3a"/>
+  <text x="550" y="566" font-size="12" font-weight="700" fill="#e7edf7">🤖 Claude API</text>
+  <text x="652" y="566" font-size="10" fill="#9fb0cd">리포트 설명문 생성 전용 · 수치 계산 미사용</text>
+
+  <text x="532" y="612" font-size="9.5" fill="#7e88a0">모든 외부 API는 장애 시 정적 폴백으로 자동 전환된다</text>
 </svg>
