@@ -34,59 +34,9 @@
 
 ## 시스템 아키텍처
 
-```mermaid
-flowchart TB
-    user(["👤 사용자 · 모바일 퍼스트"])
-
-    subgraph FE["프런트엔드 · Vercel"]
-        react["React + Vite + Leaflet<br/>farmbaton.vercel.app"]
-    end
-
-    subgraph BE["백엔드 · Railway (FastAPI)"]
-        direction TB
-        routers["API 라우터<br/>auth · farms · young-farmers · chat"]
-        subgraph SVC["서비스 계층"]
-            val["valuation.py<br/>🔒 결정론적 가치평가 (LLM 미사용)"]
-            match["매칭 엔진<br/>🔒 결정론적 점수"]
-            ai["report_ai.py<br/>✍️ 설명문 생성 전용"]
-            pdf["pdf_render.py<br/>📄 Playwright PDF"]
-        end
-        routers --> SVC
-    end
-
-    subgraph DATA["데이터"]
-        db[("PostgreSQL + PostGIS<br/>Supabase · EPSG:4326")]
-        seed["정적 시드/폴백<br/>실거래가 CSV · 팜맵 SHP · 소득조사"]
-    end
-
-    subgraph EXT["외부 API (정적 폴백 보장)"]
-        vworld["V-World<br/>지오코딩·공시지가·배경지도"]
-        kamis["KAMIS<br/>도매 시세"]
-        farmmap["팜맵 (data.go.kr)"]
-        claude["Claude API<br/>설명문 생성"]
-    end
-
-    proxy["🇰🇷 국내 우회 프록시<br/>Pi + Tailscale Funnel"]
-
-    user --> react
-    react -->|REST /api| routers
-    SVC --> db
-    SVC --> seed
-    val -.시세 보정.-> kamis
-    BE -->|국외 IP 차단 우회| proxy --> vworld
-    ai --> claude
-    db -.적재.- farmmap
-```
-
-**설계 원칙 (요약)**
-
-| 원칙 | 내용 |
-| --- | --- |
-| 🔒 **수치는 결정론적** | 가치평가·매칭 점수는 전부 순수 Python 함수. LLM은 **설명문 생성에만** 사용 |
-| 🛟 **데모는 죽지 않는다** | 모든 외부 API에 정적 폴백(CSV/SHP). 실거래가는 DB 적재본만 사용 |
-| 🗺 **공간 데이터 통일** | DB 저장은 EPSG:4326 단일 좌표계 (SHP 원본 5186 → 적재 시 변환) |
-| ⚖️ **"감정가" 표기 금지** | 화면·문서는 **"인수 검토가 범위(참고용 추정)"** + 면책 문구 |
-| 🇰🇷 **국내 우회 프록시** | 해외 클라우드 IP를 차단하는 V-World를 국내 회선 경유로 우회 ([proxy/](proxy/)) |
+<div align="center">
+  <img src="docs/architecture.svg" alt="팜바톤 시스템 아키텍처" width="900" />
+</div>
 
 ---
 
