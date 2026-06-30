@@ -35,7 +35,7 @@
 ## 시스템 아키텍처
 
 <div align="center">
-  <img src="docs/architecture.svg" alt="팜바톤 시스템 아키텍처" width="900" />
+  <img src="docs/architecture.svg" alt="팜바톤 시스템 아키텍처" width="960" />
 </div>
 
 ---
