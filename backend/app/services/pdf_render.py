@@ -12,6 +12,7 @@ import functools
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import sync_playwright
 
 _TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
@@ -48,10 +49,16 @@ def render_report_html(context: dict) -> str:
     return template.render(**ctx)
 
 
-def html_to_pdf(html: str) -> bytes:
-    """HTML 문자열 → A4 PDF 바이트 (Playwright headless Chromium)."""
+# 컨테이너(Railway 등) 기본 /dev/shm은 64MB로 작아, 폰트를 base64로 인라인한
+# 무거운 HTML을 set_content 할 때 Chromium 렌더러가 메모리 부족으로 죽는다
+# ("Page crashed"). --disable-dev-shm-usage 로 공유 메모리를 /tmp 에 쓰게 해
+# 크래시를 막고, --no-sandbox 로 root 컨테이너의 sandbox 기동 실패를 피한다.
+_LAUNCH_ARGS = ["--no-sandbox", "--disable-dev-shm-usage"]
+
+
+def _render_once(html: str) -> bytes:
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(args=_LAUNCH_ARGS)
         try:
             page = browser.new_page()
             page.set_content(html, wait_until="load")
@@ -64,6 +71,18 @@ def html_to_pdf(html: str) -> bytes:
             )
         finally:
             browser.close()
+
+
+def html_to_pdf(html: str) -> bytes:
+    """HTML 문자열 → A4 PDF 바이트 (Playwright headless Chromium).
+
+    렌더러가 일시적 메모리 압박 등으로 한 번 죽어도("Page crashed") 데모가
+    멈추지 않도록 1회 재시도한다. 두 번째도 실패하면 그대로 예외를 올린다.
+    """
+    try:
+        return _render_once(html)
+    except PlaywrightError:
+        return _render_once(html)
 
 
 def render_report_pdf(context: dict) -> bytes:
