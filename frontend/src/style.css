@@ -231,7 +231,7 @@ textarea { resize: vertical; min-height: 60px; }
 }
 .match-item:hover {
   border-color: rgba(31,107,58,.32);
-  box-shadow: 0 14px 32px rgba(21,53,31,.09); transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(21,53,31,.07); transform: translateY(-1px);
 }
 .match-item.clickable { cursor: pointer; }
 .match-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: .2rem; }
@@ -548,7 +548,7 @@ textarea { resize: vertical; min-height: 60px; }
 }
 .lp-pill:active { transform: translateY(1px); }
 .lp-pill-warm, .lp-pill-dark { box-shadow: 0 1px 2px rgba(21,53,31,.06); }
-.lp-pill-warm:hover, .lp-pill-dark:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(21,53,31,.18); }
+.lp-pill-warm:hover, .lp-pill-dark:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21,53,31,.14); }
 .lp-pill-warm { background: var(--accent); color: #fff; }
 .lp-pill-warm:hover { background: var(--accent-dark); }
 .lp-pill-dark { background: var(--green-deep); color: #fff; }
@@ -701,7 +701,7 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-steps .lp-sec-head h2 { max-width: 16em; margin: 0 auto; }
 .lp-step-list { display: flex; flex-direction: column; gap: 18px; margin-top: 36px; }
 .lp-step { display: grid; grid-template-columns: 1fr; gap: 22px; background: #fff; border: 1px solid var(--border); border-radius: 22px; padding: 26px; align-items: center; transition: box-shadow .25s ease, transform .25s ease; }
-.lp-step:hover { box-shadow: 0 16px 32px rgba(21,53,31,.08); transform: translateY(-3px); }
+.lp-step:hover { box-shadow: 0 6px 18px rgba(21,53,31,.06); }
 .lp-step-copy .idx { font-size: 52px; font-weight: 800; color: var(--lime); -webkit-text-stroke: 1.5px var(--green); line-height: 1; margin-bottom: 14px; }
 .lp-step-copy h3 { font-size: clamp(20px, 3.5vw, 26px); font-weight: 800; color: var(--green-deep); letter-spacing: -.02em; margin-bottom: 10px; }
 .lp-step-copy p { font-size: 15.5px; line-height: 1.65; color: var(--gray); }
