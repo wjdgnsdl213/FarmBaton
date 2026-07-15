@@ -263,7 +263,6 @@ export default function DashboardPage() {
         <div className="match-farm-meta">불러오는 중...</div>
       ) : farms.length === 0 ? (
         <div className="empty">
-          <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>🌾</div>
           등록한 농장이 없습니다.
         </div>
       ) : (

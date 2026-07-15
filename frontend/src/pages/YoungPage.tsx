@@ -376,7 +376,6 @@ export default function YoungPage() {
 
           {matches.length === 0 ? (
             <div className="empty">
-              <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>🌾</div>
               조건에 맞는 농장이 없습니다.
             </div>
           ) : (

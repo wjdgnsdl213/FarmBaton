@@ -23,7 +23,6 @@ export default function MyRequestsPage() {
         <div className="match-farm-meta">불러오는 중...</div>
       ) : requests.length === 0 ? (
         <div className="empty">
-          <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>🌱</div>
           아직 신청한 상담이 없습니다.<br />
           <Link to="/young" style={{ display: 'inline-block', marginTop: '.6rem' }}>농장 매칭 보러 가기 →</Link>
         </div>

@@ -54,7 +54,6 @@ export default function ConversationsPage() {
         <div className="match-farm-meta">불러오는 중...</div>
       ) : convos.length === 0 ? (
         <div className="empty">
-          <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>💬</div>
           아직 진행 중인 대화가 없습니다.<br />
           <span className="match-farm-meta">상담이 수락되면 여기에서 대화할 수 있습니다.</span>
         </div>
