@@ -1,0 +1,88 @@
+<svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg" role="img" font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">
+  <title>팜바톤 시스템 아키텍처</title>
+  <desc>사용자 → 프런트엔드 → API → 서비스, 그리고 데이터·외부 API 계층</desc>
+  <rect width="1000" height="620" fill="#FBFBF8"/>
+
+  <!-- request flow row -->
+  <text x="40" y="52" font-size="12" font-weight="700" fill="#9AA49B" letter-spacing="1.5">요청 흐름</text>
+
+  <g>
+    <rect x="40" y="70" width="212" height="118" rx="10" fill="#FFFFFF" stroke="#E1E4DB"/>
+    <text x="64" y="104" font-size="16" font-weight="800" fill="#1B241D">사용자</text>
+    <text x="64" y="132" font-size="12.5" fill="#66706A">모바일 퍼스트 웹</text>
+    <text x="64" y="154" font-size="12.5" fill="#66706A">농가 · 청년농</text>
+    <text x="64" y="176" font-size="11" fill="#9AA49B">farmbaton.vercel.app</text>
+  </g>
+  <g>
+    <rect x="288" y="70" width="212" height="118" rx="10" fill="#FFFFFF" stroke="#E1E4DB"/>
+    <text x="312" y="104" font-size="16" font-weight="800" fill="#6F8F3A">Frontend</text>
+    <text x="312" y="132" font-size="12.5" fill="#66706A">React · Vite · Leaflet</text>
+    <text x="312" y="154" font-size="12.5" fill="#66706A">Vercel 배포</text>
+    <text x="312" y="176" font-size="11" fill="#9AA49B">등록 · 리포트 · 매칭 · 지도</text>
+  </g>
+  <g>
+    <rect x="536" y="70" width="212" height="118" rx="10" fill="#FFFFFF" stroke="#E1E4DB"/>
+    <text x="560" y="104" font-size="16" font-weight="800" fill="#1F8047">API · FastAPI</text>
+    <text x="560" y="132" font-size="12.5" fill="#66706A">/farms · /young-farmers</text>
+    <text x="560" y="154" font-size="12.5" fill="#66706A">/auth · /conversations</text>
+    <text x="560" y="176" font-size="11" fill="#9AA49B">Railway</text>
+  </g>
+  <g>
+    <rect x="784" y="70" width="176" height="118" rx="10" fill="#13301C"/>
+    <text x="808" y="104" font-size="16" font-weight="800" fill="#FFFFFF">Services</text>
+    <text x="808" y="132" font-size="12.5" fill="#C9D6CC">가치평가 · 매칭</text>
+    <text x="808" y="154" font-size="12.5" fill="#C9D6CC">결정론 수치 계산</text>
+    <text x="808" y="176" font-size="11" fill="#8FA595">report · pdf</text>
+  </g>
+
+  <g stroke="#C7CDBF" stroke-width="1.5" fill="none">
+    <path d="M 252 129 L 284 129" marker-end="url(#b)"/>
+    <path d="M 500 129 L 532 129" marker-end="url(#b)"/>
+    <path d="M 748 129 L 780 129" marker-end="url(#b)"/>
+  </g>
+  <defs>
+    <marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#C7CDBF"/>
+    </marker>
+  </defs>
+
+  <!-- data layer -->
+  <text x="40" y="248" font-size="12" font-weight="700" fill="#9AA49B" letter-spacing="1.5">데이터 계층</text>
+
+  <rect x="40" y="266" width="452" height="298" rx="10" fill="#FFFFFF" stroke="#E1E4DB"/>
+  <text x="64" y="300" font-size="15" font-weight="800" fill="#1B241D">Supabase · PostgreSQL + PostGIS</text>
+  <text x="64" y="324" font-size="11.5" fill="#9AA49B">공간데이터 EPSG:4326 통일 저장</text>
+  <text x="64" y="360" font-size="11.5" font-weight="700" fill="#9AA49B" letter-spacing="1">운영 테이블</text>
+  <g font-size="13" font-weight="600" fill="#1B241D">
+    <text x="64" y="386">farms</text><text x="200" y="386">young_farmers</text><text x="360" y="386">conversations</text>
+  </g>
+  <line x1="64" y1="404" x2="468" y2="404" stroke="#EEF0E9" stroke-width="1"/>
+  <text x="64" y="436" font-size="11.5" font-weight="700" fill="#9AA49B" letter-spacing="1">기준 테이블 · 하드코딩 없음</text>
+  <g font-size="13" font-weight="600" fill="#1B241D">
+    <text x="64" y="462">facility_std</text><text x="200" y="462">orchard_age_coef</text><text x="380" y="462">income_coef</text>
+  </g>
+  <line x1="64" y1="480" x2="468" y2="480" stroke="#EEF0E9" stroke-width="1"/>
+  <text x="64" y="512" font-size="11.5" font-weight="700" fill="#9AA49B" letter-spacing="1">정적 적재 · 폴백</text>
+  <g font-size="13" font-weight="600" fill="#1B241D">
+    <text x="64" y="538">실거래가 CSV</text><text x="200" y="538">팜맵 SHP</text><text x="330" y="538">geocode_fallback</text>
+  </g>
+
+  <!-- external apis -->
+  <rect x="508" y="266" width="452" height="298" rx="10" fill="#FFFFFF" stroke="#E1E4DB"/>
+  <text x="532" y="300" font-size="15" font-weight="800" fill="#1B241D">External APIs · 전 구간 정적 폴백</text>
+  <text x="532" y="324" font-size="11.5" fill="#9AA49B">데모가 죽지 않는 신뢰성 설계</text>
+  <g font-size="13.5" font-weight="600" fill="#1B241D">
+    <text x="532" y="366">V-World</text><text x="936" y="366" font-size="11.5" font-weight="400" fill="#9AA49B" text-anchor="end">지오코딩·공시지가·배경지도</text>
+    <line x1="532" y1="384" x2="936" y2="384" stroke="#EEF0E9" stroke-width="1"/>
+    <text x="532" y="416">KAMIS</text><text x="936" y="416" font-size="11.5" font-weight="400" fill="#9AA49B" text-anchor="end">과수 시세 · 시세보정</text>
+    <line x1="532" y1="434" x2="936" y2="434" stroke="#EEF0E9" stroke-width="1"/>
+    <text x="532" y="466">팜맵 (data.go.kr)</text><text x="936" y="466" font-size="11.5" font-weight="400" fill="#9AA49B" text-anchor="end">필지 경계·면적</text>
+    <line x1="532" y1="484" x2="936" y2="484" stroke="#EEF0E9" stroke-width="1"/>
+    <text x="532" y="516">Claude API</text><text x="936" y="516" font-size="11.5" font-weight="400" fill="#9AA49B" text-anchor="end">설명문 생성 전용 · 수치 계산 미사용</text>
+  </g>
+
+  <g stroke="#C7CDBF" stroke-width="1.5" fill="none" stroke-dasharray="4 4">
+    <path d="M 640 188 L 300 264" marker-end="url(#b)"/>
+    <path d="M 720 188 L 730 264" marker-end="url(#b)"/>
+  </g>
+</svg>
