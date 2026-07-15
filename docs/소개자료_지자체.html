@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>팜바톤 — 지자체 협력 제안 소개자료</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 210mm; height: 297mm; }
+  body {
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    color: #16241b; background: #f6f5f0;
+    display: flex; flex-direction: column;
+  }
+  .header {
+    background: #15351f; color: #fff; padding: 9mm 12mm 8mm;
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .header h1 { font-size: 22pt; font-weight: 800; letter-spacing: -0.5px; }
+  .header h1 .sub { color: #a8c66c; }
+  .header .tagline { font-size: 10.5pt; color: #cdd8cf; margin-top: 2mm; }
+  .badge {
+    background: #234a30; border: 1px solid #3b6247; color: #d9e5db;
+    font-size: 8pt; font-weight: 700; padding: 2mm 3.5mm; border-radius: 4mm;
+    text-align: center; line-height: 1.5;
+  }
+  .body { flex: 1; padding: 7mm 12mm 0; }
+  .section-title {
+    font-size: 11pt; font-weight: 800; color: #15351f; margin: 5.5mm 0 2.5mm;
+    padding-left: 3mm; border-left: 3.5px solid #2e9e57;
+  }
+  .stats { display: flex; gap: 4mm; }
+  .stat {
+    flex: 1; background: #fff; border: 1px solid #e3e6dd; border-radius: 2.5mm;
+    padding: 3.5mm 4mm;
+  }
+  .stat .num { font-size: 17pt; font-weight: 800; color: #15351f; }
+  .stat .lbl { font-size: 8pt; color: #5e6a61; margin-top: 1mm; line-height: 1.45; }
+  .src { font-size: 7pt; color: #9aa49b; margin-top: 1.5mm; }
+  .service-box {
+    background: #fff; border: 1px solid #e3e6dd; border-radius: 2.5mm; padding: 4mm 5mm;
+    font-size: 9.5pt; line-height: 1.65;
+  }
+  .service-box b { color: #1f8047; }
+  .url-line {
+    margin-top: 2.5mm; font-size: 9.5pt; font-weight: 700; color: #15351f;
+    background: #e3f2e8; border-radius: 1.5mm; padding: 1.8mm 3mm; display: inline-block;
+  }
+  .two-col { display: flex; gap: 5mm; align-items: stretch; }
+  .two-col .left { flex: 1.15; }
+  .two-col .right { flex: 1; display: flex; flex-direction: column; }
+  .offer { background: #fff; border: 1px solid #e3e6dd; border-radius: 2.5mm; padding: 3.5mm 4.5mm; margin-bottom: 3mm; }
+  .offer .t { font-size: 9.5pt; font-weight: 800; color: #15351f; }
+  .offer .t .n { color: #2e9e57; margin-right: 1mm; }
+  .offer .d { font-size: 8.5pt; color: #5e6a61; line-height: 1.55; margin-top: 1mm; }
+  .mock { border: 1px solid #e3e6dd; border-radius: 2.5mm; overflow: hidden; background: #fff; }
+  .mock img { width: 100%; display: block; }
+  .mock .cap { font-size: 7.5pt; color: #9aa49b; padding: 1.5mm 3mm 2mm; }
+  table.benefit { width: 100%; border-collapse: collapse; background: #fff; border-radius: 2.5mm; overflow: hidden; }
+  table.benefit th, table.benefit td { border: 1px solid #e3e6dd; padding: 2.2mm 3mm; font-size: 8.5pt; text-align: left; vertical-align: top; line-height: 1.5; }
+  table.benefit th { background: #eef0e6; color: #15351f; font-weight: 800; width: 22mm; }
+  .footer {
+    margin-top: auto; background: #fff; border-top: 2px solid #15351f;
+    padding: 4.5mm 12mm 5mm; display: flex; justify-content: space-between; align-items: center;
+  }
+  .contact { font-size: 9.5pt; line-height: 1.7; }
+  .contact b { font-size: 10.5pt; }
+  .disclaimer { font-size: 7pt; color: #9aa49b; text-align: right; line-height: 1.6; max-width: 80mm; }
+  .fill { background: #fdf3e3; color: #8a5a10; font-weight: 700; padding: 0 1.5mm; border-radius: 1mm; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🌾 팜바톤 <span class="sub">FarmBaton</span></h1>
+    <div class="tagline">고령 농가의 농장(농지·작목·시설·판로)을 청년농에게 잇는 승계 진단·매칭 플랫폼</div>
+  </div>
+  <div class="badge">제11회 농업·농촌 공공데이터<br>+AI 활용 창업경진대회<br><b>1차(서류) 통과 · 본선 진출</b></div>
+</div>
+
+<div class="body">
+  <div class="section-title">왜 지금인가</div>
+  <div class="stats">
+    <div class="stat"><div class="num">55.8%</div><div class="lbl">65세 이상 농가인구 비율 — 역대 최고</div></div>
+    <div class="stat"><div class="num">49만 가구</div><div class="lbl">70세 이상 경영주 — 전체의 과반</div></div>
+    <div class="stat"><div class="num">4,601가구</div><div class="lbl">40세 미만 청년 경영주 — 4년 만에 1/3로, 역대 최저</div></div>
+  </div>
+  <div class="src">출처: 통계청 2024 농림어업조사 · 후계자를 찾지 못한 농장은 청년농과 만날 통로 없이 멈춰 서고 있습니다.</div>
+
+  <div class="section-title">팜바톤은 이렇게 잇습니다 — 실서비스 운영 중</div>
+  <div class="service-box">
+    <b>① 농장주:</b> 주소만 입력하면 팜맵·개별공시지가·실거래가·농산물 소득조사·KAMIS 등 공공데이터를 결합해
+    <b>인수 검토가 범위(참고용 추정)</b>와 예상 소득을 즉시·무료 산출 — 생성형 AI가 농장주·청년농 관점별 리포트로 설명<br>
+    <b>② 청년농:</b> 희망 지역·작목·자본 조건으로 승계 가능 농장을 점수순 추천 → 인앱 상담·채팅으로 논의 시작<br>
+    <span class="url-line">farmbaton.vercel.app</span>&nbsp;
+    <span style="font-size:8.5pt;color:#5e6a61">— 별도 설치 없이 스마트폰에서 바로 동작합니다.</span>
+  </div>
+
+  <div class="section-title">귀 기관에 제안드리는 것 — 무상 실증(파일럿) 협력</div>
+  <div class="two-col">
+    <div class="left">
+      <div class="offer">
+        <div class="t"><span class="n">제안 1</span>관내 승계 희망 농가 시범 등록</div>
+        <div class="d">농업기술센터·읍면 창구에서 승계 고민 농가 3~5곳을 연계해 주시면, 저희가 등록·검토 리포트 산출까지 무상 지원합니다.</div>
+      </div>
+      <div class="offer">
+        <div class="t"><span class="n">제안 2</span>관내 청년농 지원사업 등록·노출</div>
+        <div class="d">귀 기관 지원사업을 플랫폼에 등록하면, 조건이 맞는 매칭 청년농에게 자동으로 노출됩니다. 등록·운영 무상.</div>
+      </div>
+      <div class="offer">
+        <div class="t"><span class="n">제안 3</span>승계 모니터링 대시보드 실증</div>
+        <div class="d">읍면별 승계 위험 농장 분포·유치 실적을 보여주는 행정용 대시보드(우측 콘셉트)를 귀 기관 의견을 받아 함께 설계하고자 합니다.</div>
+      </div>
+      <table class="benefit">
+        <tr><th>발굴</th><td>청년농 유치·경영이양 사업의 <b>정책 대상자</b>를 데이터로 탐색</td></tr>
+        <tr><th>보고</th><td>등록 농가·유입 청년농 수요·상담 건수를 <b>분기 실적 리포트</b>로 제공</td></tr>
+        <tr><th>집행</th><td>지원사업을 실수요 청년농에게 직접 노출 — <b>모집 채널</b> 확보</td></tr>
+      </table>
+    </div>
+    <div class="right">
+      <div class="mock">
+        <img src="slide11_b2g_dashboard_mockup.svg" alt="승계 모니터링 대시보드 콘셉트 목업">
+        <div class="cap">▲ 승계 모니터링 대시보드 — 콘셉트 목업(예시 데이터, 지명·수치는 가상)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="contact">
+    <b>김정훈</b> · 팜바톤 팀 대표<br>
+    wjdgnsdl213@gmail.com · <span class="fill">〔연락처 기입〕</span>
+  </div>
+  <div class="disclaimer">
+    본 자료의 가치 추정은 법적 감정평가가 아닌 "인수 검토가 범위(참고용 추정)"입니다.<br>
+    시드 데이터는 실존 필지 기반이나 소유주는 가상 인물입니다. · 2026. 7.
+  </div>
+</div>
+
+</body>
+</html>
