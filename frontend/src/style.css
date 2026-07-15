@@ -700,14 +700,14 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-steps .lp-sec-head .lp-eyebrow { background: var(--lime-soft); }
 .lp-steps .lp-sec-head h2 { max-width: 16em; margin: 0 auto; }
 .lp-step-list { display: flex; flex-direction: column; gap: 18px; margin-top: 36px; }
-.lp-step { display: grid; grid-template-columns: 1fr; gap: 22px; background: #fff; border: 1px solid var(--border); border-radius: 22px; padding: 26px; align-items: center; transition: box-shadow .25s ease, transform .25s ease; }
+.lp-step { display: grid; grid-template-columns: 1fr; gap: 22px; background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 26px; align-items: center; transition: box-shadow .25s ease; }
 .lp-step:hover { box-shadow: 0 6px 18px rgba(21,53,31,.06); }
-.lp-step-copy .idx { font-size: 52px; font-weight: 800; color: var(--lime); -webkit-text-stroke: 1.5px var(--green); line-height: 1; margin-bottom: 14px; }
+.lp-step-copy .idx { font-size: 44px; font-weight: 800; color: var(--green); line-height: 1; letter-spacing: -.02em; margin-bottom: 12px; }
 .lp-step-copy h3 { font-size: clamp(20px, 3.5vw, 26px); font-weight: 800; color: var(--green-deep); letter-spacing: -.02em; margin-bottom: 10px; }
 .lp-step-copy p { font-size: 15.5px; line-height: 1.65; color: var(--gray); }
 .lp-step-copy .chip { display: inline-block; margin-top: 14px; font-size: 13px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 6px 13px; border-radius: 999px; }
 .lp-step-vis {
-  width: 100%; height: clamp(220px, 50vw, 340px); border-radius: 16px; overflow: hidden;
+  width: 100%; height: clamp(220px, 50vw, 340px); border-radius: 12px; overflow: hidden;
   background: #f1f4ec; border: 1px solid var(--border); padding: 14px;
   display: flex; align-items: center; justify-content: center;
 }
@@ -723,7 +723,7 @@ textarea { resize: vertical; min-height: 60px; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
 }
-.lp-cta-band { background: var(--green-deep); border-radius: 26px; padding: clamp(32px, 5vw, 52px); display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
+.lp-cta-band { background: var(--green-deep); border-radius: 18px; padding: clamp(32px, 5vw, 52px); display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
 .lp-cta-band h2 { font-size: clamp(24px, 4vw, 34px); font-weight: 800; color: #fff; letter-spacing: -.025em; text-wrap: balance; }
 .lp-cta-band p { font-size: 15px; color: rgba(255,255,255,.72); margin-top: 8px; }
 .lp-cta-band .lp-pill { padding: 16px 30px; font-size: 16px; }
