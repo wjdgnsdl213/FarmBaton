@@ -1,0 +1,172 @@
+<svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" font-family="'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif">
+  <title>공공데이터 7종 → 가치평가 산식 매핑</title>
+  <desc>공공데이터 7종이 팜바톤 가치평가 산식의 각 항으로 결합되어 인수 검토가 범위가 산출되는 과정</desc>
+
+  <defs>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#15351f" flood-opacity="0.12"/>
+    </filter>
+    <marker id="mOlive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7a8a66"/>
+    </marker>
+    <marker id="mSage" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8fae53"/>
+    </marker>
+    <marker id="mGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2e9e57"/>
+    </marker>
+    <marker id="mNeutral" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b7bdb2"/>
+    </marker>
+    <marker id="mDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5e6a61"/>
+    </marker>
+  </defs>
+
+  <!-- Background: warm cream -->
+  <rect width="1280" height="720" fill="#f6f5f0"/>
+
+  <!-- Header -->
+  <text x="32" y="48" font-size="23" font-weight="800" fill="#15351f">공공데이터 7종이 하나의 숫자로 결합됩니다</text>
+  <text x="33" y="70" font-size="11.5" fill="#5e6a61">각 데이터는 나열이 아니라 산식의 항(項)으로 들어갑니다</text>
+  <rect x="1002" y="28" width="250" height="30" rx="15" fill="#e3f2e8" stroke="#bfe3cc"/>
+  <text x="1127" y="47" font-size="11.5" font-weight="700" fill="#1f8047" text-anchor="middle">수치 계산에 LLM 미사용 · 100% 결정론</text>
+  <line x1="32" y1="84" x2="1248" y2="84" stroke="#e3e6dd" stroke-width="1"/>
+
+  <!-- Column headers -->
+  <text x="28" y="104" font-size="10.5" font-weight="700" fill="#9aa49b" letter-spacing="1.5">공공데이터 7종</text>
+  <text x="396" y="104" font-size="10.5" font-weight="700" fill="#9aa49b" letter-spacing="1.5">가치평가 산식 — 결정론적 계산</text>
+  <text x="896" y="104" font-size="10.5" font-weight="700" fill="#9aa49b" letter-spacing="1.5">산출물</text>
+
+  <!-- ===== LEFT: data source groups ===== -->
+
+  <!-- Group 1: 위치·필지 (olive) -->
+  <g filter="url(#soft)"><rect x="28" y="112" width="300" height="172" rx="14" fill="#fff" stroke="#e3e6dd"/></g>
+  <rect x="28" y="112" width="300" height="6" rx="3" fill="#7a8a66"/>
+  <text x="44" y="140" font-size="12" font-weight="800" fill="#5a6a44">위치 · 필지</text>
+  <circle cx="56" cy="163" r="9" fill="#7a8a66"/><text x="56" y="167" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+  <text x="72" y="167" font-size="13" font-weight="700" fill="#16241b">V-World 지오코딩<tspan font-size="10" font-weight="400" fill="#9aa49b"> 주소→좌표</tspan></text>
+  <text x="314" y="167" font-size="10" fill="#9aa49b" text-anchor="end">국토부</text>
+  <circle cx="56" cy="191" r="9" fill="#7a8a66"/><text x="56" y="195" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+  <text x="72" y="195" font-size="13" font-weight="700" fill="#16241b">법정동코드<tspan font-size="10" font-weight="400" fill="#9aa49b"> 주소 정규화</tspan></text>
+  <text x="314" y="195" font-size="10" fill="#9aa49b" text-anchor="end">행안부</text>
+  <circle cx="56" cy="219" r="9" fill="#7a8a66"/><text x="56" y="223" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+  <text x="72" y="223" font-size="13" font-weight="700" fill="#16241b">팜맵<tspan font-size="10" font-weight="400" fill="#9aa49b"> 필지 경계·면적</tspan></text>
+  <text x="314" y="223" font-size="10" fill="#9aa49b" text-anchor="end">농정원</text>
+  <rect x="44" y="240" width="268" height="30" rx="8" fill="#eef0e6"/>
+  <text x="58" y="259" font-size="12" font-weight="700" fill="#5a6a44">→ 필지 면적 자동 취득 · area(㎡)</text>
+
+  <!-- Group 2: 소득·시세 (sage) -->
+  <g filter="url(#soft)"><rect x="28" y="316" width="300" height="104" rx="14" fill="#fff" stroke="#e3e6dd"/></g>
+  <rect x="28" y="316" width="300" height="6" rx="3" fill="#a8c66c"/>
+  <text x="44" y="344" font-size="12" font-weight="800" fill="#6f8f3a">소득 · 시세</text>
+  <circle cx="56" cy="367" r="9" fill="#8fae53"/><text x="56" y="371" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+  <text x="72" y="371" font-size="13" font-weight="700" fill="#16241b">농산물 소득조사<tspan font-size="10" font-weight="400" fill="#9aa49b"> 10a당 평균소득</tspan></text>
+  <text x="314" y="371" font-size="10" fill="#9aa49b" text-anchor="end">농진청</text>
+  <circle cx="56" cy="395" r="9" fill="#8fae53"/><text x="56" y="399" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+  <text x="72" y="399" font-size="13" font-weight="700" fill="#16241b">KAMIS<tspan font-size="10" font-weight="400" fill="#9aa49b"> 시세·평년가격</tspan></text>
+  <text x="314" y="399" font-size="10" fill="#9aa49b" text-anchor="end">aT</text>
+
+  <!-- Group 3: 토지 지가 (green) -->
+  <g filter="url(#soft)"><rect x="28" y="452" width="300" height="104" rx="14" fill="#fff" stroke="#e3e6dd"/></g>
+  <rect x="28" y="452" width="300" height="6" rx="3" fill="#2e9e57"/>
+  <text x="44" y="480" font-size="12" font-weight="800" fill="#1f8047">토지 지가</text>
+  <circle cx="56" cy="503" r="9" fill="#2e9e57"/><text x="56" y="507" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+  <text x="72" y="507" font-size="13" font-weight="700" fill="#16241b">개별공시지가<tspan font-size="10" font-weight="400" fill="#9aa49b"> ㎡당 지가</tspan></text>
+  <text x="314" y="507" font-size="10" fill="#9aa49b" text-anchor="end">국토부</text>
+  <circle cx="56" cy="531" r="9" fill="#2e9e57"/><text x="56" y="535" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">7</text>
+  <text x="72" y="535" font-size="13" font-weight="700" fill="#16241b">토지 실거래가<tspan font-size="10" font-weight="400" fill="#9aa49b"> 시세 보정</tspan></text>
+  <text x="314" y="535" font-size="10" fill="#9aa49b" text-anchor="end">국토부</text>
+
+  <!-- 농가 입력 (비공공, dashed) -->
+  <rect x="28" y="588" width="300" height="64" rx="14" fill="#fff" stroke="#c9cec3" stroke-dasharray="6 4"/>
+  <text x="44" y="614" font-size="12.5" font-weight="700" fill="#5e6a61">＋ 농가 입력 (선택)</text>
+  <text x="44" y="636" font-size="11" fill="#9aa49b">작목·수령 · 시설 목록 · 매출·판로</text>
+
+  <!-- Footnote -->
+  <text x="32" y="692" font-size="10.5" fill="#9aa49b">※ 모든 단가·계수는 DB 기준테이블 참조(하드코딩 없음) · 전 외부 API 정적 폴백 구현</text>
+
+  <!-- ===== ARROWS: data → formula ===== -->
+  <path d="M 330 250 C 362 250, 366 208, 392 200" fill="none" stroke="#7a8a66" stroke-width="2" marker-end="url(#mOlive)"/>
+  <path d="M 330 258 C 374 290, 356 338, 392 338" fill="none" stroke="#7a8a66" stroke-width="2" marker-end="url(#mOlive)"/>
+  <path d="M 330 372 C 368 372, 360 240, 392 228" fill="none" stroke="#8fae53" stroke-width="2" marker-end="url(#mSage)"/>
+  <path d="M 330 512 C 370 512, 360 372, 392 362" fill="none" stroke="#2e9e57" stroke-width="2" marker-end="url(#mGreen)"/>
+  <path d="M 330 618 C 368 618, 362 528, 392 522" fill="none" stroke="#b7bdb2" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#mNeutral)"/>
+
+  <!-- ===== MIDDLE: formula cards ===== -->
+
+  <!-- Card A: 예상 연소득 -->
+  <g filter="url(#soft)"><rect x="396" y="112" width="436" height="136" rx="14" fill="#fff" stroke="#e3e6dd"/></g>
+  <text x="416" y="142" font-size="16" font-weight="800" fill="#15351f">예상 연소득</text>
+  <rect x="412" y="158" width="112" height="30" rx="8" fill="#f0f5e2"/>
+  <text x="468" y="178" font-size="12" font-weight="700" fill="#6f8f3a" text-anchor="middle">④ 10a당 소득</text>
+  <text x="532" y="178" font-size="13" fill="#9aa49b" text-anchor="middle">×</text>
+  <rect x="542" y="158" width="62" height="30" rx="8" fill="#eef0e6"/>
+  <text x="573" y="178" font-size="12" font-weight="700" fill="#5a6a44" text-anchor="middle">③ 면적</text>
+  <text x="612" y="178" font-size="13" fill="#9aa49b" text-anchor="middle">×</text>
+  <rect x="622" y="158" width="84" height="30" rx="8" fill="#efefec"/>
+  <text x="664" y="178" font-size="12" font-weight="700" fill="#5e6a61" text-anchor="middle">수령계수</text>
+  <text x="714" y="178" font-size="13" fill="#9aa49b" text-anchor="middle">×</text>
+  <rect x="724" y="158" width="92" height="30" rx="8" fill="#f0f5e2"/>
+  <text x="770" y="178" font-size="12" font-weight="700" fill="#6f8f3a" text-anchor="middle">⑤ 시세보정</text>
+  <text x="416" y="214" font-size="10.5" fill="#9aa49b">수령계수: 사과·복숭아·포도 생육곡선 (DB 기준테이블)</text>
+  <text x="416" y="232" font-size="10.5" fill="#9aa49b">산출 후 신뢰등급별 불확실성 밴드(±8~25%) 적용</text>
+
+  <!-- Card B: 토지 기준가 -->
+  <g filter="url(#soft)"><rect x="396" y="278" width="436" height="136" rx="14" fill="#fff" stroke="#e3e6dd"/></g>
+  <text x="416" y="308" font-size="16" font-weight="800" fill="#15351f">토지 기준가</text>
+  <rect x="412" y="326" width="128" height="30" rx="8" fill="#e3f2e8"/>
+  <text x="476" y="346" font-size="12" font-weight="700" fill="#1f8047" text-anchor="middle">⑥ 개별공시지가</text>
+  <text x="548" y="346" font-size="13" fill="#9aa49b" text-anchor="middle">×</text>
+  <rect x="558" y="326" width="62" height="30" rx="8" fill="#eef0e6"/>
+  <text x="589" y="346" font-size="12" font-weight="700" fill="#5a6a44" text-anchor="middle">③ 면적</text>
+  <text x="634" y="346" font-size="13" fill="#9aa49b" text-anchor="middle">→</text>
+  <rect x="652" y="326" width="136" height="30" rx="8" fill="#e3f2e8"/>
+  <text x="720" y="346" font-size="12" font-weight="700" fill="#1f8047" text-anchor="middle">⑦ 실거래가 보정</text>
+  <text x="416" y="386" font-size="10.5" fill="#9aa49b">실거래가 있으면 실거래 우선 · 표본 3건 미만이면 신뢰등급 하향</text>
+
+  <!-- Card C: 시설 잔존가 + 영업권 (농가 입력 기반) -->
+  <g filter="url(#soft)"><rect x="396" y="444" width="436" height="150" rx="14" fill="#fff" stroke="#c9cec3" stroke-dasharray="6 4"/></g>
+  <text x="416" y="474" font-size="16" font-weight="800" fill="#5e6a61">시설 잔존가 + 영업권</text>
+  <rect x="412" y="492" width="84" height="30" rx="8" fill="#efefec"/>
+  <text x="454" y="512" font-size="12" font-weight="700" fill="#5e6a61" text-anchor="middle">표준단가</text>
+  <text x="503" y="512" font-size="13" fill="#9aa49b" text-anchor="middle">×</text>
+  <rect x="512" y="492" width="84" height="30" rx="8" fill="#efefec"/>
+  <text x="554" y="512" font-size="12" font-weight="700" fill="#5e6a61" text-anchor="middle">시설 면적</text>
+  <text x="603" y="512" font-size="13" fill="#9aa49b" text-anchor="middle">×</text>
+  <rect x="612" y="492" width="84" height="30" rx="8" fill="#efefec"/>
+  <text x="654" y="512" font-size="12" font-weight="700" fill="#5e6a61" text-anchor="middle">잔존가율</text>
+  <text x="703" y="512" font-size="13" fill="#9aa49b" text-anchor="middle">×</text>
+  <rect x="712" y="492" width="84" height="30" rx="8" fill="#efefec"/>
+  <text x="754" y="512" font-size="12" font-weight="700" fill="#5e6a61" text-anchor="middle">상태등급</text>
+  <text x="416" y="548" font-size="10.5" fill="#9aa49b">시설·매출·판로는 농가 입력 — 자료를 낼수록 신뢰등급 상승 (C→B)</text>
+  <text x="416" y="566" font-size="10.5" fill="#9aa49b">영업권: 매출 자료 제출 시에만 순소득 기반 보수적 가산 (없으면 0)</text>
+
+  <!-- ===== ARROWS: formula → output ===== -->
+  <path d="M 834 180 C 866 180, 866 270, 892 282" fill="none" stroke="#5e6a61" stroke-width="2" marker-end="url(#mDark)"/>
+  <path d="M 834 346 C 860 346, 866 348, 892 350" fill="none" stroke="#5e6a61" stroke-width="2" marker-end="url(#mDark)"/>
+  <path d="M 834 518 C 866 518, 866 428, 892 416" fill="none" stroke="#5e6a61" stroke-width="2" marker-end="url(#mDark)"/>
+
+  <!-- ===== RIGHT: output card ===== -->
+  <g filter="url(#soft)"><rect x="896" y="180" width="356" height="340" rx="16" fill="#15351f"/></g>
+  <text x="916" y="214" font-size="10.5" font-weight="700" fill="#a8c66c" letter-spacing="2">산출물</text>
+  <text x="916" y="246" font-size="22" font-weight="800" fill="#ffffff">인수 검토가 범위</text>
+  <text x="916" y="268" font-size="12" fill="#cdd8cf">(참고용 추정) · 항상 min ~ max 범위로만 제시</text>
+  <rect x="916" y="284" width="316" height="30" rx="8" fill="#234a30"/>
+  <text x="1074" y="303" font-size="12.5" font-weight="700" fill="#e8eee9" text-anchor="middle">= 토지 + 시설 + 영업권 − 리스크 할인</text>
+  <text x="916" y="348" font-size="14" font-weight="700" fill="#ffffff">예상 연소득 범위</text>
+  <text x="916" y="368" font-size="10.5" fill="#9fb2a4">승계 후 소득 가늠 + 영업권 산정의 기초</text>
+  <text x="916" y="404" font-size="12" fill="#cdd8cf">신뢰등급</text>
+  <rect x="990" y="386" width="28" height="28" rx="8" fill="#a8c66c"/>
+  <text x="1004" y="405" font-size="13" font-weight="800" fill="#15351f" text-anchor="middle">A</text>
+  <rect x="1026" y="386" width="28" height="28" rx="8" fill="none" stroke="#4a5f50"/>
+  <text x="1040" y="405" font-size="13" font-weight="700" fill="#cdd8cf" text-anchor="middle">B</text>
+  <rect x="1062" y="386" width="28" height="28" rx="8" fill="none" stroke="#4a5f50"/>
+  <text x="1076" y="405" font-size="13" font-weight="700" fill="#cdd8cf" text-anchor="middle">C</text>
+  <rect x="1098" y="386" width="28" height="28" rx="8" fill="none" stroke="#4a5f50"/>
+  <text x="1112" y="405" font-size="13" font-weight="700" fill="#cdd8cf" text-anchor="middle">D</text>
+  <text x="916" y="438" font-size="10.5" fill="#9fb2a4">자료를 낼수록 등급 상승 (D → A)</text>
+  <line x1="916" y1="460" x2="1232" y2="460" stroke="#2c4736" stroke-width="1"/>
+  <text x="916" y="486" font-size="10.5" fill="#9aa49b">본 수치는 법적 감정평가가 아니며,</text>
+  <text x="916" y="502" font-size="10.5" fill="#9aa49b">승계 검토를 위한 참고용 추정입니다.</text>
+</svg>
