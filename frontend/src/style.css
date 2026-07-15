@@ -684,19 +684,16 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-sec-head .lp-eyebrow { background: var(--green-light); color: var(--green); margin-bottom: 14px; }
 .lp-sec-head .lp-eyebrow .dot { background: var(--green); }
 .lp-sec-head h2 { font-size: clamp(26px, 4.5vw, 36px); font-weight: 800; letter-spacing: -.025em; color: var(--green-deep); text-wrap: balance; }
-.lp-feat-cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
-.lp-feat-card { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; min-height: 180px; transition: transform .25s ease, box-shadow .25s ease; }
-.lp-feat-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(21,53,31,.1); }
-.lp-feat-card .ic { transition: transform .25s ease; }
-.lp-feat-card:hover .ic { transform: scale(1.08) rotate(-4deg); }
-.lp-feat-card.lime { background: var(--lime); border-color: var(--lime); }
-.lp-feat-card .ic { width: 46px; height: 46px; border-radius: 13px; background: var(--green-light); display: flex; align-items: center; justify-content: center; margin-bottom: auto; }
-.lp-feat-card.lime .ic { background: rgba(21,53,31,.12); }
-.lp-feat-card .ic svg { width: 25px; height: 25px; stroke: var(--green); }
-.lp-feat-card.lime .ic svg { stroke: var(--green-deep); }
-.lp-feat-card h3 { font-size: 19px; font-weight: 800; color: var(--green-deep); margin: 22px 0 8px; letter-spacing: -.01em; }
-.lp-feat-card p { font-size: 14.5px; line-height: 1.6; color: var(--gray); }
-.lp-feat-card.lime p { color: rgba(21,53,31,.72); }
+/* 피처: 카드 박스 대신 짧은 그린 룰 + 타이포 (에디토리얼) */
+.lp-feat-cards { display: grid; grid-template-columns: 1fr; gap: 30px; }
+.lp-feat-card { position: relative; padding-top: 22px; display: flex; flex-direction: column; }
+.lp-feat-card::before {
+  content: ""; position: absolute; top: 0; left: 0;
+  width: 40px; height: 3px; border-radius: 2px; background: var(--green);
+}
+.lp-feat-card .ic { display: none; }
+.lp-feat-card h3 { font-size: 20px; font-weight: 800; color: var(--green-deep); margin: 0 0 10px; letter-spacing: -.01em; }
+.lp-feat-card p { font-size: 15px; line-height: 1.65; color: var(--gray); max-width: 30ch; }
 
 .lp-steps { background: var(--cream); padding: clamp(48px, 8vw, 84px) 0; }
 .lp-steps .lp-sec-head { text-align: center; }
@@ -751,7 +748,7 @@ textarea { resize: vertical; min-height: 60px; }
   .lp-hero { min-height: clamp(560px, 78vh, 760px); }
   .lp-hero-content { padding: 56px 0 68px; flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 32px; }
   .lp-hero-content .lp-hero-text { max-width: 56%; }
-  .lp-feat-cards { grid-template-columns: repeat(3, 1fr); }
+  .lp-feat-cards { grid-template-columns: repeat(3, 1fr); gap: 44px; }
   .lp-step { grid-template-columns: 1.1fr 1fr; gap: 40px; padding: 38px; }
   .lp-step.flip .lp-step-vis { order: -1; }
   .lp-cta-band { flex-direction: row; align-items: center; justify-content: space-between; }

@@ -168,36 +168,14 @@ export default function LandingPage() {
           </div>
           <div className="lp-feat-cards">
             <div className="lp-feat-card reveal">
-              <div className="ic">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10Z" />
-                  <circle cx="12" cy="11" r="2.3" />
-                </svg>
-              </div>
               <h3>주소 한 줄로 진단</h3>
               <p>지번·도로명 주소만 입력하면 필지 면적을 자동으로 가져와 평가에 반영합니다.</p>
             </div>
-            <div className="lp-feat-card lime reveal" style={{ transitionDelay: '.1s' }}>
-              <div className="ic">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="5" y1="20" x2="5" y2="13" />
-                  <line x1="12" y1="20" x2="12" y2="8" />
-                  <line x1="19" y1="20" x2="19" y2="4" />
-                  <line x1="3" y1="20" x2="21" y2="20" />
-                </svg>
-              </div>
+            <div className="lp-feat-card reveal" style={{ transitionDelay: '.1s' }}>
               <h3>인수 검토가 범위</h3>
               <p>예상 소득·토지·시설 가치를 범위로 정리한 참고용 추정 리포트를 받습니다.</p>
             </div>
             <div className="lp-feat-card reveal" style={{ transitionDelay: '.2s' }}>
-              <div className="ic">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="9" cy="8" r="3" />
-                  <path d="M3.5 20a5.5 5.5 0 0 1 11 0" />
-                  <circle cx="17.5" cy="9.5" r="2.3" />
-                  <path d="M16 14.6a4.7 4.7 0 0 1 4.5 5" />
-                </svg>
-              </div>
               <h3>청년농 매칭</h3>
               <p>지역·작목·자본 조건에 맞춰 승계 가능한 농장을 점수순으로 추천합니다.</p>
             </div>
