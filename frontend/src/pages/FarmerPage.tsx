@@ -264,7 +264,7 @@ export default function FarmerPage() {
             onClick={() => setShowOptional(s => !s)}
             style={{
               width: '100%', display: 'flex', alignItems: 'center', gap: '.7rem',
-              padding: '.85rem 1rem', borderRadius: '12px', cursor: 'pointer',
+              padding: '.85rem 1rem', borderRadius: '8px', cursor: 'pointer',
               fontFamily: 'inherit', textAlign: 'left',
               border: `1.5px ${showOptional ? 'solid' : 'dashed'} var(--green)`,
               background: showOptional ? 'var(--green-light)' : '#fff',
@@ -376,7 +376,7 @@ export default function FarmerPage() {
           )}
         </div>
 
-        <button type="submit" className="btn btn-primary" disabled={loading}>
+        <button type="submit" className="btn btn-primary" style={{ marginTop: '1.5rem' }} disabled={loading}>
           {loading ? <span className="spinner" /> : '인수 검토 리포트 산출'}
         </button>
       </form>
