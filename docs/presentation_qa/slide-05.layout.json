@@ -1,0 +1,1329 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/jhyytu",
+    "id": "jhyytu",
+    "slide": 5,
+    "layoutId": "cea64539-766b-4c7c-9b19-0f9612360d8c",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "696bab32-a520-4f2e-b51c-e8f45da5830f",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FBFBF8",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "cea64539-766b-4c7c-9b19-0f9612360d8c",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "696bab32-a520-4f2e-b51c-e8f45da5830f",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "696bab32-a520-4f2e-b51c-e8f45da5830f",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/rehg7alc",
+      "id": "1",
+      "bbox": [
+        82,
+        64,
+        700,
+        28
+      ],
+      "geometry": "rect",
+      "text": "기존 대안의 공백",
+      "textPreview": "기존 대안의 공백",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#2E9E57",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "기존 대안의 공백"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "기존 대안의 공백",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#2E9E57",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "기존 대안의 공백",
+              "fontSize": 16,
+              "color": "#2E9E57",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/sfqhgv2x",
+      "id": "2",
+      "bbox": [
+        80,
+        104,
+        1120,
+        72
+      ],
+      "geometry": "rect",
+      "text": "농장 전체를 진단하고 연결하는 통로가 비어 있습니다",
+      "textPreview": "농장 전체를 진단하고 연결하는 통로가 비어 있습니다",
+      "resolvedFontSize": 42,
+      "resolvedTextStyle": {
+        "fontSize": 42,
+        "typeface": "+mn-lt",
+        "color": "#1B241D",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "농장 전체를 진단하고 연결하는 통로가 비어 있습니다"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "농장 전체를 진단하고 연결하는 통로가 비어 있습니다",
+          "resolvedTextStyle": {
+            "fontSize": 42,
+            "color": "#1B241D",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "농장 전체를 진단하고 연결하는 통로가 비어 있습니다",
+              "fontSize": 42,
+              "color": "#1B241D",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/dgzy903i",
+      "id": "3",
+      "bbox": [
+        1138,
+        674,
+        62,
+        20
+      ],
+      "geometry": "rect",
+      "text": "05",
+      "textPreview": "05",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#9AA49B",
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "05"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "05",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#9AA49B",
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "05",
+              "fontSize": 12,
+              "color": "#9AA49B",
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ipozalkv",
+      "id": "4",
+      "bbox": [
+        80,
+        232,
+        240,
+        284
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#D9E1DA",
+      "lineWidth": 1
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3qxg3qlg",
+      "id": "5",
+      "bbox": [
+        100,
+        266,
+        200,
+        34
+      ],
+      "geometry": "rect",
+      "text": "감정평가",
+      "textPreview": "감정평가",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#1B241D",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "감정평가"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "감정평가",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#1B241D",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "감정평가",
+              "fontSize": 24,
+              "color": "#1B241D",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4bqhcv21",
+      "id": "6",
+      "bbox": [
+        100,
+        326,
+        200,
+        3
+      ],
+      "geometry": "rect",
+      "fillColor": "#D9E1DA",
+      "lineColor": "#D9E1DA",
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5czy503m",
+      "id": "7",
+      "bbox": [
+        100,
+        358,
+        198,
+        80
+      ],
+      "geometry": "rect",
+      "text": "정확하지만 느리고 비쌈",
+      "textPreview": "정확하지만 느리고 비쌈",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#66706A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "정확하지만 느리고"
+          },
+          {
+            "index": 2,
+            "text": "비쌈"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "정확하지만 느리고 비쌈",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#66706A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "정확하지만 느리고 비쌈",
+              "fontSize": 18,
+              "color": "#66706A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ulof6lkz",
+      "id": "8",
+      "bbox": [
+        100,
+        454,
+        198,
+        30
+      ],
+      "geometry": "rect",
+      "text": "일부 요소만 해결",
+      "textPreview": "일부 요소만 해결",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#9AA49B",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "일부 요소만 해결"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "일부 요소만 해결",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#9AA49B",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "일부 요소만 해결",
+              "fontSize": 16,
+              "color": "#9AA49B",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/vmxgzql4",
+      "id": "9",
+      "bbox": [
+        360,
+        232,
+        240,
+        284
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#D9E1DA",
+      "lineWidth": 1
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/f2ps3ads",
+      "id": "10",
+      "bbox": [
+        380,
+        266,
+        200,
+        34
+      ],
+      "geometry": "rect",
+      "text": "부동산 중개",
+      "textPreview": "부동산 중개",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#1B241D",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "부동산 중개"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "부동산 중개",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#1B241D",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "부동산 중개",
+              "fontSize": 24,
+              "color": "#1B241D",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/e1gra5wn",
+      "id": "11",
+      "bbox": [
+        380,
+        326,
+        200,
+        3
+      ],
+      "geometry": "rect",
+      "fillColor": "#D9E1DA",
+      "lineColor": "#D9E1DA",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/147a50vy",
+      "id": "12",
+      "bbox": [
+        380,
+        358,
+        198,
+        80
+      ],
+      "geometry": "rect",
+      "text": "토지 거래 중심",
+      "textPreview": "토지 거래 중심",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#66706A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "토지 거래 중심"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "토지 거래 중심",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#66706A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "토지 거래 중심",
+              "fontSize": 18,
+              "color": "#66706A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/03y9cfed",
+      "id": "13",
+      "bbox": [
+        380,
+        454,
+        198,
+        30
+      ],
+      "geometry": "rect",
+      "text": "일부 요소만 해결",
+      "textPreview": "일부 요소만 해결",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#9AA49B",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "일부 요소만 해결"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "일부 요소만 해결",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#9AA49B",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "일부 요소만 해결",
+              "fontSize": 16,
+              "color": "#9AA49B",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/nqps7ad4",
+      "id": "14",
+      "bbox": [
+        640,
+        232,
+        240,
+        284
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#D9E1DA",
+      "lineWidth": 1
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/25gre5wj",
+      "id": "15",
+      "bbox": [
+        660,
+        266,
+        200,
+        34
+      ],
+      "geometry": "rect",
+      "text": "농지은행",
+      "textPreview": "농지은행",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#1B241D",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "농지은행"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "농지은행",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#1B241D",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "농지은행",
+              "fontSize": 24,
+              "color": "#1B241D",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/psra9kva",
+      "id": "16",
+      "bbox": [
+        660,
+        326,
+        200,
+        3
+      ],
+      "geometry": "rect",
+      "fillColor": "#D9E1DA",
+      "lineColor": "#D9E1DA",
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ory9gfep",
+      "id": "17",
+      "bbox": [
+        660,
+        358,
+        198,
+        80
+      ],
+      "geometry": "rect",
+      "text": "농지 중심 지원",
+      "textPreview": "농지 중심 지원",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#66706A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "농지 중심 지원"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "농지 중심 지원",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#66706A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "농지 중심 지원",
+              "fontSize": 18,
+              "color": "#66706A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ju58vqxk",
+      "id": "18",
+      "bbox": [
+        660,
+        454,
+        198,
+        30
+      ],
+      "geometry": "rect",
+      "text": "일부 요소만 해결",
+      "textPreview": "일부 요소만 해결",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#9AA49B",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "일부 요소만 해결"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "일부 요소만 해결",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#9AA49B",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "일부 요소만 해결",
+              "fontSize": 16,
+              "color": "#9AA49B",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/i9wr2lwf",
+      "id": "19",
+      "bbox": [
+        920,
+        232,
+        240,
+        284
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#EAF3EC",
+      "lineColor": "#2E9E57",
+      "lineWidth": 1
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mpkvatgn",
+      "id": "20",
+      "bbox": [
+        940,
+        266,
+        200,
+        34
+      ],
+      "geometry": "rect",
+      "text": "팜바톤",
+      "textPreview": "팜바톤",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#2E9E57",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "팜바톤"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "팜바톤",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#2E9E57",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "팜바톤",
+              "fontSize": 24,
+              "color": "#2E9E57",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7qtc3yx8",
+      "id": "21",
+      "bbox": [
+        940,
+        326,
+        200,
+        3
+      ],
+      "geometry": "rect",
+      "fillColor": "#2E9E57",
+      "lineColor": "#2E9E57",
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8rmdcjyt",
+      "id": "22",
+      "bbox": [
+        940,
+        358,
+        198,
+        80
+      ],
+      "geometry": "rect",
+      "text": "농장 전체 + 매칭",
+      "textPreview": "농장 전체 + 매칭",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#66706A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "농장 전체 + 매칭"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "농장 전체 + 매칭",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#66706A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "농장 전체 + 매칭",
+              "fontSize": 18,
+              "color": "#66706A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/9svu5ofe",
+      "id": "23",
+      "bbox": [
+        940,
+        454,
+        198,
+        30
+      ],
+      "geometry": "rect",
+      "text": "농지·작목·시설·판로",
+      "textPreview": "농지·작목·시설·판로",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#13301C",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "농지·작목·시설·판로"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "농지·작목·시설·판로",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#13301C",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "농지·작목·시설·판로",
+              "fontSize": 16,
+              "color": "#13301C",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ylkb69gr",
+      "id": "24",
+      "bbox": [
+        80,
+        566,
+        1120,
+        38
+      ],
+      "geometry": "rect",
+      "text": "빠른 1차 검토에서 실제 상담까지, 하나의 흐름이 필요합니다",
+      "textPreview": "빠른 1차 검토에서 실제 상담까지, 하나의 흐름이 필요합니다",
+      "resolvedFontSize": 25,
+      "resolvedTextStyle": {
+        "fontSize": 25,
+        "typeface": "+mn-lt",
+        "color": "#13301C",
+        "bold": true,
+        "alignment": "center",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "빠른 1차 검토에서 실제 상담까지, 하나의 흐름이 필요합니다"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "빠른 1차 검토에서 실제 상담까지, 하나의 흐름이 필요합니다",
+          "resolvedTextStyle": {
+            "fontSize": 25,
+            "color": "#13301C",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "빠른 1차 검토에서 실제 상담까지, 하나의 흐름이 필요합니다",
+              "fontSize": 25,
+              "color": "#13301C",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/zmtczexc",
+      "id": "25",
+      "bbox": [
+        81,
+        662,
+        22,
+        22
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#13301C",
+      "lineColor": "#13301C",
+      "lineWidth": 1
+    },
+    {
+      "order": 26,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kn2d8jyx",
+      "id": "26",
+      "bbox": [
+        82,
+        664,
+        20,
+        18
+      ],
+      "geometry": "rect",
+      "text": "팜",
+      "textPreview": "팜",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "+mn-lt",
+        "color": "#FFFFFF",
+        "bold": true,
+        "alignment": "center",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "팜"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "팜",
+          "resolvedTextStyle": {
+            "fontSize": 10,
+            "color": "#FFFFFF",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "팜",
+              "fontSize": 10,
+              "color": "#FFFFFF",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 27,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lobu1ofi",
+      "id": "27",
+      "bbox": [
+        112,
+        665,
+        230,
+        18
+      ],
+      "geometry": "rect",
+      "text": "팜바톤 · FarmBaton",
+      "textPreview": "팜바톤 · FarmBaton",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#8B958D",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "팜바톤 · FarmBaton"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "팜바톤 · FarmBaton",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#8B958D",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "팜바톤 · FarmBaton",
+              "fontSize": 12,
+              "color": "#8B958D",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

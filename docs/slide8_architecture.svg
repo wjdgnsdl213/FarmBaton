@@ -36,15 +36,15 @@
   </g>
 
   <g stroke="#C7CDBF" stroke-width="1.5" fill="none">
-    <path d="M 252 129 L 284 129" marker-end="url(#b)"/>
-    <path d="M 500 129 L 532 129" marker-end="url(#b)"/>
-    <path d="M 748 129 L 780 129" marker-end="url(#b)"/>
+    <path d="M 252 129 L 284 129"/>
+    <path d="M 500 129 L 532 129"/>
+    <path d="M 748 129 L 780 129"/>
   </g>
-  <defs>
-    <marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0,0 L9,5 L0,10 z" fill="#C7CDBF"/>
-    </marker>
-  </defs>
+  <g fill="#C7CDBF">
+    <polygon points="284,129 277,132.5 277,125.5"/>
+    <polygon points="532,129 525,132.5 525,125.5"/>
+    <polygon points="780,129 773,132.5 773,125.5"/>
+  </g>
 
   <!-- data layer -->
   <text x="40" y="248" font-size="12" font-weight="700" fill="#9AA49B" letter-spacing="1.5">데이터 계층</text>
@@ -82,7 +82,11 @@
   </g>
 
   <g stroke="#C7CDBF" stroke-width="1.5" fill="none" stroke-dasharray="4 4">
-    <path d="M 640 188 L 300 264" marker-end="url(#b)"/>
-    <path d="M 720 188 L 730 264" marker-end="url(#b)"/>
+    <path d="M 640 188 L 300 264"/>
+    <path d="M 720 188 L 730 264"/>
+  </g>
+  <g fill="#C7CDBF">
+    <polygon points="300,264 306.07,259.05 307.59,265.89"/>
+    <polygon points="730,264 725.62,257.51 732.56,256.60"/>
   </g>
 </svg>

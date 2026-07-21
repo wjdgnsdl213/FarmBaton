@@ -118,9 +118,25 @@ def kicker_head(s, kicker, head, accent=None):
     text(s, Emu(int(LM) - Inches(0.02)), Inches(1.06), Inches(11.8), Inches(0.9), [runs])
 
 
+MARK_SIZE = Inches(0.22)
+
+
+def logo_mark(s, x, y, size=MARK_SIZE, on_dark=False):
+    """타이포그래피 모노그램 — 타이틀 슬라이드의 FOREST 배경 위 흰 '팜바톤'과 같은 배색을
+    작은 사각 마크로 반복. 래스터 로고 대신 벡터 도형만 사용해 톤을 유지."""
+    fill = WHITE if on_dark else FOREST
+    fg = FOREST if on_dark else WHITE
+    block(s, x, y, size, size, fill, radius=0.32)
+    text(s, x, Emu(int(y) - Inches(0.008)), size, size, [[("팜", 12.5, BLACK, fg, 0)]],
+         align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+
+
 def footer(s, num, dark=False):
     c = FAINT if not dark else RGBColor(0x6E, 0x78, 0x6F)
-    text(s, LM, Inches(7.06), Inches(6), Inches(0.3), [[("팜바톤 · FarmBaton", 9.5, MED, c, 0.5)]])
+    mark_y = Inches(7.03)
+    logo_mark(s, LM, mark_y, on_dark=dark)
+    text(s, Emu(int(LM) + int(MARK_SIZE) + Inches(0.09)), Inches(7.06), Inches(6), Inches(0.3),
+         [[("팜바톤 · FarmBaton", 9.5, MED, c, 0.5)]])
     text(s, Inches(12.0), Inches(7.06), Inches(0.5), Inches(0.3),
          [[(num, 10, MED, c, 0)]], align=PP_ALIGN.RIGHT)
 
@@ -186,7 +202,8 @@ def build(assets: Path, out: Path):
     text(s, Emu(int(LM) + Inches(0.02)), Inches(5.12), Inches(11.5), Inches(0.7),
          [[("떠나는 농장과 시작하는 청년을 ", 27, XBOLD, WHITE, -0.5), ("잇다", 27, BLACK, SAGE, -0.5)]])
     hline(s, Emu(int(LM) + Inches(0.02)), Inches(6.5), Inches(11.6), HAIR_DK, 1.0)
-    text(s, LM, Inches(6.72), Inches(8), Inches(0.4),
+    logo_mark(s, LM, Inches(6.69), on_dark=True)
+    text(s, Emu(int(LM) + int(MARK_SIZE) + Inches(0.1)), Inches(6.72), Inches(8), Inches(0.4),
          [[("farmbaton.vercel.app", 15, SEMI, WHITE, 0), ("   지금 접속하면 실제로 동작합니다", 12.5, REG, RGBColor(0x8F, 0xA5, 0x95), 0)]])
     text(s, Inches(9.5), Inches(6.72), Inches(2.95), Inches(0.4),
          [[("김정훈 · 윤채원 · 유수민", 11.5, MED, RGBColor(0x8F, 0xA5, 0x95), 0.5)]], align=PP_ALIGN.RIGHT)
@@ -194,9 +211,9 @@ def build(assets: Path, out: Path):
     # ===== S2 빅넘버 =====
     s = new(); bg(s, PAPER)
     kicker_head(s, "주제 시의성", "농장은 멈추는데, 이어받을 통로가 없다")
-    cols = [("55.8", "%", "65세 이상 농가인구 비율", "역대 최고 · 처음 55% 돌파", FOREST),
-            ("49", "만 가구", "70세 이상 경영주", "전체 경영주의 과반 (50.8%)", FOREST),
-            ("4,601", "가구", "40세 미만 청년 경영주", "12,426 → 4,601 · 4년 만에 1/3", AMBER)]
+    cols = [("51.3", "%", "65세 이상 농가인구 비율", "128만 6천 명 · 전체 인구의 2.5배", FOREST),
+            ("54.8", "만 가구", "70세 이상 경영주", "전체 경영주의 44.1%", FOREST),
+            ("1.1", "%", "40세 미만 청년 경영주", "1만 4천 가구 · 100명 중 1명", AMBER)]
     x0, colw, gap, top = LM, Inches(3.85), Inches(0.15), Inches(2.7)
     for i, (big, unit, lbl, sub, col) in enumerate(cols):
         x = Emu(int(x0) + i * (int(colw) + int(gap)))
@@ -210,7 +227,7 @@ def build(assets: Path, out: Path):
     text(s, Emu(int(LM) - Inches(0.02)), Inches(6.36), Inches(11.6), Inches(0.6),
          [[("수십만 농가가 은퇴를 앞두고 있지만 — ", 19, MED, INK, -0.3),
            ("청년농과 만날 통로가 없습니다", 19, XBOLD, GREEN, -0.3)]])
-    text(s, LM, Inches(7.0), Inches(6), Inches(0.3), [[("통계청 2024 농림어업조사", 10, REG, FAINT, 0.5)]])
+    text(s, LM, Inches(6.78), Inches(8), Inches(0.3), [[("통계청 2025 농림어업총조사(잠정) · 2026.4 발표", 10, REG, FAINT, 0.5)]])
     footer(s, "02")
 
     # ===== S3 공백 =====
@@ -328,8 +345,8 @@ def build(assets: Path, out: Path):
 
     # ===== S10 시장 =====
     s = new(); bg(s, PAPER)
-    kicker_head(s, "발전 가능성 · 시장", "49만 가구가 기다리는 시장")
-    tiers = [("49만 가구", "후계 연결이 필요한 70세 이상 경영주", FOREST, 44),
+    kicker_head(s, "발전 가능성 · 시장", "54만 가구가 기다리는 시장")
+    tiers = [("54만 8천 가구", "후계 연결이 필요한 70세 이상 경영주 (44.1%)", FOREST, 44),
              ("3개 도 48개 시군", "충북·경북·충남 · 과수 3작목 (시작점)", GREEN, 32),
              ("MVP 검증", "초기 타깃 — 승계 희망 등록 농가", SAGE, 24)]
     ty = Inches(2.5)
@@ -375,7 +392,24 @@ def build(assets: Path, out: Path):
            ("   저희 DB에서 실측한 숫자입니다", 12.5, REG, MUTED, 0)]])
     footer(s, "11")
 
-    # ===== S12 팀 =====
+    # ===== S12 확장 로드맵 (신규 2026-07-20 — 시간 미검증, 단축 시 1순위 컷) =====
+    s = new(); bg(s, PAPER)
+    kicker_head(s, "발전 가능성 · 확장", "지금 구조 그대로, 세 방향으로 넓어집니다")
+    expansions = [("작목", "품종 확장", "수령계수·소득계수 등 기준 데이터만 추가 — 산식·코드는 그대로", GREEN),
+                  ("지역", "전국 확장", "팜맵·공시지가·KAMIS는 전국 단위 데이터 — 대상 지역만 넓히면 전국", RGBColor(0x7A, 0x8A, 0x66)),
+                  ("정주여건", "매칭 요인 확장", "교육·의료·문화체육·교통 공공데이터를 매칭 점수에 결합 (5~6종 추가)", SAGE)]
+    ey = Inches(2.35)
+    for i, (tag, t, d, col) in enumerate(expansions):
+        y = Emu(int(ey) + i * int(Inches(1.15)))
+        text(s, LM, y, Inches(1.6), Inches(0.8), [[(tag, 13, XBOLD, col, 0)]], anchor=MSO_ANCHOR.MIDDLE)
+        text(s, Inches(2.2), y, Inches(9.3), Inches(0.9),
+             [[(t, 16, SEMI, INK, 0)], [(d, 12.5, REG, MUTED, 0)]], ls=1.35, sa=2)
+        hline(s, LM, Emu(int(y) + int(Inches(1.0))), CW, HAIR, 0.75)
+    text(s, Emu(int(LM) - Inches(0.02)), Inches(6.15), CW, Inches(0.5),
+         [[("전부 지금의 산식·매칭 엔진 구조를 바꾸지 않고, 데이터만 추가하는 확장입니다", 15, XBOLD, GREEN_DK, -0.3)]])
+    footer(s, "12")
+
+    # ===== S13 팀 =====
     s = new(); bg(s, PAPER)
     kicker_head(s, "팀", "개발 + 디자인 + 농업 도메인")
     team = [("김정훈", "대표 · 컴퓨터공학", ["기획·풀스택 개발 총괄", "공공데이터 적재 · 가치평가·매칭 엔진 · 배포"]),
@@ -390,9 +424,9 @@ def build(assets: Path, out: Path):
         text(s, x, Inches(3.65), Inches(3.5), Inches(0.35), [[(role, 13, SEMI, GREEN_DK, 0.3)]])
         text(s, x, Inches(4.2), Inches(3.5), Inches(1.0),
              [[(d, 12.5, REG, MUTED, 0)] for d in desc], ls=1.4, sa=3)
-    footer(s, "12")
+    footer(s, "13")
 
-    # ===== S13 클로징 =====
+    # ===== S14 클로징 =====
     s = new(); bg(s, FOREST)
     text(s, LM, Inches(1.9), Inches(11.5), Inches(0.5), [[("승계 검토의 진입장벽을", 26, SEMI, PALE, -0.3)]])
     text(s, Emu(int(LM) - Inches(0.02)), Inches(2.6), Inches(12), Inches(1.1),
@@ -403,7 +437,8 @@ def build(assets: Path, out: Path):
     hline(s, Emu(int(LM) + Inches(0.02)), Inches(5.35), Inches(11.6), HAIR_DK, 1.0)
     text(s, LM, Inches(5.6), Inches(8), Inches(0.5),
          [[("farmbaton.vercel.app", 18, SEMI, WHITE, 0), ("   지금 접속해 보세요", 13, REG, RGBColor(0x8F, 0xA5, 0x95), 0)]])
-    text(s, LM, Inches(6.9), Inches(9), Inches(0.3),
+    logo_mark(s, LM, Inches(6.87), on_dark=True)
+    text(s, Emu(int(LM) + int(MARK_SIZE) + Inches(0.1)), Inches(6.9), Inches(9), Inches(0.3),
          [[("감사합니다 · 김정훈 · 윤채원 · 유수민", 12, MED, RGBColor(0x6E, 0x78, 0x6F), 0.5)]])
     # QR
     block(s, Inches(11.0), Inches(5.5), Inches(1.5), Inches(1.5), WHITE, radius=0.06)

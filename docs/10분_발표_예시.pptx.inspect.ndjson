@@ -1,0 +1,284 @@
+{"kind":"deck","id":"pr/d9l5y9","name":"Deck"}
+{"kind":"layout","layoutId":"696bab32-a520-4f2e-b51c-e8f45da5830f","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"cea64539-766b-4c7c-9b19-0f9612360d8c","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/b4mcem","slide":1,"title":"Slide 1","textShapes":0}
+{"kind":"image","id":"im/j6tcrix8","slide":1,"name":"","alt":"apple_orchard_opening.png","bbox":[0,0,1280,720]}
+{"kind":"notes","id":"nt/b4mcem","slide":1,"text":"이 사진이 무엇처럼 보이십니까? 사과농장입니다.\n이 농장을 다른 사람에게 그대로 넘기려면, 어디서부터 시작해야 할까요?\n[15초] 질문 뒤 1초간 멈춘다."}
+{"kind":"slide","id":"sl/89nfw6","slide":2,"title":"하나의 농장, 세 개의 처분","textShapes":12}
+{"kind":"textbox","id":"sh/gv6dkrmd","slide":2,"text":"하나의 농장, 세 개의 처분","textPreview":"하나의 농장, 세 개의 처분","textChars":15,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/fuxcrm5s","slide":2,"text":"농장은 하나지만, 승계 과정은 조각나 있습니다","textPreview":"농장은 하나지만, 승계 과정은 조각나 있습니다","textChars":25,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/utovih47","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/p0zexw3u","slide":2,"bbox":[80,218,352,344]}
+{"kind":"textbox","id":"sh/3yxwvml4","slide":2,"text":"농지","textPreview":"농지","textChars":2,"textLines":1,"bbox":[102,432,200,34]}
+{"kind":"textbox","id":"sh/2xovmh4j","slide":2,"text":"필지·면적·토지가격","textPreview":"필지·면적·토지가격","textChars":10,"textLines":1,"bbox":[102,474,285,28]}
+{"kind":"shape","id":"sh/doze1g36","slide":2,"bbox":[464,218,352,344]}
+{"kind":"textbox","id":"sh/u5o325kb","slide":2,"text":"시설·기계","textPreview":"시설·기계","textChars":5,"textLines":1,"bbox":[486,432,200,34]}
+{"kind":"textbox","id":"sh/f6xkbalg","slide":2,"text":"창고·관수·농기계","textPreview":"창고·관수·농기계","textChars":9,"textLines":1,"bbox":[486,474,285,28]}
+{"kind":"shape","id":"sh/g76l4f21","slide":2,"bbox":[848,218,352,344]}
+{"kind":"textbox","id":"sh/29o36pk7","slide":2,"text":"작목·판로","textPreview":"작목·판로","textChars":5,"textLines":1,"bbox":[870,432,200,34]}
+{"kind":"textbox","id":"sh/3ahkfa1s","slide":2,"text":"수령·소득·거래관계","textPreview":"수령·소득·거래관계","textChars":10,"textLines":1,"bbox":[870,474,285,28]}
+{"kind":"textbox","id":"sh/4vql8f2d","slide":2,"text":"농지, 시설, 기계를 전부 따로따로 처분해야 합니다","textPreview":"농지, 시설, 기계를 전부 따로따로 처분해야 합니다","textChars":28,"textLines":1,"bbox":[80,590,1120,42]}
+{"kind":"shape","id":"sh/pwzmhkjy","slide":2,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/id4julk3","slide":2,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/jedk3ql8","slide":2,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"image","id":"im/t0jm5g3a","slide":2,"name":"","geometry":"roundRect","alt":"orchard_land.png","bbox":[92,230,328,184]}
+{"kind":"image","id":"im/5wjm1g3e","slide":2,"name":"","geometry":"roundRect","alt":"facility_machinery.png","bbox":[476,230,328,184]}
+{"kind":"image","id":"im/2pg32ho3","slide":2,"name":"","geometry":"roundRect","alt":"apples_market.png","bbox":[860,230,328,184]}
+{"kind":"notes","id":"nt/89nfw6","slide":2,"text":"상속지는 농지대로, 시설과 농기계는 별도로, 작목과 판로 정보는 다시 풀어야 합니다.\n농장은 하나지만 승계 과정은 조각나 있습니다.\n[25초]"}
+{"kind":"slide","id":"sl/o8mi6p","slide":3,"title":"농장 승계를","textShapes":7}
+{"kind":"textbox","id":"sh/vml8bepc","slide":3,"text":"농장 승계를","textPreview":"농장 승계를","textChars":6,"textLines":1,"bbox":[80,168,1120,70]}
+{"kind":"textbox","id":"sh/wnu9kjqx","slide":3,"text":"조각이 아닌 하나의 흐름으로","textPreview":"조각이 아닌 하나의 흐름으로","textChars":15,"textLines":1,"bbox":[80,244,1120,92]}
+{"kind":"shape","id":"sh/xo3qdo7i","slide":3,"bbox":[80,392,1118,2]}
+{"kind":"textbox","id":"sh/mhs7e98v","slide":3,"text":"FarmBaton","textPreview":"FarmBaton","textChars":9,"textLines":1,"bbox":[80,426,700,82]}
+{"kind":"textbox","id":"sh/ni187epg","slide":3,"text":"농지 + 작목 + 시설 + 판로를 잇는 승계 진단·매칭 플랫폼","textPreview":"농지 + 작목 + 시설 + 판로를 잇는 승계 진단·매칭 플랫폼","textChars":34,"textLines":1,"bbox":[82,526,900,36]}
+{"kind":"shape","id":"sh/8ja9gjq1","slide":3,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/9kjq9o7m","slide":3,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/6dwrqd8z","slide":3,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"textbox","id":"sh/7e58jipk","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"notes","id":"nt/o8mi6p","slide":3,"text":"[2초간 말없이 보여준다.]\n이 조각들을 다시 하나로 잇는 서비스, 팜바톤입니다.\n그렇다면 왜 지금 팜바톤이 필요할까요?\n[5초]"}
+{"kind":"slide","id":"sl/onff6q","slide":4,"title":"문제의 크기","textShapes":7}
+{"kind":"textbox","id":"sh/e54nq1gf","slide":4,"text":"문제의 크기","textPreview":"문제의 크기","textChars":6,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/18fmlgfq","slide":4,"text":"농가 경영주는 늙고, 다음 주자는 줄고 있습니다","textPreview":"농가 경영주는 늙고, 다음 주자는 줄고 있습니다","textChars":26,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/0765sbe5","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/rid4fmxo","slide":4,"bbox":[80,205,1120,390]}
+{"kind":"textbox","id":"sh/qh43m1g3","slide":4,"text":"(%)","textPreview":"(%)","textChars":3,"textLines":1,"bbox":[116,226,40,20]}
+{"kind":"textbox","id":"sh/sjmlory9","slide":4,"text":"출처: 통계청, 2025 농림어업총조사 결과(잠정)","textPreview":"출처: 통계청, 2025 농림어업총조사 결과(잠정)","textChars":28,"textLines":1,"bbox":[82,612,650,24]}
+{"kind":"shape","id":"sh/beh4rqxs","slide":4,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/adonilwn","slide":4,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/w3adsbqx","slide":4,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"chart","id":"ch/5c7mx8nq","slide":4,"name":"","chartType":"line","bbox":[120,242,1040,300]}
+{"kind":"notes","id":"nt/onff6q","slide":4,"text":"통계청 2025 농림어업총조사 잠정 결과입니다.\n60대 이상 경영주는 58.3%에서 78.8%로 높아졌고, 40대 이하는 17.9%에서 5.5%로 줄었습니다.\n농장은 빠르게 늙지만 이어받을 사람은 줄고 있습니다.\n[40초]"}
+{"kind":"slide","id":"sl/jhyytu","slide":5,"title":"기존 대안의 공백","textShapes":18}
+{"kind":"textbox","id":"sh/rehg7alc","slide":5,"text":"기존 대안의 공백","textPreview":"기존 대안의 공백","textChars":9,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/sfqhgv2x","slide":5,"text":"농장 전체를 진단하고 연결하는 통로가 비어 있습니다","textPreview":"농장 전체를 진단하고 연결하는 통로가 비어 있습니다","textChars":28,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/dgzy903i","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/ipozalkv","slide":5,"bbox":[80,232,240,284]}
+{"kind":"textbox","id":"sh/3qxg3qlg","slide":5,"text":"감정평가","textPreview":"감정평가","textChars":4,"textLines":1,"bbox":[100,266,200,34]}
+{"kind":"shape","id":"sh/4bqhcv21","slide":5,"bbox":[100,326,200,3]}
+{"kind":"textbox","id":"sh/5czy503m","slide":5,"text":"정확하지만 느리고 비쌈","textPreview":"정확하지만 느리고 비쌈","textChars":12,"textLines":1,"bbox":[100,358,198,80]}
+{"kind":"textbox","id":"sh/ulof6lkz","slide":5,"text":"일부 요소만 해결","textPreview":"일부 요소만 해결","textChars":9,"textLines":1,"bbox":[100,454,198,30]}
+{"kind":"shape","id":"sh/vmxgzql4","slide":5,"bbox":[360,232,240,284]}
+{"kind":"textbox","id":"sh/f2ps3ads","slide":5,"text":"부동산 중개","textPreview":"부동산 중개","textChars":6,"textLines":1,"bbox":[380,266,200,34]}
+{"kind":"shape","id":"sh/e1gra5wn","slide":5,"bbox":[380,326,200,3]}
+{"kind":"textbox","id":"sh/147a50vy","slide":5,"text":"토지 거래 중심","textPreview":"토지 거래 중심","textChars":8,"textLines":1,"bbox":[380,358,198,80]}
+{"kind":"textbox","id":"sh/03y9cfed","slide":5,"text":"일부 요소만 해결","textPreview":"일부 요소만 해결","textChars":9,"textLines":1,"bbox":[380,454,198,30]}
+{"kind":"shape","id":"sh/nqps7ad4","slide":5,"bbox":[640,232,240,284]}
+{"kind":"textbox","id":"sh/25gre5wj","slide":5,"text":"농지은행","textPreview":"농지은행","textChars":4,"textLines":1,"bbox":[660,266,200,34]}
+{"kind":"shape","id":"sh/psra9kva","slide":5,"bbox":[660,326,200,3]}
+{"kind":"textbox","id":"sh/ory9gfep","slide":5,"text":"농지 중심 지원","textPreview":"농지 중심 지원","textChars":8,"textLines":1,"bbox":[660,358,198,80]}
+{"kind":"textbox","id":"sh/ju58vqxk","slide":5,"text":"일부 요소만 해결","textPreview":"일부 요소만 해결","textChars":9,"textLines":1,"bbox":[660,454,198,30]}
+{"kind":"shape","id":"sh/i9wr2lwf","slide":5,"bbox":[920,232,240,284]}
+{"kind":"textbox","id":"sh/mpkvatgn","slide":5,"text":"팜바톤","textPreview":"팜바톤","textChars":3,"textLines":1,"bbox":[940,266,200,34]}
+{"kind":"shape","id":"sh/7qtc3yx8","slide":5,"bbox":[940,326,200,3]}
+{"kind":"textbox","id":"sh/8rmdcjyt","slide":5,"text":"농장 전체 + 매칭","textPreview":"농장 전체 + 매칭","textChars":10,"textLines":1,"bbox":[940,358,198,80]}
+{"kind":"textbox","id":"sh/9svu5ofe","slide":5,"text":"농지·작목·시설·판로","textPreview":"농지·작목·시설·판로","textChars":11,"textLines":1,"bbox":[940,454,198,30]}
+{"kind":"textbox","id":"sh/ylkb69gr","slide":5,"text":"빠른 1차 검토에서 실제 상담까지, 하나의 흐름이 필요합니다","textPreview":"빠른 1차 검토에서 실제 상담까지, 하나의 흐름이 필요합니다","textChars":33,"textLines":1,"bbox":[80,566,1120,38]}
+{"kind":"shape","id":"sh/zmtczexc","slide":5,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/kn2d8jyx","slide":5,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/lobu1ofi","slide":5,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"notes","id":"nt/jhyytu","slide":5,"text":"기존 방법이 없는 것이 아닙니다. 다만 각각 농장의 일부만 봅니다.\n농지는 물론 과수 수령, 시설, 판로까지 한 번에 진단하고 다음 주자와 연결하는 통로가 비어 있습니다.\n[35초]"}
+{"kind":"slide","id":"sl/whipvc","slide":6,"title":"팜바톤의 해법","textShapes":15}
+{"kind":"textbox","id":"sh/9gfu18ni","slide":6,"text":"팜바톤의 해법","textPreview":"팜바톤의 해법","textChars":7,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/md4vqdo7","slide":6,"text":"두 개의 MVP 흐름에 집중했습니다","textPreview":"두 개의 MVP 흐름에 집중했습니다","textChars":19,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/nedczi5s","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/0bmdo361","slide":6,"bbox":[80,218,540,328]}
+{"kind":"shape","id":"sh/lcvux8nm","slide":6,"bbox":[660,218,540,328]}
+{"kind":"textbox","id":"sh/yp4vmtov","slide":6,"text":"01  농가 등록","textPreview":"01  농가 등록","textChars":9,"textLines":1,"bbox":[112,252,430,30]}
+{"kind":"textbox","id":"sh/zqdcvy5g","slide":6,"text":"주소 하나로","textPreview":"주소 하나로","textChars":6,"textLines":1,"bbox":[112,304,430,48]}
+{"kind":"textbox","id":"sh/k7qd076l","slide":6,"text":"인수 검토 리포트","textPreview":"인수 검토 리포트","textChars":9,"textLines":1,"bbox":[112,354,430,48]}
+{"kind":"textbox","id":"sh/58ze9cnq","slide":6,"text":"농지 · 작목 · 시설 · 판로","textPreview":"농지 · 작목 · 시설 · 판로","textChars":17,"textLines":1,"bbox":[112,432,420,28]}
+{"kind":"textbox","id":"sh/p8vi98ji","slide":6,"text":"→ 참고용 범위와 근거를 한눈에","textPreview":"→ 참고용 범위와 근거를 한눈에","textChars":17,"textLines":1,"bbox":[112,472,430,30]}
+{"kind":"textbox","id":"sh/o7m1gn2x","slide":6,"text":"02  청년농 프로필","textPreview":"02  청년농 프로필","textChars":11,"textLines":1,"bbox":[692,252,430,30]}
+{"kind":"textbox","id":"sh/36d07i1s","slide":6,"text":"희망 조건으로","textPreview":"희망 조건으로","textChars":7,"textLines":1,"bbox":[692,304,430,48]}
+{"kind":"textbox","id":"sh/25kzedk7","slide":6,"text":"맞춤 농장 리스트","textPreview":"맞춤 농장 리스트","textChars":9,"textLines":1,"bbox":[692,354,430,48]}
+{"kind":"textbox","id":"sh/14bi583m","slide":6,"text":"지역 · 작목 · 자본 · 경험","textPreview":"지역 · 작목 · 자본 · 경험","textChars":17,"textLines":1,"bbox":[692,432,420,28]}
+{"kind":"textbox","id":"sh/g32hc321","slide":6,"text":"→ 설명 가능한 매칭 점수","textPreview":"→ 설명 가능한 매칭 점수","textChars":14,"textLines":1,"bbox":[692,472,430,30]}
+{"kind":"shape","id":"sh/f2t03ylg","slide":6,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/u1kzatkv","slide":6,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/l0fihsjq","slide":6,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"notes","id":"nt/whipvc","slide":6,"text":"팜바톤은 두 가지 기능에 집중합니다.\n농장주는 주소 하나로 인수 검토 리포트를 받고, 청년농은 희망 조건을 입력해 적합한 농장을 추천받습니다.\n[25초]"}
+{"kind":"slide","id":"sl/22qud1","slide":7,"title":"LIVE DEMO","textShapes":9}
+{"kind":"textbox","id":"sh/t4fyt83e","slide":7,"text":"LIVE DEMO","textPreview":"LIVE DEMO","textChars":9,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/614fydk3","slide":7,"text":"등록 → 리포트 → 매칭, 3분 안에 보여드립니다","textPreview":"등록 → 리포트 → 매칭, 3분 안에 보여드립니다","textChars":27,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/72dwrilo","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/g76x4n25","slide":7,"bbox":[78,220,360,330]}
+{"kind":"textbox","id":"sh/u5of2dkz","slide":7,"text":"1. 주소 입력","textPreview":"1. 주소 입력","textChars":8,"textLines":1,"bbox":[96,486,320,32]}
+{"kind":"shape","id":"sh/f6xgvilk","slide":7,"bbox":[473,220,360,330]}
+{"kind":"textbox","id":"sh/pwzy1s3m","slide":7,"text":"2. 인수 검토 리포트","textPreview":"2. 인수 검토 리포트","textChars":12,"textLines":1,"bbox":[491,486,320,32]}
+{"kind":"shape","id":"sh/tsnu50fm","slide":7,"bbox":[868,220,360,330]}
+{"kind":"textbox","id":"sh/76lc3qxw","slide":7,"text":"3. 매칭 리스트","textPreview":"3. 매칭 리스트","textChars":9,"textLines":1,"bbox":[886,486,320,32]}
+{"kind":"textbox","id":"sh/65cbu5wb","slide":7,"text":"※ 데모 오류 시 동일 화면의 녹화 영상으로 즉시 전환","textPreview":"※ 데모 오류 시 동일 화면의 녹화 영상으로 즉시 전환","textChars":30,"textLines":1,"bbox":[80,585,720,24]}
+{"kind":"shape","id":"sh/hwnu9kfy","slide":7,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/gved0fed","slide":7,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/fu5c7axs","slide":7,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"image","id":"im/crm1gfal","slide":7,"name":"","geometry":"roundRect","alt":"input.png","bbox":[90,232,336,236]}
+{"kind":"image","id":"im/twbix0b2","slide":7,"name":"","geometry":"roundRect","alt":"report.png","bbox":[485,232,336,236]}
+{"kind":"image","id":"im/7e9kjy98","slide":7,"name":"","geometry":"roundRect","alt":"match.png","bbox":[880,232,336,236]}
+{"kind":"notes","id":"nt/22qud1","slide":7,"text":"[3분 라이브 데모]\n0:00~0:50 농가 등록 / 0:50~1:40 인수 검토 리포트 / 1:40~2:30 청년농 매칭 / 2:30~3:00 상담 연결\n결과 화면에서 반드시 ‘인수 검토가 범위(참고용 추정)’와 면책 문구를 짚는다."}
+{"kind":"slide","id":"sl/v1ryo6","slide":8,"title":"공공데이터 활용","textShapes":22}
+{"kind":"textbox","id":"sh/t872pszi","slide":8,"text":"공공데이터 활용","textPreview":"공공데이터 활용","textChars":8,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/65g3edgr","slide":8,"text":"7종의 데이터를 하나의 의사결정 흐름으로 연결합니다","textPreview":"7종의 데이터를 하나의 의사결정 흐름으로 연결합니다","textChars":28,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/76pknihc","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/kjelc3y1","slide":8,"bbox":[80,218,248,96]}
+{"kind":"textbox","id":"sh/lk72l8z6","slide":8,"text":"V-World","textPreview":"V-World","textChars":7,"textLines":1,"bbox":[96,236,216,28]}
+{"kind":"textbox","id":"sh/yhw3atgv","slide":8,"text":"위치·공시지가","textPreview":"위치·공시지가","textChars":7,"textLines":1,"bbox":[96,270,216,22]}
+{"kind":"shape","id":"sh/ji5kjyhg","slide":8,"bbox":[360,218,248,96]}
+{"kind":"textbox","id":"sh/4filo7y5","slide":8,"text":"팜맵","textPreview":"팜맵","textChars":2,"textLines":1,"bbox":[376,236,216,28]}
+{"kind":"textbox","id":"sh/5grmxczq","slide":8,"text":"필지·면적","textPreview":"필지·면적","textChars":5,"textLines":1,"bbox":[376,270,216,22]}
+{"kind":"shape","id":"sh/5crih03y","slide":8,"bbox":[640,218,248,96]}
+{"kind":"textbox","id":"sh/kri1ov2d","slide":8,"text":"실거래 DB","textPreview":"실거래 DB","textChars":6,"textLines":1,"bbox":[656,236,216,28]}
+{"kind":"textbox","id":"sh/jqp0fqls","slide":8,"text":"토지 보정","textPreview":"토지 보정","textChars":5,"textLines":1,"bbox":[656,270,216,22]}
+{"kind":"shape","id":"sh/ipgjmlk7","slide":8,"bbox":[920,218,248,96]}
+{"kind":"textbox","id":"sh/xo7idg3m","slide":8,"text":"소득조사","textPreview":"소득조사","textChars":4,"textLines":1,"bbox":[936,236,216,28]}
+{"kind":"textbox","id":"sh/wny1kv21","slide":8,"text":"작목 소득","textPreview":"작목 소득","textChars":5,"textLines":1,"bbox":[936,270,216,22]}
+{"kind":"shape","id":"sh/vmp0bqlw","slide":8,"bbox":[80,356,248,96]}
+{"kind":"textbox","id":"sh/algjilkb","slide":8,"text":"KAMIS","textPreview":"KAMIS","textChars":5,"textLines":1,"bbox":[96,374,216,28]}
+{"kind":"textbox","id":"sh/hkb2pkj6","slide":8,"text":"시세 보정","textPreview":"시세 보정","textChars":5,"textLines":1,"bbox":[96,408,216,22]}
+{"kind":"shape","id":"sh/gj21wf2l","slide":8,"bbox":[360,356,248,96]}
+{"kind":"textbox","id":"sh/0zad8net","slide":8,"text":"기준표","textPreview":"기준표","textChars":3,"textLines":1,"bbox":[376,374,216,28]}
+{"kind":"textbox","id":"sh/l03uhsve","slide":8,"text":"시설·수령","textPreview":"시설·수령","textChars":5,"textLines":1,"bbox":[376,408,216,22]}
+{"kind":"shape","id":"sh/yxsv6dwn","slide":8,"bbox":[640,356,248,96]}
+{"kind":"textbox","id":"sh/zy1cfid8","slide":8,"text":"중개업소","textPreview":"중개업소","textChars":4,"textLines":1,"bbox":[656,374,216,28]}
+{"kind":"textbox","id":"sh/cvat43ex","slide":8,"text":"상담 연결","textPreview":"상담 연결","textChars":5,"textLines":1,"bbox":[656,408,216,22]}
+{"kind":"shape","id":"sh/dwjud8vi","slide":8,"bbox":[922,356,278,96]}
+{"kind":"textbox","id":"sh/q9sb2dwr","slide":8,"text":"결정론적 산식","textPreview":"결정론적 산식","textChars":7,"textLines":1,"bbox":[944,376,230,30]}
+{"kind":"textbox","id":"sh/ba1cbidc","slide":8,"text":"인수 검토 범위 · 매칭","textPreview":"인수 검토 범위 · 매칭","textChars":13,"textLines":1,"bbox":[944,414,230,22]}
+{"kind":"textbox","id":"sh/o7qt03el","slide":8,"text":"하나라도 빠지면, 농장의 한 조각이 빠집니다","textPreview":"하나라도 빠지면, 농장의 한 조각이 빠집니다","textChars":24,"textLines":1,"bbox":[80,548,1120,38]}
+{"kind":"shape","id":"sh/p8ju98v6","slide":8,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/r2hcjyh8","slide":8,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/618vatgn","slide":8,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"notes","id":"nt/v1ryo6","slide":8,"text":"팜바톤은 데이터를 단순히 나열하지 않습니다.\n팜맵과 V-World, 실거래 DB, 농산물소득조사와 KAMIS, 기준표와 중개업소 정보를 가치평가와 연결의 흐름으로 묶습니다.\n[50초]"}
+{"kind":"slide","id":"sl/adc6aw","slide":9,"title":"AI 사용 원칙","textShapes":12}
+{"kind":"textbox","id":"sh/6xo3y54v","slide":9,"text":"AI 사용 원칙","textPreview":"AI 사용 원칙","textChars":8,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/t0fmt036","slide":9,"text":"숫자는 알고리즘, 설명은 AI","textPreview":"숫자는 알고리즘, 설명은 AI","textChars":16,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/sz6l0vm1","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/f2h4valc","slide":9,"bbox":[80,228,520,286]}
+{"kind":"shape","id":"sh/u1o3254r","slide":9,"bbox":[680,228,520,286]}
+{"kind":"textbox","id":"sh/hozmxk3i","slide":9,"text":"결정론적 Python 함수","textPreview":"결정론적 Python 함수","textChars":14,"textLines":1,"bbox":[112,266,440,34]}
+{"kind":"textbox","id":"sh/g3ql4fmx","slide":9,"text":"가치평가 · 매칭 점수","textPreview":"가치평가 · 매칭 점수","textChars":12,"textLines":1,"bbox":[112,322,440,42]}
+{"kind":"textbox","id":"sh/3qh4zulo","slide":9,"text":"같은 입력 → 항상 같은 결과","textPreview":"같은 입력 → 항상 같은 결과","textChars":16,"textLines":1,"bbox":[112,402,440,28]}
+{"kind":"textbox","id":"sh/2p836p43","slide":9,"text":"생성형 AI","textPreview":"생성형 AI","textChars":6,"textLines":1,"bbox":[712,266,440,34]}
+{"kind":"textbox","id":"sh/sje1k3qt","slide":9,"text":"관점별 설명문","textPreview":"관점별 설명문","textChars":7,"textLines":1,"bbox":[712,322,440,42]}
+{"kind":"textbox","id":"sh/tkn2d87y","slide":9,"text":"계산 근거를 쉽게 풀어 전달","textPreview":"계산 근거를 쉽게 풀어 전달","textChars":15,"textLines":1,"bbox":[712,402,440,28]}
+{"kind":"shape","id":"sh/6hcjit8n","slide":9,"bbox":[80,568,1120,2]}
+{"kind":"textbox","id":"sh/7i5kbyp8","slide":9,"text":"LLM은 수치 계산에 사용하지 않습니다","textPreview":"LLM은 수치 계산에 사용하지 않습니다","textChars":21,"textLines":1,"bbox":[80,590,1120,34]}
+{"kind":"shape","id":"sh/gne1o3qp","slide":9,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/hon2h87a","slide":9,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/ulwjmt8j","slide":9,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"notes","id":"nt/adc6aw","slide":9,"text":"핵심은 AI를 어디에 쓰지 않았는가입니다.\n금액과 매칭 점수는 결정론적 함수가 계산해 같은 입력에 같은 결과를 냅니다.\nAI는 그 결과를 농장주와 청년농의 관점에 맞게 설명하는 역할만 합니다.\n[40초]"}
+{"kind":"slide","id":"sl/p3hbkh","slide":10,"title":"기술성과 완성도","textShapes":14}
+{"kind":"textbox","id":"sh/e5wbmhwn","slide":10,"text":"기술성과 완성도","textPreview":"기술성과 완성도","textChars":8,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/18nuhwfy","slide":10,"text":"실제 배포를 전제로, 데모가 멈추지 않게 설계했습니다","textPreview":"실제 배포를 전제로, 데모가 멈추지 않게 설계했습니다","textChars":29,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/07etored","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/napcj6x4","slide":10,"bbox":[180,212,920,70]}
+{"kind":"textbox","id":"sh/29gbq1wj","slide":10,"text":"React · Vite · Leaflet","textPreview":"React · Vite · Leaflet","textChars":22,"textLines":1,"bbox":[210,230,360,28]}
+{"kind":"textbox","id":"sh/pc7ulwfa","slide":10,"text":"모바일 퍼스트 화면","textPreview":"모바일 퍼스트 화면","textChars":10,"textLines":1,"bbox":[600,232,450,26]}
+{"kind":"shape","id":"sh/obydsrep","slide":10,"bbox":[180,304,920,70]}
+{"kind":"textbox","id":"sh/3elc72x0","slide":10,"text":"FastAPI","textPreview":"FastAPI","textChars":7,"textLines":1,"bbox":[210,322,360,28]}
+{"kind":"textbox","id":"sh/idcbexgf","slide":10,"text":"검증된 가치평가·매칭 함수","textPreview":"검증된 가치평가·매칭 함수","textChars":14,"textLines":1,"bbox":[600,324,450,26]}
+{"kind":"shape","id":"sh/kz2lcb6d","slide":10,"bbox":[180,396,920,70]}
+{"kind":"textbox","id":"sh/l0b25gny","slide":10,"text":"PostgreSQL · PostGIS","textPreview":"PostgreSQL · PostGIS","textChars":20,"textLines":1,"bbox":[210,414,360,28]}
+{"kind":"textbox","id":"sh/yxk3alon","slide":10,"text":"공간 데이터 EPSG:4326","textPreview":"공간 데이터 EPSG:4326","textChars":16,"textLines":1,"bbox":[600,416,450,26]}
+{"kind":"shape","id":"sh/zytk3q58","slide":10,"bbox":[180,488,920,70]}
+{"kind":"textbox","id":"sh/83mlgv6p","slide":10,"text":"외부 API + 정적 폴백","textPreview":"외부 API + 정적 폴백","textChars":14,"textLines":1,"bbox":[210,506,360,28]}
+{"kind":"textbox","id":"sh/94v290na","slide":10,"text":"V-World · KAMIS · 팜맵","textPreview":"V-World · KAMIS · 팜맵","textChars":20,"textLines":1,"bbox":[600,508,450,26]}
+{"kind":"textbox","id":"sh/m1k3eloj","slide":10,"text":"테스트 가능한 산식 · 공간데이터 통일 · 모든 외부 API의 정적 대체","textPreview":"테스트 가능한 산식 · 공간데이터 통일 · 모든 외부 API의 정적 대체","textChars":40,"textLines":1,"bbox":[80,600,1120,30]}
+{"kind":"shape","id":"sh/72dk7q54","slide":10,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/o7i14r6l","slide":10,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/p8r2xwnq","slide":10,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"notes","id":"nt/p3hbkh","slide":10,"text":"팜바톤은 화면 목업이 아니라 실제 배포 가능한 구조입니다.\n공간 데이터는 PostGIS에 통일하고, 가치평가 산식은 테스트로 검증합니다.\n외부 API마다 정적 폴백을 두어 데모가 멈추지 않도록 했습니다.\n[35초]"}
+{"kind":"slide","id":"sl/5j3vc4","slide":11,"title":"차별점","textShapes":18}
+{"kind":"textbox","id":"sh/9svaxozi","slide":11,"text":"차별점","textPreview":"차별점","textChars":3,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/mp4rm90r","slide":11,"text":"개별 기능보다, 농장 전체를 잇는 결합이 다릅니다","textPreview":"개별 기능보다, 농장 전체를 잇는 결합이 다릅니다","textChars":27,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/nqd8vehc","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/0n29kzi1","slide":11,"bbox":[80,236,252,292]}
+{"kind":"textbox","id":"sh/lovqt4zm","slide":11,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[100,260,50,26]}
+{"kind":"textbox","id":"sh/ylkri90v","slide":11,"text":"즉시","textPreview":"즉시","textChars":2,"textLines":1,"bbox":[100,316,210,42]}
+{"kind":"shape","id":"sh/zmt8ruhg","slide":11,"bbox":[100,378,210,3]}
+{"kind":"textbox","id":"sh/cz29gzip","slide":11,"text":"주소부터 시작","textPreview":"주소부터 시작","textChars":7,"textLines":1,"bbox":[100,406,210,58]}
+{"kind":"shape","id":"sh/dkbqp4za","slide":11,"bbox":[360,236,252,292]}
+{"kind":"textbox","id":"sh/hoj65oza","slide":11,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[380,260,50,26]}
+{"kind":"textbox","id":"sh/gna5cjyp","slide":11,"text":"무료","textPreview":"무료","textChars":2,"textLines":1,"bbox":[380,316,210,42]}
+{"kind":"shape","id":"sh/v21o3eh4","slide":11,"bbox":[380,378,210,3]}
+{"kind":"textbox","id":"sh/u1sna9gj","slide":11,"text":"첫 인수 검토","textPreview":"첫 인수 검토","textChars":7,"textLines":1,"bbox":[380,406,210,58]}
+{"kind":"shape","id":"sh/t0j614zy","slide":11,"bbox":[640,236,252,292]}
+{"kind":"textbox","id":"sh/8za58jyd","slide":11,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[660,260,50,26]}
+{"kind":"textbox","id":"sh/7yh4zeh8","slide":11,"text":"상속 기반 전체","textPreview":"상속 기반 전체","textChars":8,"textLines":1,"bbox":[660,316,210,42]}
+{"kind":"shape","id":"sh/6x8n69gn","slide":11,"bbox":[660,378,210,3]}
+{"kind":"textbox","id":"sh/lwzmx4z2","slide":11,"text":"농지+작목+시설+판로","textPreview":"농지+작목+시설+판로","textChars":11,"textLines":1,"bbox":[660,406,210,58]}
+{"kind":"shape","id":"sh/kvq54zyh","slide":11,"bbox":[920,236,252,292]}
+{"kind":"textbox","id":"sh/wrex03ap","slide":11,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[940,260,50,26]}
+{"kind":"textbox","id":"sh/xsne98ba","slide":11,"text":"현업 연결","textPreview":"현업 연결","textChars":5,"textLines":1,"bbox":[940,316,210,42]}
+{"kind":"shape","id":"sh/apcfytsj","slide":11,"bbox":[940,378,210,3]}
+{"kind":"textbox","id":"sh/bq5w7yt4","slide":11,"text":"공인중개 상담","textPreview":"공인중개 상담","textChars":7,"textLines":1,"bbox":[940,406,210,58]}
+{"kind":"textbox","id":"sh/onuxwjad","slide":11,"text":"확인한 범위에서: 빠른 검토 → 매칭 → 상담을 한 흐름으로","textPreview":"확인한 범위에서: 빠른 검토 → 매칭 → 상담을 한 흐름으로","textChars":33,"textLines":1,"bbox":[80,572,1120,34]}
+{"kind":"shape","id":"sh/9o3e5oby","slide":11,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/mlcfuts7","slide":11,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/nmlw3ets","slide":11,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"notes","id":"nt/5j3vc4","slide":11,"text":"차별점은 기술 하나가 아니라 결합에 있습니다.\n농지뿐 아니라 수령, 시설, 영업권까지 반영하고, 그 결과를 청년농 매칭과 현업 상담으로 연결합니다.\n[35초]"}
+{"kind":"slide","id":"sl/j7v29j","slide":12,"title":"시장과 수익모델","textShapes":15}
+{"kind":"textbox","id":"sh/q5g3mpgz","slide":12,"text":"시장과 수익모델","textPreview":"시장과 수익모델","textChars":8,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/d872x4zq","slide":12,"text":"3개 도·3개 과수에서 검증하고, B2G로 확장합니다","textPreview":"3개 도·3개 과수에서 검증하고, B2G로 확장합니다","textChars":29,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/s7ylozy5","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/fa9kzehg","slide":12,"bbox":[80,216,400,330]}
+{"kind":"textbox","id":"sh/e903q9gb","slide":12,"text":"54.8만","textPreview":"54.8만","textChars":5,"textLines":1,"bbox":[112,266,330,76]}
+{"kind":"textbox","id":"sh/1wrm14zm","slide":12,"text":"70대 이상 농가 경영주","textPreview":"70대 이상 농가 경영주","textChars":13,"textLines":1,"bbox":[112,352,330,34]}
+{"kind":"textbox","id":"sh/0vilszy1","slide":12,"text":"출발 시장","textPreview":"출발 시장","textChars":5,"textLines":1,"bbox":[112,420,330,26]}
+{"kind":"shape","id":"sh/ny943ehs","slide":12,"bbox":[520,216,680,92]}
+{"kind":"textbox","id":"sh/mx03u9g7","slide":12,"text":"초기 범위","textPreview":"초기 범위","textChars":5,"textLines":1,"bbox":[544,236,150,28]}
+{"kind":"textbox","id":"sh/oj2pofmt","slide":12,"text":"충북 · 경북 · 충남\n사과 · 복숭아 · 포도","textPreview":"충북 · 경북 · 충남 | 사과 · 복숭아 · 포도","textChars":26,"textLines":2,"bbox":[710,234,450,54]}
+{"kind":"shape","id":"sh/p4bqhkny","slide":12,"bbox":[520,326,680,92]}
+{"kind":"textbox","id":"sh/2h07m54n","slide":12,"text":"1차 수익","textPreview":"1차 수익","textChars":5,"textLines":1,"bbox":[544,346,150,28]}
+{"kind":"textbox","id":"sh/3i98fa58","slide":12,"text":"지자체 구독형 대시보드\n3개 도 × 48개 시군","textPreview":"지자체 구독형 대시보드 | 3개 도 × 48개 시군","textChars":26,"textLines":2,"bbox":[710,344,450,54]}
+{"kind":"shape","id":"sh/c72pszmp","slide":12,"bbox":[520,436,680,92]}
+{"kind":"textbox","id":"sh/d8bqlkna","slide":12,"text":"확장 수익","textPreview":"확장 수익","textChars":5,"textLines":1,"bbox":[544,456,150,28]}
+{"kind":"textbox","id":"sh/q5k7qp4j","slide":12,"text":"제휴 공인중개업소\n상담 성공보수","textPreview":"제휴 공인중개업소 | 상담 성공보수","textChars":17,"textLines":2,"bbox":[710,454,450,54]}
+{"kind":"textbox","id":"sh/b6t8ju54","slide":12,"text":"개인 사용자는 계속 무료 → 농장 등록 장벽 최소화","textPreview":"개인 사용자는 계속 무료 → 농장 등록 장벽 최소화","textChars":28,"textLines":1,"bbox":[520,572,680,30]}
+{"kind":"shape","id":"sh/0bm9wzml","slide":12,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/lcvqp4n6","slide":12,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/9srq94fa","slide":12,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"notes","id":"nt/j7v29j","slide":12,"text":"출발 시장은 70대 이상 농가 경영주 54만 8천 가구입니다.\n초기 범위는 충북·경북·충남의 사과·복숭아·포도 농가로 제한합니다.\n수익은 지자체 구독형 대시보드에서 시작하고, 이후 제휴 공인중개업소의 상담 성공보수로 확장합니다.\n[60초]"}
+{"kind":"slide","id":"sl/v6czjv","slide":13,"title":"팀","textShapes":18}
+{"kind":"textbox","id":"sh/lcbyl87i","slide":13,"text":"팀","textPreview":"팀","textChars":1,"textLines":1,"bbox":[82,64,700,28]}
+{"kind":"textbox","id":"sh/y90fato7","slide":13,"text":"기술·디자인·농업 현장을 한 팀에 담았습니다","textPreview":"기술·디자인·농업 현장을 한 팀에 담았습니다","textChars":24,"textLines":1,"bbox":[80,104,1120,72]}
+{"kind":"textbox","id":"sh/ja9gjyps","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"shape","id":"sh/wnix8j61","slide":13,"bbox":[80,238,352,282]}
+{"kind":"shape","id":"sh/xoryho7m","slide":13,"bbox":[104,264,64,64]}
+{"kind":"textbox","id":"sh/al0f69ov","slide":13,"text":"김","textPreview":"김","textChars":1,"textLines":1,"bbox":[104,276,64,32]}
+{"kind":"textbox","id":"sh/bm9gfepg","slide":13,"text":"김정훈","textPreview":"김정훈","textChars":3,"textLines":1,"bbox":[192,266,210,36]}
+{"kind":"textbox","id":"sh/ojyx4j65","slide":13,"text":"개발 총괄","textPreview":"개발 총괄","textChars":5,"textLines":1,"bbox":[192,310,210,26]}
+{"kind":"shape","id":"sh/9krydo7q","slide":13,"bbox":[104,360,304,2]}
+{"kind":"textbox","id":"sh/p8ja14by","slide":13,"text":"데이터 · 백엔드 · 배포","textPreview":"데이터 · 백엔드 · 배포","textChars":14,"textLines":1,"bbox":[104,390,304,54]}
+{"kind":"shape","id":"sh/47at8zut","slide":13,"bbox":[464,238,352,282]}
+{"kind":"shape","id":"sh/361szut8","slide":13,"bbox":[488,264,64,64]}
+{"kind":"textbox","id":"sh/25sb6pcn","slide":13,"text":"오","textPreview":"오","textChars":1,"textLines":1,"bbox":[488,276,64,32]}
+{"kind":"textbox","id":"sh/h4zaxkb2","slide":13,"text":"오채은","textPreview":"오채은","textChars":3,"textLines":1,"bbox":[576,266,210,36]}
+{"kind":"textbox","id":"sh/g3qt4zuh","slide":13,"text":"UI·UX","textPreview":"UI·UX","textChars":5,"textLines":1,"bbox":[576,310,210,26]}
+{"kind":"shape","id":"sh/f2hsvudw","slide":13,"bbox":[488,360,304,2]}
+{"kind":"textbox","id":"sh/u18b2pcb","slide":13,"text":"서비스 흐름 · 화면 설계","textPreview":"서비스 흐름 · 화면 설계","textChars":14,"textLines":1,"bbox":[488,390,304,54]}
+{"kind":"shape","id":"sh/t0zatkv6","slide":13,"bbox":[848,238,352,282]}
+{"kind":"shape","id":"sh/sfqt0ful","slide":13,"bbox":[872,264,64,64]}
+{"kind":"textbox","id":"sh/kjutgf2h","slide":13,"text":"윤","textPreview":"윤","textChars":1,"textLines":1,"bbox":[872,276,64,32]}
+{"kind":"textbox","id":"sh/lk3apk3m","slide":13,"text":"윤수민","textPreview":"윤수민","textChars":3,"textLines":1,"bbox":[960,266,210,36]}
+{"kind":"textbox","id":"sh/yhsbepkb","slide":13,"text":"농업 어드바이저","textPreview":"농업 어드바이저","textChars":8,"textLines":1,"bbox":[960,310,210,26]}
+{"kind":"shape","id":"sh/jilsnalw","slide":13,"bbox":[872,360,304,2]}
+{"kind":"textbox","id":"sh/wfatcf25","slide":13,"text":"현장 검증 · 사용자 관점","textPreview":"현장 검증 · 사용자 관점","textChars":14,"textLines":1,"bbox":[872,390,304,54]}
+{"kind":"textbox","id":"sh/xgjalk3q","slide":13,"text":"한 사람이 만든 기능이 아니라, 세 관점이 맞물린 서비스","textPreview":"한 사람이 만든 기능이 아니라, 세 관점이 맞물린 서비스","textChars":31,"textLines":1,"bbox":[80,570,1120,34]}
+{"kind":"shape","id":"sh/atsba5kz","slide":13,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/bu1sjalk","slide":13,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/gbetoz2p","slide":13,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"notes","id":"nt/v6czjv","slide":13,"text":"개발을 맡은 김정훈, UI·UX를 맡은 오채은, 농업 현장 검증을 맡은 윤수민으로 구성했습니다.\n기술과 디자인, 농업 현장의 세 관점을 함께 갖춘 팀입니다.\n[15초]"}
+{"kind":"slide","id":"sl/3voo93","slide":14,"title":"FarmBaton","textShapes":8}
+{"kind":"shape","id":"sh/kjmpwbm9","slide":14,"bbox":[0,0,1280,720]}
+{"kind":"textbox","id":"sh/5kvqpg3e","slide":14,"text":"FarmBaton","textPreview":"FarmBaton","textChars":9,"textLines":1,"bbox":[80,116,700,66]}
+{"kind":"textbox","id":"sh/6l47yl4z","slide":14,"text":"농장은 처분하는 자산이 아니라","textPreview":"농장은 처분하는 자산이 아니라","textChars":16,"textLines":1,"bbox":[80,226,1040,58]}
+{"kind":"textbox","id":"sh/7md8rqlk","slide":14,"text":"다음 농부에게 이어지는 삶의 기반입니다","textPreview":"다음 농부에게 이어지는 삶의 기반입니다","textChars":21,"textLines":1,"bbox":[80,292,1100,72]}
+{"kind":"shape","id":"sh/snmp0vm5","slide":14,"bbox":[80,414,1120,2]}
+{"kind":"textbox","id":"sh/tovqt03q","slide":14,"text":"인수 검토: 수일·수십만 원 → 무료·수십 초","textPreview":"인수 검토: 수일·수십만 원 → 무료·수십 초","textChars":25,"textLines":1,"bbox":[80,446,1000,38]}
+{"kind":"textbox","id":"sh/mp07mh4v","slide":14,"text":"farmbaton.kr  ·  감사합니다","textPreview":"farmbaton.kr  ·  감사합니다","textChars":22,"textLines":1,"bbox":[80,548,700,34]}
+{"kind":"shape","id":"sh/nqtofm5g","slide":14,"bbox":[81,662,22,22]}
+{"kind":"textbox","id":"sh/n2ls7e9o","slide":14,"text":"팜","textPreview":"팜","textChars":1,"textLines":1,"bbox":[82,664,20,18]}
+{"kind":"textbox","id":"sh/m1cry9s3","slide":14,"text":"팜바톤 · FarmBaton","textPreview":"팜바톤 · FarmBaton","textChars":15,"textLines":1,"bbox":[112,665,230,18]}
+{"kind":"textbox","id":"sh/94na9oru","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[1138,674,62,20]}
+{"kind":"image","id":"im/mhgb2psb","slide":14,"name":"","alt":"apple_orchard_opening.png","bbox":[0,0,1280,720]}
+{"kind":"notes","id":"nt/3voo93","slide":14,"text":"처음 보여드린 사과농장은 낡은 자산이 아니라 다음 농부에게 이어갈 농장입니다.\n인수 검토의 첫 문턱을 수일과 수십만 원에서 무료와 수십 초로 낮추겠습니다.\n사라지는 농장의 데이터로 다음 농부를 잇겠습니다. 팜바톤이었습니다. 감사합니다.\n[20초]"}

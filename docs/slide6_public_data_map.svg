@@ -52,16 +52,17 @@
 
   <!-- ===== arrows to formula ===== -->
   <g stroke="#C7CDBF" stroke-width="1.5" fill="none">
-    <path d="M 400 290 C 430 290, 435 258, 462 254" marker-end="url(#a)"/>
-    <path d="M 400 420 C 432 420, 436 300, 462 292" marker-end="url(#a)"/>
-    <path d="M 400 530 C 434 530, 438 452, 462 446" marker-end="url(#a)"/>
-    <path d="M 400 625 C 432 625, 438 540, 462 534" stroke-dasharray="4 4" marker-end="url(#a)"/>
+    <path d="M 400 290 C 430 290, 435 258, 462 254"/>
+    <path d="M 400 420 C 432 420, 436 300, 462 292"/>
+    <path d="M 400 530 C 434 530, 438 452, 462 446"/>
+    <path d="M 400 625 C 432 625, 438 540, 462 534" stroke-dasharray="4 4"/>
   </g>
-  <defs>
-    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0,0 L9,5 L0,10 z" fill="#C7CDBF"/>
-    </marker>
-  </defs>
+  <g fill="#C7CDBF">
+    <polygon points="462,254 455.59,258.49 454.57,251.57"/>
+    <polygon points="462,292 456.34,297.41 454.28,290.71"/>
+    <polygon points="462,446 456.06,451.10 454.36,444.31"/>
+    <polygon points="462,534 456.06,539.10 454.36,532.31"/>
+  </g>
 
   <!-- ===== MIDDLE: formula, light hairline blocks ===== -->
   <!-- A 예상 연소득 -->
@@ -107,9 +108,14 @@
 
   <!-- ===== arrows to output ===== -->
   <g stroke="#C7CDBF" stroke-width="1.5" fill="none">
-    <path d="M 912 286 C 940 286, 944 340, 968 348" marker-end="url(#a)"/>
-    <path d="M 912 430 C 936 430, 944 400, 968 396" marker-end="url(#a)"/>
-    <path d="M 912 578 C 940 578, 944 460, 968 452" marker-end="url(#a)"/>
+    <path d="M 912 286 C 940 286, 944 340, 968 348"/>
+    <path d="M 912 430 C 936 430, 944 400, 968 396"/>
+    <path d="M 912 578 C 940 578, 944 460, 968 452"/>
+  </g>
+  <g fill="#C7CDBF">
+    <polygon points="968,348 960.25,349.11 962.47,342.47"/>
+    <polygon points="968,396 961.68,400.60 960.53,393.70"/>
+    <polygon points="968,452 962.47,457.53 960.25,450.89"/>
   </g>
 
   <!-- ===== RIGHT: output ===== -->

@@ -1,0 +1,784 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/22qud1",
+    "id": "22qud1",
+    "slide": 7,
+    "layoutId": "cea64539-766b-4c7c-9b19-0f9612360d8c",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "696bab32-a520-4f2e-b51c-e8f45da5830f",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FBFBF8",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "cea64539-766b-4c7c-9b19-0f9612360d8c",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "696bab32-a520-4f2e-b51c-e8f45da5830f",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "696bab32-a520-4f2e-b51c-e8f45da5830f",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/t4fyt83e",
+      "id": "1",
+      "bbox": [
+        82,
+        64,
+        700,
+        28
+      ],
+      "geometry": "rect",
+      "text": "LIVE DEMO",
+      "textPreview": "LIVE DEMO",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#2E9E57",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "LIVE DEMO"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "LIVE DEMO",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#2E9E57",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "LIVE DEMO",
+              "fontSize": 16,
+              "color": "#2E9E57",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/614fydk3",
+      "id": "2",
+      "bbox": [
+        80,
+        104,
+        1120,
+        72
+      ],
+      "geometry": "rect",
+      "text": "등록 → 리포트 → 매칭, 3분 안에 보여드립니다",
+      "textPreview": "등록 → 리포트 → 매칭, 3분 안에 보여드립니다",
+      "resolvedFontSize": 42,
+      "resolvedTextStyle": {
+        "fontSize": 42,
+        "typeface": "+mn-lt",
+        "color": "#1B241D",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "등록 → 리포트 → 매칭, 3분 안에 보여드립니다"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "등록 → 리포트 → 매칭, 3분 안에 보여드립니다",
+          "resolvedTextStyle": {
+            "fontSize": 42,
+            "color": "#1B241D",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "등록 → 리포트 → 매칭, 3분 안에 보여드립니다",
+              "fontSize": 42,
+              "color": "#1B241D",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/72dwrilo",
+      "id": "3",
+      "bbox": [
+        1138,
+        674,
+        62,
+        20
+      ],
+      "geometry": "rect",
+      "text": "07",
+      "textPreview": "07",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#9AA49B",
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "07"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "07",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#9AA49B",
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "07",
+              "fontSize": 12,
+              "color": "#9AA49B",
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/g76x4n25",
+      "id": "4",
+      "bbox": [
+        78,
+        220,
+        360,
+        330
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#D9E1DA",
+      "lineWidth": 1
+    },
+    {
+      "order": 5,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/crm1gfal",
+      "id": "5",
+      "bbox": [
+        90,
+        232,
+        336,
+        236
+      ],
+      "geometry": "roundRect",
+      "alt": "input.png",
+      "contentType": "image/png",
+      "imageFit": "contain",
+      "imageMask": {
+        "geometry": "roundRect",
+        "adjustmentList": [
+          {
+            "name": "adj",
+            "formula": "val 5085"
+          }
+        ]
+      },
+      "asset": {
+        "assetId": "a4bdd32d-2b32-402e-ae6a-1c20edf9e3df",
+        "contentType": "image/png",
+        "byteLength": 190722
+      }
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/u5of2dkz",
+      "id": "6",
+      "bbox": [
+        96,
+        486,
+        320,
+        32
+      ],
+      "geometry": "rect",
+      "text": "1. 주소 입력",
+      "textPreview": "1. 주소 입력",
+      "resolvedFontSize": 19,
+      "resolvedTextStyle": {
+        "fontSize": 19,
+        "typeface": "+mn-lt",
+        "color": "#13301C",
+        "bold": true,
+        "alignment": "center",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "1. 주소 입력"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "1. 주소 입력",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#13301C",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "1. 주소 입력",
+              "fontSize": 19,
+              "color": "#13301C",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/f6xgvilk",
+      "id": "7",
+      "bbox": [
+        473,
+        220,
+        360,
+        330
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#D9E1DA",
+      "lineWidth": 1
+    },
+    {
+      "order": 8,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/twbix0b2",
+      "id": "8",
+      "bbox": [
+        485,
+        232,
+        336,
+        236
+      ],
+      "geometry": "roundRect",
+      "alt": "report.png",
+      "contentType": "image/png",
+      "imageFit": "contain",
+      "imageMask": {
+        "geometry": "roundRect",
+        "adjustmentList": [
+          {
+            "name": "adj",
+            "formula": "val 5085"
+          }
+        ]
+      },
+      "asset": {
+        "assetId": "3bf644a3-a69f-4af6-8f10-df88d4312c32",
+        "contentType": "image/png",
+        "byteLength": 112260
+      }
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pwzy1s3m",
+      "id": "9",
+      "bbox": [
+        491,
+        486,
+        320,
+        32
+      ],
+      "geometry": "rect",
+      "text": "2. 인수 검토 리포트",
+      "textPreview": "2. 인수 검토 리포트",
+      "resolvedFontSize": 19,
+      "resolvedTextStyle": {
+        "fontSize": 19,
+        "typeface": "+mn-lt",
+        "color": "#13301C",
+        "bold": true,
+        "alignment": "center",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2. 인수 검토 리포트"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2. 인수 검토 리포트",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#13301C",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "2. 인수 검토 리포트",
+              "fontSize": 19,
+              "color": "#13301C",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/tsnu50fm",
+      "id": "10",
+      "bbox": [
+        868,
+        220,
+        360,
+        330
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#D9E1DA",
+      "lineWidth": 1
+    },
+    {
+      "order": 11,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/7e9kjy98",
+      "id": "11",
+      "bbox": [
+        880,
+        232,
+        336,
+        236
+      ],
+      "geometry": "roundRect",
+      "alt": "match.png",
+      "contentType": "image/png",
+      "imageFit": "contain",
+      "imageMask": {
+        "geometry": "roundRect",
+        "adjustmentList": [
+          {
+            "name": "adj",
+            "formula": "val 5085"
+          }
+        ]
+      },
+      "asset": {
+        "assetId": "96a75bb0-af53-4f51-b2af-7566fd663147",
+        "contentType": "image/png",
+        "byteLength": 71589
+      }
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/76lc3qxw",
+      "id": "12",
+      "bbox": [
+        886,
+        486,
+        320,
+        32
+      ],
+      "geometry": "rect",
+      "text": "3. 매칭 리스트",
+      "textPreview": "3. 매칭 리스트",
+      "resolvedFontSize": 19,
+      "resolvedTextStyle": {
+        "fontSize": 19,
+        "typeface": "+mn-lt",
+        "color": "#13301C",
+        "bold": true,
+        "alignment": "center",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "3. 매칭 리스트"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "3. 매칭 리스트",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#13301C",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "3. 매칭 리스트",
+              "fontSize": 19,
+              "color": "#13301C",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/65cbu5wb",
+      "id": "13",
+      "bbox": [
+        80,
+        585,
+        720,
+        24
+      ],
+      "geometry": "rect",
+      "text": "※ 데모 오류 시 동일 화면의 녹화 영상으로 즉시 전환",
+      "textPreview": "※ 데모 오류 시 동일 화면의 녹화 영상으로 즉시 전환",
+      "resolvedFontSize": 14,
+      "resolvedTextStyle": {
+        "fontSize": 14,
+        "typeface": "+mn-lt",
+        "color": "#66706A",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "※ 데모 오류 시 동일 화면의 녹화 영상으로 즉시 전환"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "※ 데모 오류 시 동일 화면의 녹화 영상으로 즉시 전환",
+          "resolvedTextStyle": {
+            "fontSize": 14,
+            "color": "#66706A",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "※ 데모 오류 시 동일 화면의 녹화 영상으로 즉시 전환",
+              "fontSize": 14,
+              "color": "#66706A",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/hwnu9kfy",
+      "id": "14",
+      "bbox": [
+        81,
+        662,
+        22,
+        22
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#13301C",
+      "lineColor": "#13301C",
+      "lineWidth": 1
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/gved0fed",
+      "id": "15",
+      "bbox": [
+        82,
+        664,
+        20,
+        18
+      ],
+      "geometry": "rect",
+      "text": "팜",
+      "textPreview": "팜",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "+mn-lt",
+        "color": "#FFFFFF",
+        "bold": true,
+        "alignment": "center",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "팜"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "팜",
+          "resolvedTextStyle": {
+            "fontSize": 10,
+            "color": "#FFFFFF",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "팜",
+              "fontSize": 10,
+              "color": "#FFFFFF",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/fu5c7axs",
+      "id": "16",
+      "bbox": [
+        112,
+        665,
+        230,
+        18
+      ],
+      "geometry": "rect",
+      "text": "팜바톤 · FarmBaton",
+      "textPreview": "팜바톤 · FarmBaton",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#8B958D",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "팜바톤 · FarmBaton"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "팜바톤 · FarmBaton",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#8B958D",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "팜바톤 · FarmBaton",
+              "fontSize": 12,
+              "color": "#8B958D",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

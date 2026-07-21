@@ -1,0 +1,82 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/b4mcem",
+    "id": "b4mcem",
+    "slide": 1,
+    "layoutId": "cea64539-766b-4c7c-9b19-0f9612360d8c",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "696bab32-a520-4f2e-b51c-e8f45da5830f",
+    "masterLayoutName": "Master",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    }
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "cea64539-766b-4c7c-9b19-0f9612360d8c",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "696bab32-a520-4f2e-b51c-e8f45da5830f",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "696bab32-a520-4f2e-b51c-e8f45da5830f",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/j6tcrix8",
+      "id": "1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "alt": "apple_orchard_opening.png",
+      "contentType": "image/png",
+      "imageFit": "cover",
+      "asset": {
+        "assetId": "9068f912-d97e-487e-ba51-da3bdf772774",
+        "contentType": "image/png",
+        "byteLength": 2754111
+      }
+    }
+  ],
+  "composeRuns": []
+}

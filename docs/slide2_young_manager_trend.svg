@@ -1,0 +1,61 @@
+<svg viewBox="0 0 800 460" xmlns="http://www.w3.org/2000/svg" role="img" font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">
+  <title>40대 이하 경영주 비율 추이 2005–2025</title>
+  <desc>농가 경영주 중 40대 이하 구성비가 2005년 17.9%에서 2025년 5.5%로 하락 — 통계청 농림어업총조사 시계열</desc>
+
+  <rect width="800" height="460" fill="#FBFBF8"/>
+
+  <!-- Header -->
+  <text x="48" y="44" font-size="13" font-weight="600" fill="#2E9E57" letter-spacing="2">경영주 고령화 추세</text>
+  <text x="48" y="74" font-size="21" font-weight="800" fill="#1B241D" letter-spacing="-0.5">40대 이하 경영주 비율, 2005 → 2025</text>
+  <text x="48" y="96" font-size="12" font-weight="400" fill="#66706A">농가 경영주 중 49세 이하 구성비 · 같은 총조사 시계열 비교</text>
+
+  <!-- Grid (recessive) -->
+  <g stroke="#E1E4DB" stroke-width="1">
+    <line x1="80" y1="130" x2="730" y2="130"/>
+    <line x1="80" y1="197.5" x2="730" y2="197.5"/>
+    <line x1="80" y1="265" x2="730" y2="265"/>
+    <line x1="80" y1="332.5" x2="730" y2="332.5"/>
+  </g>
+  <line x1="80" y1="400" x2="730" y2="400" stroke="#C7CDBF" stroke-width="1.25"/>
+  <g font-size="11" font-weight="400" fill="#9AA49B" text-anchor="end">
+    <text x="72" y="134">20%</text>
+    <text x="72" y="269">10%</text>
+    <text x="72" y="404">0</text>
+  </g>
+
+  <!-- Area fill (subtle) -->
+  <polygon points="80,158.4 242.5,201.6 405,278.5 567.5,302.8 730,325.8 730,400 80,400"
+           fill="#C26B2E" fill-opacity="0.06"/>
+
+  <!-- Line -->
+  <polyline points="80,158.4 242.5,201.6 405,278.5 567.5,302.8 730,325.8"
+            fill="none" stroke="#C26B2E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Point markers (white spacer ring) -->
+  <g fill="#C26B2E" stroke="#FBFBF8" stroke-width="2">
+    <circle cx="80" cy="158.4" r="4.5"/>
+    <circle cx="242.5" cy="201.6" r="4"/>
+    <circle cx="405" cy="278.5" r="4"/>
+    <circle cx="567.5" cy="302.8" r="4"/>
+  </g>
+  <circle cx="730" cy="325.8" r="6.5" fill="#92400E" stroke="#FBFBF8" stroke-width="2"/>
+
+  <!-- Direct labels: first and last only -->
+  <text x="88" y="141" font-size="13.5" font-weight="700" fill="#1B241D" text-anchor="middle">17.9%</text>
+  <text x="738" y="320" font-size="21" font-weight="800" fill="#92400E">5.5%</text>
+
+  <!-- Annotation -->
+  <text x="430" y="216" font-size="13" font-weight="600" fill="#66706A" text-anchor="middle">20년 만에 3분의 1 이하로</text>
+
+  <!-- X axis labels -->
+  <g font-size="11.5" font-weight="400" fill="#9AA49B" text-anchor="middle">
+    <text x="80" y="424">2005</text>
+    <text x="242.5" y="424">2010</text>
+    <text x="405" y="424">2015</text>
+    <text x="567.5" y="424">2020</text>
+  </g>
+  <text x="730" y="424" font-size="11.5" font-weight="700" fill="#1B241D" text-anchor="middle">2025</text>
+
+  <!-- Source -->
+  <text x="48" y="448" font-size="10.5" font-weight="400" fill="#9AA49B">출처: 통계청 농림어업총조사 각 연도 · 2025년은 잠정치(2026.4 발표)</text>
+</svg>

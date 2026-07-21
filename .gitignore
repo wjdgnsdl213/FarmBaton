@@ -41,3 +41,8 @@ Thumbs.db
 *.log
 tmp/
 .cache/
+
+.vercel
+
+# ── 타 기관 참고자료 (공개 저장소 배포 금지) ──────
+docs/고용정보원PT.pptx
