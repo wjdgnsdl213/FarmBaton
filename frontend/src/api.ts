@@ -145,6 +145,7 @@ export interface GeocodeResult {
   sido?: string
   sigungu?: string
   boundary?: GeoJSON.Geometry
+  warning?: string
 }
 
 export interface AssetSummary {

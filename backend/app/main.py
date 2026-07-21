@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.db import get_db
 from backend.app.routers import auth, chat, farms, young_farmers
-from backend.app.routers.farms import KNN_DISTANCE_WARN_KM
+from backend.app.routers.farms import KNN_CONFIDENT_KM
 
 _GEOCODE_FALLBACK_PATH = Path(__file__).resolve().parents[2] / "db" / "seed" / "geocode_fallback.csv"
 
@@ -179,12 +179,11 @@ def geocode(address: str, crop_code: str = "APPLE", conn=Depends(get_db)):
                 if row:
                     dist_km = row[5]
 
-        # 거리 임계값 초과 KNN 매칭은 신뢰하지 않음 — 필지 매칭 실패로 취급
-        # (자동 면적 채움 없이 사용자가 직접 입력하도록 유도)
-        if row and dist_km is not None and dist_km > KNN_DISTANCE_WARN_KM:
+        # KNN 매칭이 KNN_CONFIDENT_KM(500m)보다 멀면 "그냥 제일 가까운 과수원"일
+        # 뿐 이 좌표가 농지라는 보장이 없음 — 자동 면적 채움 없이 직접 입력 유도
+        if row and dist_km is not None and dist_km > KNN_CONFIDENT_KM:
             result["warning"] = (
-                f"입력 좌표 근처 {KNN_DISTANCE_WARN_KM:.0f}km 이내에 일치하는 과수원 필지가 "
-                "없습니다. 면적을 직접 입력해주세요."
+                "이 위치는 등록된 과수원 필지가 아닌 것 같습니다. 면적을 직접 입력해주세요."
             )
         elif row:
             sido, sigungu, area_m2 = row[1], row[2], row[4]

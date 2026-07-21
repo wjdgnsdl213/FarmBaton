@@ -165,19 +165,23 @@ def _extract_sido(address: str) -> str:
     return address.split()[0] if address else ""
 
 
-KNN_DISTANCE_WARN_KM = 20.0  # 이 거리를 넘는 KNN 매칭은 매칭 실패로 취급(하드 컷오프)
+KNN_CONFIDENT_KM = 0.5  # 이 거리 이내 KNN 매칭만 "농지 맞음"으로 신뢰.
 
 
 def _call_farm_card(lon: float, lat: float, crop_code: str, address_sido: str | None, conn):
     """필지 매칭: ST_Contains 우선, 없으면 같은 시도 내 KNN, 최후엔 전역 KNN.
 
     Returns (parcel_id, sido, sigungu, bjd_cd, area_m2) or None.
-    마을 중심좌표는 개별 필지 안에 들어오지 않는 경우가 많아 KNN 폴백 필수.
-    시도 스코프 없이 전역 KNN만 쓰면 주소 오인식 시 수십km 떨어진 엉뚱한
-    필지가 붙을 수 있어(검증 중 서울 좌표 → 67km 거리 천안시 필지 매칭
-    확인), 같은 시도로 먼저 좁히고 거리 임계값을 넘으면 매칭 실패(None)로
-    처리한다 — 틀린 값을 자신있게 보여주는 것보다 "필지 못 찾음 → 면적
-    직접 입력 + 시도 단위 폴백"(db_loader._load_land)으로 넘기는 쪽이 안전.
+    마을 중심좌표는 개별 필지 안에 들어오지 않는 경우가 많아 KNN 폴백 필수
+    (지번 주소 지오코딩 좌표가 실제 필지 폴리곤 밖에 찍히는 경우가 흔함).
+    다만 KNN은 "그냥 제일 가까운 과수원"을 찾는 것일 뿐 그 위치가 농지라는
+    보장이 없다 — 검색 좌표가 도심 한복판이어도 같은 시도 안에서 가장 가까운
+    과수원이 뭐든 하나는 잡힌다. 그래서 KNN_CONFIDENT_KM(500m) 이내인
+    경우만 "이 주소가 그 필지"로 인정하고, 그보다 멀면(과거엔 20km까지도
+    허용해 서울 좌표 → 67km 거리 천안시 필지가 조용히 매칭되는 버그가 있었음)
+    매칭 실패(None)로 처리해 "필지 못 찾음 → 면적 직접 입력 + 시도 단위
+    폴백"(db_loader._load_land)으로 넘긴다 — 틀린 값을 자신있게 보여주는
+    것보다 안전.
     """
     try:
         with conn.cursor() as cur:
@@ -225,8 +229,8 @@ def _call_farm_card(lon: float, lat: float, crop_code: str, address_sido: str | 
                 return None
 
             parcel_id, sido, sigungu, bjd_cd, area_m2, dist_km = row
-            if dist_km is not None and dist_km > KNN_DISTANCE_WARN_KM:
-                return None  # 너무 멀면 매칭 실패로 취급 (하드 컷오프)
+            if dist_km is not None and dist_km > KNN_CONFIDENT_KM:
+                return None  # 500m 넘게 떨어진 KNN 매칭은 "농지 아님"으로 취급
             return (parcel_id, sido, sigungu, bjd_cd, area_m2)
     except Exception:
         conn.rollback()

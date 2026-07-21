@@ -46,6 +46,7 @@ export default function FarmerPage() {
   const [boundary, setBoundary] = useState<GeoJSON.Geometry | null>(null)
   const [geocoding, setGeocoding] = useState(false)
   const [geocodeError, setGeocodeError] = useState<string | null>(null)
+  const [geocodeWarning, setGeocodeWarning] = useState<string | null>(null)
   const [parcelInfo, setParcelInfo] = useState<{ area_m2?: number; sigungu?: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -79,6 +80,7 @@ export default function FarmerPage() {
     if (!form.address.trim()) return
     setGeocoding(true)
     setGeocodeError(null)
+    setGeocodeWarning(null)
     setParcelInfo(null)
     setBoundary(null)
     try {
@@ -89,6 +91,8 @@ export default function FarmerPage() {
       if (res.area_m2) {
         setForm(f => ({ ...f, area_m2: String(Math.round(res.area_m2!)) }))
         setParcelInfo({ area_m2: res.area_m2, sigungu: res.sigungu })
+      } else if (res.warning) {
+        setGeocodeWarning(res.warning)
       }
     } catch {
       setGeocodeError('주소를 찾을 수 없습니다. 지번 또는 도로명 주소로 다시 입력해보세요.')
@@ -206,7 +210,10 @@ export default function FarmerPage() {
           {geocodeError && (
             <p style={{ fontSize: '.78rem', color: '#b91c1c', marginTop: '.3rem' }}>{geocodeError}</p>
           )}
-          {mapPos && !geocodeError && (
+          {mapPos && !geocodeError && geocodeWarning && (
+            <p style={{ fontSize: '.78rem', color: '#b45309', marginTop: '.3rem' }}>{geocodeWarning}</p>
+          )}
+          {mapPos && !geocodeError && !geocodeWarning && (
             <p style={{ fontSize: '.78rem', color: 'var(--green)', marginTop: '.3rem' }}>
               위치 확인됨
               {parcelInfo?.sigungu ? ` — ${parcelInfo.sigungu}` : ''}
