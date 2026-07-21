@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1050" role="img" aria-labelledby="chart-title chart-desc">
+  <title id="chart-title">농가 경영주 연령분포 20년 추이</title>
+  <desc id="chart-desc">2005년부터 2025년까지 40대 이하 경영주 비중은 17.9%에서 5.5%로 감소하고, 60대 이상은 58.3%에서 78.8%로 증가했다.</desc>
+
+  <!-- 배경 도형을 두지 않아 투명하게 유지 -->
+  <g font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+    <!-- 단위 및 범례 -->
+    <text x="150" y="66" font-size="25" font-weight="400" fill="#9AA49B">단위: %</text>
+    <g transform="translate(740 37)">
+      <line x1="0" y1="18" x2="54" y2="18" stroke="#2E9E57" stroke-width="7"/>
+      <circle cx="30" cy="18" r="11" fill="#2E9E57" stroke="#FFFFFF" stroke-width="4"/>
+      <text x="70" y="29" font-size="28" font-weight="600" fill="#1B241D">40대 이하</text>
+    </g>
+    <g transform="translate(1018 37)">
+      <line x1="0" y1="18" x2="54" y2="18" stroke="#C26B2E" stroke-width="7"/>
+      <circle cx="30" cy="18" r="11" fill="#C26B2E" stroke="#FFFFFF" stroke-width="4"/>
+      <text x="70" y="29" font-size="28" font-weight="600" fill="#1B241D">60대 이상</text>
+    </g>
+
+    <!-- 가로축 그리드 -->
+    <g stroke="#E1E4DB" stroke-width="2">
+      <line x1="150" y1="120" x2="1860" y2="120"/>
+      <line x1="150" y1="206.7" x2="1860" y2="206.7"/>
+      <line x1="150" y1="293.3" x2="1860" y2="293.3"/>
+      <line x1="150" y1="380" x2="1860" y2="380"/>
+      <line x1="150" y1="466.7" x2="1860" y2="466.7"/>
+      <line x1="150" y1="553.3" x2="1860" y2="553.3"/>
+      <line x1="150" y1="640" x2="1860" y2="640"/>
+      <line x1="150" y1="726.7" x2="1860" y2="726.7"/>
+      <line x1="150" y1="813.3" x2="1860" y2="813.3"/>
+    </g>
+    <line x1="150" y1="900" x2="1860" y2="900" stroke="#C7CDBF" stroke-width="3"/>
+
+    <!-- Y축 눈금 -->
+    <g font-size="24" font-weight="400" fill="#9AA49B" text-anchor="end">
+      <text x="120" y="128">90</text>
+      <text x="120" y="214.7">80</text>
+      <text x="120" y="301.3">70</text>
+      <text x="120" y="388">60</text>
+      <text x="120" y="474.7">50</text>
+      <text x="120" y="561.3">40</text>
+      <text x="120" y="648">30</text>
+      <text x="120" y="734.7">20</text>
+      <text x="120" y="821.3">10</text>
+      <text x="120" y="908">0</text>
+    </g>
+
+    <!-- X축 눈금 -->
+    <g font-size="26" font-weight="400" fill="#9AA49B" text-anchor="middle">
+      <text x="150" y="965">2005</text>
+      <text x="577.5" y="965">2010</text>
+      <text x="1005" y="965">2015</text>
+      <text x="1432.5" y="965">2020</text>
+      <text x="1860" y="965">2025</text>
+    </g>
+
+    <!-- 60대 이상 -->
+    <polyline points="150,394.7 577.5,372.2 1005,308.1 1432.5,264.7 1860,217.1"
+      fill="none" stroke="#C26B2E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#C26B2E" stroke="#FFFFFF" stroke-width="5">
+      <circle cx="150" cy="394.7" r="15"/>
+      <circle cx="577.5" cy="372.2" r="15"/>
+      <circle cx="1005" cy="308.1" r="15"/>
+      <circle cx="1432.5" cy="264.7" r="15"/>
+      <circle cx="1860" cy="217.1" r="15"/>
+    </g>
+    <g font-size="27" font-weight="600" fill="#1B241D" text-anchor="middle">
+      <text x="150" y="354.7">58.3%</text>
+      <text x="577.5" y="332.2">60.9%</text>
+      <text x="1005" y="268.1">68.3%</text>
+      <text x="1432.5" y="224.7">73.3%</text>
+      <text x="1860" y="177.1">78.8%</text>
+    </g>
+
+    <!-- 40대 이하 -->
+    <polyline points="150,744.9 577.5,772.6 1005,822 1432.5,837.6 1860,852.3"
+      fill="none" stroke="#2E9E57" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#2E9E57" stroke="#FFFFFF" stroke-width="5">
+      <circle cx="150" cy="744.9" r="15"/>
+      <circle cx="577.5" cy="772.6" r="15"/>
+      <circle cx="1005" cy="822" r="15"/>
+      <circle cx="1432.5" cy="837.6" r="15"/>
+      <circle cx="1860" cy="852.3" r="15"/>
+    </g>
+    <g font-size="27" font-weight="600" fill="#1B241D" text-anchor="middle">
+      <text x="150" y="796.9">17.9%</text>
+      <text x="577.5" y="824.6">14.7%</text>
+      <text x="1005" y="874">9.0%</text>
+      <text x="1432.5" y="889.6">7.2%</text>
+      <text x="1860" y="904.3">5.5%</text>
+    </g>
+  </g>
+</svg>
