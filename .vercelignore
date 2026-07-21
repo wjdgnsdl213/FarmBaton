@@ -1,0 +1,11 @@
+data/
+backend/
+etl/
+db/
+docs/
+proxy/
+.venv/
+venv/
+env/
+.pytest_cache/
+frontend/node_modules/

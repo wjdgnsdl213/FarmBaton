@@ -191,6 +191,12 @@ def geocode(address: str, crop_code: str = "APPLE", conn=Depends(get_db)):
             result["area_m2"] = float(area_m2)
             result["sido"] = sido or ""
             result["sigungu"] = sigungu or ""
+            # 필지 경계(빨간 테두리 표시용) — 이미 찾은 parcel_id로 조회
+            with conn.cursor() as cur:
+                cur.execute("SELECT ST_AsGeoJSON(geom) FROM parcel WHERE id = %s", (row[0],))
+                geom_row = cur.fetchone()
+            if geom_row and geom_row[0]:
+                result["boundary"] = json.loads(geom_row[0])
     except Exception:
         conn.rollback()  # 필지 취득 실패해도 좌표는 반환
 

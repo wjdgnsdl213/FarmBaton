@@ -144,6 +144,7 @@ export interface GeocodeResult {
   area_m2?: number
   sido?: string
   sigungu?: string
+  boundary?: GeoJSON.Geometry
 }
 
 export interface AssetSummary {

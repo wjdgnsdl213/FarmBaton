@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, GeoJSON, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { api, type ValuationResult, type FacilityOption } from '../api'
 import heroFarmer from '../assets/hero-farmer.jpg'
@@ -15,12 +15,25 @@ const GRADE_DESC: Record<string, string> = {
   A: '실사 기반 추정', B: '농가 제출자료 기반', C: '사전 검토용 추정', D: '참고용 자동 추정',
 }
 
-// 지오코딩 결과로 지도 이동
-function MapFlyTo({ position }: { position: [number, number] | null }) {
+// V-World 항공영상 배경 — 키 미설정 시 OSM으로 자동 폴백(데모가 죽지 않도록)
+const VWORLD_KEY = import.meta.env.VITE_VWORLD_API_KEY as string | undefined
+const AERIAL_TILE_URL = VWORLD_KEY
+  ? `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_KEY}/Satellite/{z}/{y}/{x}.jpeg`
+  : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+const AERIAL_ATTRIBUTION = VWORLD_KEY ? '&copy; VWorld' : 'OpenStreetMap'
+
+const BOUNDARY_STYLE: L.PathOptions = { color: '#e11d2c', weight: 3, fillColor: '#e11d2c', fillOpacity: 0.08 }
+
+// 지오코딩 결과로 지도 이동 — 필지 경계가 있으면 경계 전체가 보이게, 없으면 좌표로 확대
+function MapFlyTo({ position, boundary }: { position: [number, number] | null; boundary?: GeoJSON.Geometry }) {
   const map = useMap()
   useEffect(() => {
+    if (boundary) {
+      const bounds = L.geoJSON(boundary).getBounds()
+      if (bounds.isValid()) { map.flyToBounds(bounds, { padding: [24, 24], duration: 1 }); return }
+    }
     if (position) map.flyTo(position, 16, { duration: 1 })
-  }, [position, map])
+  }, [position, boundary, map])
   return null
 }
 
@@ -30,6 +43,7 @@ export default function FarmerPage() {
     succession_type: 'SALE', area_m2: '',
   })
   const [mapPos, setMapPos] = useState<[number, number] | null>(null)
+  const [boundary, setBoundary] = useState<GeoJSON.Geometry | null>(null)
   const [geocoding, setGeocoding] = useState(false)
   const [geocodeError, setGeocodeError] = useState<string | null>(null)
   const [parcelInfo, setParcelInfo] = useState<{ area_m2?: number; sigungu?: string } | null>(null)
@@ -66,9 +80,11 @@ export default function FarmerPage() {
     setGeocoding(true)
     setGeocodeError(null)
     setParcelInfo(null)
+    setBoundary(null)
     try {
       const res = await api.geocode(form.address, form.crop_code)
       setMapPos([res.lat, res.lon])
+      setBoundary(res.boundary ?? null)
       // 면적 자동 취득
       if (res.area_m2) {
         setForm(f => ({ ...f, area_m2: String(Math.round(res.area_m2!)) }))
@@ -201,20 +217,18 @@ export default function FarmerPage() {
           )}
         </div>
 
-        {/* 지도 (위치 확인용) */}
+        {/* 지도 (위치 확인용) — 필지 매칭 시 빨간 테두리로 경계 표시 */}
         <div className="map-wrap">
           <MapContainer
             center={[36.5, 127.8]}
             zoom={7}
-            style={{ height: '200px', width: '100%' }}
+            style={{ height: '260px', width: '100%' }}
             scrollWheelZoom={false}
           >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="OpenStreetMap"
-            />
-            <MapFlyTo position={mapPos} />
-            {mapPos && <Marker position={mapPos} />}
+            <TileLayer url={AERIAL_TILE_URL} attribution={AERIAL_ATTRIBUTION} maxZoom={19} />
+            <MapFlyTo position={mapPos} boundary={boundary ?? undefined} />
+            {boundary && <GeoJSON key={JSON.stringify(boundary)} data={boundary} style={BOUNDARY_STYLE} />}
+            {mapPos && !boundary && <Marker position={mapPos} />}
           </MapContainer>
         </div>
 
