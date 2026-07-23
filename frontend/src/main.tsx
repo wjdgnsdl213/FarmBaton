@@ -13,6 +13,8 @@ import { getToken, getRole, clearToken } from './api'
 import logoImg from './assets/logo.png'
 import './style.css'
 
+const LARGE_TEXT_KEY = 'fb_large_text'
+
 function RoleNotice({ requiredRole }: { requiredRole: 'FARMER' | 'YOUNG' }) {
   const roleLabel = requiredRole === 'FARMER' ? '농장주' : '청년농'
   const myRole = getRole()
@@ -84,7 +86,7 @@ function NavLinks({ loc, activeSection, loggedIn, role, onLogout, onNavigate }: 
   )
 }
 
-function Nav() {
+function Nav({ largeText, onToggleLargeText }: { largeText: boolean; onToggleLargeText: () => void }) {
   const loc = useLocation()
   const navigate = useNavigate()
   const loggedIn = !!getToken()
@@ -131,6 +133,16 @@ function Nav() {
           <NavLinks loc={loc} activeSection={activeSection} loggedIn={loggedIn} role={role} onLogout={logout} />
         </div>
         <div className="lp-nav-right">
+          <button
+            type="button"
+            className={`lp-text-size-toggle ${largeText ? 'active' : ''}`}
+            aria-pressed={largeText}
+            aria-label={largeText ? '큰 글씨 끄기' : '큰 글씨 켜기'}
+            onClick={onToggleLargeText}
+          >
+            <span aria-hidden="true">가</span>
+            <span className="lp-text-size-toggle-label">글씨 크게</span>
+          </button>
           {!loggedIn && <Link className="lp-pill lp-pill-warm" to="/">시작하기 →</Link>}
           <button
             className="lp-nav-burger"
@@ -148,6 +160,7 @@ function Nav() {
       {mobileOpen && (
         <div className="lp-nav-mobile-panel">
           <NavLinks loc={loc} activeSection={activeSection} loggedIn={loggedIn} role={role} onLogout={logout} onNavigate={() => setMobileOpen(false)} />
+          <Link to="/" onClick={() => setMobileOpen(false)}>처음 화면에서 역할 다시 고르기</Link>
         </div>
       )}
     </nav>
@@ -157,10 +170,16 @@ function Nav() {
 function App() {
   const loc = useLocation()
   const isWide = loc.pathname === '/' || loc.pathname === '/farmer' || loc.pathname === '/young' || loc.pathname === '/conversations'
+  const [largeText, setLargeText] = useState(() => localStorage.getItem(LARGE_TEXT_KEY) === 'true')
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('large-text', largeText)
+    localStorage.setItem(LARGE_TEXT_KEY, String(largeText))
+  }, [largeText])
 
   return (
     <>
-      <Nav />
+      <Nav largeText={largeText} onToggleLargeText={() => setLargeText(value => !value)} />
       <main className={isWide ? 'main main-wide' : 'main'}>
         <Routes>
           <Route path="/" element={<LandingPage />} />

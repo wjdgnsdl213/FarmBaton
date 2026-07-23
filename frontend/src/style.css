@@ -25,13 +25,15 @@ html { scroll-behavior: smooth; }
   --radius-sm: 6px;
   --shadow: 0 1px 2px rgba(21,53,31,.04), 0 8px 24px rgba(21,53,31,.06);
   --shadow-sm: 0 1px 2px rgba(21,53,31,.05);
+  --base-font-size: 16px;
 }
+html.large-text { font-size: 118.75%; --base-font-size: 19px; }
 
 body {
   font-family: 'Pretendard', 'Apple SD Gothic Neo', system-ui, sans-serif;
   color: var(--ink);
   background: var(--cream);
-  font-size: 16px;
+  font-size: var(--base-font-size);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   word-break: keep-all;
@@ -610,6 +612,13 @@ textarea { resize: vertical; min-height: 60px; }
 }
 .lp-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; gap: 12px; }
 .lp-nav-right { display: flex; align-items: center; gap: 20px; }
+.lp-text-size-toggle {
+  display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,.32);
+  border-radius: 999px; padding: 7px 10px; background: transparent; color: rgba(255,255,255,.9);
+  font: 700 13px/1 inherit; cursor: pointer;
+}
+.lp-text-size-toggle > span:first-child { font-size: 17px; line-height: .8; }
+.lp-text-size-toggle:hover, .lp-text-size-toggle.active { color: var(--green-deep); background: var(--lime); border-color: var(--lime); }
 .lp-nav-links { display: none; align-items: center; gap: 26px; }
 .lp-nav-links a { font-size: 15px; font-weight: 600; color: rgba(255,255,255,.85); text-decoration: none; white-space: nowrap; transition: color .15s; }
 .lp-nav-links a:hover { color: #fff; }
@@ -644,6 +653,17 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-nav-mobile-panel .lp-nav-scroll { display: flex; }
 .lp-nav-mobile-panel .lp-nav-scroll::after { margin-left: auto; }
 .lp-nav-mobile-panel .lp-nav-divider { width: 100%; height: 1px; margin: 6px 0; background: rgba(255,255,255,.15); }
+
+/* 큰 글씨는 기기별 설정으로 저장한다. 고령 사용자가 주로 읽는 문구를 함께 키운다. */
+html.large-text .lp-nav-links a, html.large-text .lp-nav-mobile-panel a { font-size: 17px; }
+html.large-text .lp-hero-tagline { font-size: clamp(17px, 2.2vw, 21px); }
+html.large-text .lp-hero-lead { font-size: clamp(18px, 2.4vw, 21px); }
+html.large-text .lp-role-chooser-head h2 { font-size: clamp(31px, 5vw, 42px); }
+html.large-text .lp-role-card strong { font-size: 23px; }
+html.large-text .lp-feat-card h3 { font-size: 23px; }
+html.large-text .lp-feat-card p, html.large-text .lp-step-copy p { font-size: 17px; }
+html.large-text .hero h1 { font-size: 2.25rem; }
+html.large-text .hero p { font-size: 1.12rem; }
 .lp-hero-content { padding: 40px 0 52px; display: flex; flex-direction: column; gap: 26px; }
 .lp-hero h1 { font-size: clamp(38px, 8.5vw, 60px); line-height: 1.08; letter-spacing: -.035em; font-weight: 800; margin: 18px 0; text-wrap: balance; }
 .lp-hero-tagline { font-size: clamp(15px, 2vw, 19px); font-weight: 600; color: var(--lime); line-height: 1.5; letter-spacing: -.01em; margin-bottom: 14px; }
@@ -778,6 +798,11 @@ textarea { resize: vertical; min-height: 60px; }
 @media (max-width: 380px) {
   .form-row { grid-template-columns: 1fr; }
   .nav-link { padding: .5rem .8rem; font-size: .88rem; }
+}
+@media (max-width: 480px) {
+  .lp-nav-right { gap: 9px; }
+  .lp-text-size-toggle-label { display: none; }
+  .lp-text-size-toggle { width: 34px; height: 34px; justify-content: center; padding: 0; }
 }
 @media (min-width: 760px) {
   .lp-nav-links { display: flex; }
