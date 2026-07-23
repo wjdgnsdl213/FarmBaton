@@ -18,6 +18,7 @@ import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from statistics import median
 from pathlib import Path
 from typing import Iterable
 
@@ -432,10 +433,14 @@ def build_trade_groups(
     source: CsvSource,
     exact_legal: dict[str, str],
     normalized_legal: dict[str, str],
-) -> tuple[dict[tuple[str, str], tuple[Decimal, int]], Counter[str], list[tuple[str, int]]]:
-    sums: defaultdict[tuple[str, str], list[Decimal | int]] = defaultdict(
-        lambda: [Decimal("0"), 0]
-    )
+) -> tuple[dict[tuple[str, str], list[Decimal]], Counter[str], list[tuple[str, int]]]:
+    """법정동·지목별 거래 단가(원/㎡) 리스트를 수집한다.
+
+    집계는 build_rows에서 중앙값(median)으로 수행 — 소필지 고단가
+    이상치가 평균을 끌어올리는 문제를 백테스트로 확인해 평균에서 변경
+    (2026-07, 과수원 중앙오차 24.2%→18.5%).
+    """
+    groups: defaultdict[tuple[str, str], list[Decimal]] = defaultdict(list)
     stats: Counter[str] = Counter()
     unmatched: Counter[str] = Counter()
     target_prefixes_seen: set[str] = set()
@@ -481,9 +486,7 @@ def build_trade_groups(
             continue
 
         price_m2 = deal_amount_manwon * Decimal("10000") / area_m2
-        key = (bjd_cd, jimok)
-        sums[key][0] = sums[key][0] + price_m2
-        sums[key][1] = int(sums[key][1]) + 1
+        groups[(bjd_cd, jimok)].append(price_m2)
         target_prefixes_seen.add(prefix)
         stats[f"trade.rows.jimok.{jimok}"] += 1
 
@@ -499,11 +502,7 @@ def build_trade_groups(
             )
         )
 
-    return (
-        {key: (values[0], int(values[1])) for key, values in sums.items()},
-        stats,
-        unmatched.most_common(20),
-    )
+    return (dict(groups), stats, unmatched.most_common(20))
 
 
 def build_rows(
@@ -542,22 +541,21 @@ def build_rows(
     rows: list[LandPriceRow] = []
     for key in keys:
         official_sum_count = selected_official.get(key)
-        deal_sum_count = trade_groups.get(key)
+        deal_prices = trade_groups.get(key)
         official_price = (
             money(official_sum_count[0] / official_sum_count[1])
             if official_sum_count
             else None
         )
-        deal_price = (
-            money(deal_sum_count[0] / deal_sum_count[1]) if deal_sum_count else None
-        )
+        # 중앙값 집계 — 소필지 고단가 이상치의 평균 왜곡 방지 (백테스트 근거)
+        deal_price = money(median(deal_prices)) if deal_prices else None
         rows.append(
             LandPriceRow(
                 bjd_cd=key[0],
                 jimok=key[1],
                 official_price_m2=official_price,
                 deal_price_m2=deal_price,
-                deal_sample_cnt=deal_sum_count[1] if deal_sum_count else 0,
+                deal_sample_cnt=len(deal_prices) if deal_prices else 0,
                 base_year=selected_year,
             )
         )

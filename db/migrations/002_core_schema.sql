@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS land_price (
     bjd_cd            TEXT NOT NULL,
     jimok             TEXT NOT NULL,          -- 과수원/전/답
     official_price_m2 NUMERIC(14,2),          -- 개별공시지가 원/㎡
-    deal_price_m2     NUMERIC(14,2),          -- 실거래 평균 원/㎡ (보정용)
+    deal_price_m2     NUMERIC(14,2),          -- 실거래 중앙값 원/㎡ (보정용)
     deal_sample_cnt   INTEGER DEFAULT 0,
     base_year         INTEGER NOT NULL,
     UNIQUE (bjd_cd, jimok, base_year)

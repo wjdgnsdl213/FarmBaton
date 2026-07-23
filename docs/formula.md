@@ -55,6 +55,10 @@ land_value_point = area_m2 × unit
 ```
 
 - `official_to_market = 0.65` — 공시지가는 통상 시세의 60~70%. 실거래가 없을 때만 보정 적용. **실거래(deal_price_m2)가 있으면 보정하지 않는다.**
+- `deal_price_m2` = 법정동·지목별 실거래 단가의 **중앙값** (ETL 적재 시 집계).
+  평균이 아닌 중앙값인 이유: 소필지 고단가 거래(도로 편입 등)가 평균을 왜곡 —
+  실거래 20만건 LOO 백테스트에서 과수원 중앙오차 24.2%→18.5% 개선 확인
+  (2026-07, `etl/07_backtest_land.py`, `docs/backtest_land_report.md`).
 - 실거래 표본이 빈약(`deal_sample_cnt < 3`)하면 신뢰도 등급 한 단계 하향.
 - 범위: `land_min = ×0.9`, `land_max = ×1.1` (지가 자체 변동폭).
 

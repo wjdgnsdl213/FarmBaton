@@ -130,32 +130,50 @@ class Result:
         return statistics.median(self.apes) if self.apes else 0.0
 
 
-def run_backtest(deals: list[Deal], official: dict[tuple[str, str], Decimal]):
-    # 동·지목별 (단가합, 건수) — LOO 계산용
-    sums: dict[tuple[str, str], list] = defaultdict(lambda: [Decimal("0"), 0])
-    for d in deals:
-        key = (d.bjd_cd, d.jimok)
-        sums[key][0] += d.price_m2
-        sums[key][1] += 1
+def _loo_median(sorted_prices: list[float], idx: int) -> float:
+    """정렬 리스트에서 idx 원소를 제외한 나머지의 중앙값 (O(1))."""
+    n = len(sorted_prices)
+    m1, m2 = (n - 2) // 2, (n - 1) // 2  # 제외 후 배열(n-1개)의 중앙 인덱스
 
-    # 결과 버킷: (지목, 경로, 표본구간)
-    loo_results: dict[tuple[str, str], Result] = defaultdict(Result)   # (jimok, "n>=3"|"n<3")
-    official_results: dict[str, Result] = defaultdict(Result)          # jimok
+    def reduced(j: int) -> float:
+        return sorted_prices[j] if j < idx else sorted_prices[j + 1]
 
+    return (reduced(m1) + reduced(m2)) / 2.0
+
+
+def run_backtest(deals: list[Deal], official: dict[tuple[str, str], Decimal], agg: str = "median"):
+    """agg='median'(현행 산식) 또는 'mean'(구 산식, 비교 기준선)."""
+    by_key: dict[tuple[str, str], list[Deal]] = defaultdict(list)
     for d in deals:
-        key = (d.bjd_cd, d.jimok)
-        total, n = sums[key]
-        # ── 실거래 경로 (LOO) ──
-        if n >= 2:
-            loo_unit = (total - d.price_m2) / (n - 1)
-            point = d.area_m2 * loo_unit
-            seg = "n>=3" if (n - 1) >= 3 else "n<3"
-            loo_results[(d.jimok, seg)].add(point, d.amount_krw)
-        # ── 공시지가 폴백 경로 ──
-        off = official.get(key)
-        if off is not None and off > 0:
-            point = d.area_m2 * off / Decimal(str(OFFICIAL_TO_MARKET))
-            official_results[d.jimok].add(point, d.amount_krw)
+        by_key[(d.bjd_cd, d.jimok)].append(d)
+
+    # 결과 버킷: (지목, 표본구간)
+    loo_results: dict[tuple[str, str], Result] = defaultdict(Result)
+    official_results: dict[str, Result] = defaultdict(Result)
+
+    for key, dd in by_key.items():
+        n = len(dd)
+        prices = [float(x.price_m2) for x in dd]
+        total = sum(prices)
+        order = sorted(range(n), key=lambda i: prices[i])
+        sorted_prices = [prices[i] for i in order]
+        rank_of = {deal_i: r for r, deal_i in enumerate(order)}
+
+        for i, d in enumerate(dd):
+            # ── 실거래 경로 (LOO) ──
+            if n >= 2:
+                if agg == "mean":
+                    loo_unit = (total - prices[i]) / (n - 1)
+                else:
+                    loo_unit = _loo_median(sorted_prices, rank_of[i])
+                point = Decimal(str(float(d.area_m2) * loo_unit))
+                seg = "n>=3" if (n - 1) >= 3 else "n<3"
+                loo_results[(d.jimok, seg)].add(point, d.amount_krw)
+            # ── 공시지가 폴백 경로 ──
+            off = official.get(key)
+            if off is not None and off > 0:
+                point = d.area_m2 * off / Decimal(str(OFFICIAL_TO_MARKET))
+                official_results[d.jimok].add(point, d.amount_krw)
 
     return loo_results, official_results
 
@@ -171,28 +189,50 @@ def main() -> None:
 
     deals = collect_deals()
     official = load_official_prices()
-    loo, off = run_backtest(deals, official)
+    loo_med, off = run_backtest(deals, official, agg="median")
+    loo_mean, _ = run_backtest(deals, official, agg="mean")
 
     orchard = [d for d in deals if d.jimok == JIMOK_ORCHARD]
     lines: list[str] = []
     w = lines.append
 
+    def combined(results, jimok):
+        merged = Result()
+        for seg in ("n>=3", "n<3"):
+            r = results.get((jimok, seg))
+            if r:
+                merged.n += r.n
+                merged.hits += r.hits
+                merged.apes.extend(r.apes)
+        return merged
+
     w("# 토지 기준가 백테스트 결과")
     w("")
     w(f"- 검증 대상: 충북·경북·충남 실거래 {len(deals):,}건 (과수원 {len(orchard):,}건)")
     w("- 기간: 2023-06-17 ~ 2026-06-16 (국토부 실거래가, 해제거래 제외)")
-    w("- 방법: Leave-One-Out — 각 거래를 제외하고 동(洞) 평균 단가를 재계산한 뒤,")
+    w("- 방법: Leave-One-Out — 각 거래를 제외하고 동(洞) 대표 단가를 재계산한 뒤,")
     w("  팜바톤 토지 산식(면적×단가, ±10% 범위)이 실제 거래금액을 포함하는지 판정")
     w("- 적중률 = 실제 거래가가 팜바톤 '인수 검토가 범위(토지)' 안에 들어온 비율")
     w("- 중앙오차 = 점추정 대비 실거래가의 절대 오차율 중앙값")
     w("")
-    w("## 실거래 보정 경로 (동일 법정동 실거래 표본 사용 시)")
+    w("## 집계 방식 개선: 동 평균 → 동 중앙값 (2026-07)")
+    w("")
+    w("백테스트에서 소필지 고단가 거래(도로 편입 등)가 동 평균을 왜곡하는 것을")
+    w("확인, 실거래 대표 단가 집계를 평균에서 중앙값으로 변경했다.")
+    w("")
+    w("| 산식 (과수원) | 검증 건수 | 중앙오차 | ±10% 적중률 |")
+    w("|---|---:|---:|---:|")
+    r_mean, r_med = combined(loo_mean, "과수원"), combined(loo_med, "과수원")
+    w(f"| 개선 전 · 동 평균 | {r_mean.n:,} | {r_mean.median_ape:.1f}% | {r_mean.coverage:.1f}% |")
+    w(f"| **개선 후 · 동 중앙값** | {r_med.n:,} | **{r_med.median_ape:.1f}%** | **{r_med.coverage:.1f}%** |")
+    w("")
+    w("## 현행 산식(중앙값) 상세 — 실거래 보정 경로")
     w("")
     w("| 구간 | 검증 건수 | 범위 적중률 | 중앙오차 |")
     w("|---|---:|---:|---:|")
     for jimok in ("과수원", "전", "답"):
         for seg, seg_label in (("n>=3", "표본 3건 이상"), ("n<3", "표본 1~2건")):
-            r = loo.get((jimok, seg))
+            r = loo_med.get((jimok, seg))
             if r and r.n:
                 w(fmt_row(f"{jimok} · {seg_label}", r))
     w("")
@@ -207,6 +247,8 @@ def main() -> None:
     w("")
     w("> 주: 토지 부분만의 검증이다. 인수 검토가 전체(시설 잔존가·영업권 포함)의")
     w("> 범위는 이보다 넓으며, 시설·영업권은 실사 시 정밀화 대상이다.")
+    w("> 같은 법정동 안에서도 개별 필지 가격 분산이 커, 팜바톤이 단일가가 아닌")
+    w("> 범위 제시 + 실사 정밀화 안내를 채택한 근거이기도 하다.")
 
     report = "\n".join(lines)
     if args.report:
