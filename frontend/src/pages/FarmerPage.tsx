@@ -61,6 +61,7 @@ export default function FarmerPage() {
   const [assets, setAssets] = useState<AssetRow[]>([])
   const [annualRevenue, setAnnualRevenue] = useState('')   // 만원 단위 입력
   const [salesChannel, setSalesChannel] = useState('')     // '' | 계약재배 | 직거래 | 공판장
+  const [currentStep, setCurrentStep] = useState(1)
 
   // 시설 종류 목록은 DB(facility_std) 기준 — 폼 진입 시 1회 로드
   useEffect(() => {
@@ -114,6 +115,23 @@ export default function FarmerPage() {
 
   const handleAddressKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') { e.preventDefault(); handleGeocode() }
+  }
+
+  const moveToNextStep = () => {
+    if (currentStep === 1) {
+      if (!form.address.trim()) { setError('농장 주소를 입력하세요.'); return }
+      if (!mapPos && !form.area_m2) {
+        setError('위치를 검색해 확인하거나, 농장 면적을 직접 입력하세요.')
+        return
+      }
+    }
+    setError(null)
+    setCurrentStep(step => Math.min(step + 1, 3))
+  }
+
+  const moveToPreviousStep = () => {
+    setError(null)
+    setCurrentStep(step => Math.max(step - 1, 1))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -194,8 +212,24 @@ export default function FarmerPage() {
       <div className="page-wrap">
       <form className="card" onSubmit={handleSubmit}>
         <div className="card-title">농장 정보 입력</div>
+        <div className="farm-stepper" aria-label="농장 정보 입력 단계">
+          {['농장 위치', '농장 정보', '추가 정보'].map((label, index) => {
+            const step = index + 1
+            return (
+              <div key={label} className={`farm-stepper-item ${step === currentStep ? 'active' : step < currentStep ? 'done' : ''}`}>
+                <span>{step}</span><b>{label}</b>
+              </div>
+            )
+          })}
+        </div>
 
         {error && <div className="error-box">{error}</div>}
+
+        {currentStep === 1 && <section className="farm-step" aria-labelledby="farm-step-location">
+        <div className="farm-step-heading">
+          <h2 id="farm-step-location">농장은 어디에 있나요?</h2>
+          <p>주소를 입력하고 위치를 확인해주세요.</p>
+        </div>
 
         {/* 주소 + 검색 버튼 */}
         <div className="form-group">
@@ -250,6 +284,28 @@ export default function FarmerPage() {
           </MapContainer>
         </div>
 
+        <div className="form-group">
+          <label>
+            농장 면적 ㎡
+            {parcelInfo?.area_m2
+              ? <span style={{ color: 'var(--green)', fontWeight: 400 }}> (자동 입력됨)</span>
+              : <span style={{ color: 'var(--gray)', fontWeight: 400 }}> (직접 입력 가능)</span>}
+          </label>
+          <input
+            type="number" min="0" value={form.area_m2}
+            onChange={set('area_m2')} placeholder="위치 검색 시 자동 입력"
+          />
+        </div>
+        <div className="farm-step-actions farm-step-actions-next">
+          <button type="button" className="btn btn-primary" onClick={moveToNextStep}>다음</button>
+        </div>
+        </section>}
+
+        {currentStep === 2 && <section className="farm-step" aria-labelledby="farm-step-basic">
+        <div className="farm-step-heading">
+          <h2 id="farm-step-basic">농장 정보를 알려주세요</h2>
+          <p>인수 검토에 필요한 기본 정보입니다.</p>
+        </div>
         <div className="form-row">
           <div className="form-group">
             <label>작목 *</label>
@@ -265,30 +321,27 @@ export default function FarmerPage() {
           </div>
         </div>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label>승계 방식</label>
-            <select value={form.succession_type} onChange={set('succession_type')}>
-              <option value="SALE">매도</option>
-              <option value="LEASE">임대</option>
-              <option value="JOINT">공동경영</option>
-              <option value="MENTORING">멘토후독립</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>
-              면적 ㎡
-              {parcelInfo?.area_m2
-                ? <span style={{ color: 'var(--green)', fontWeight: 400 }}> (자동 취득)</span>
-                : <span style={{ color: 'var(--gray)', fontWeight: 400 }}> (검색 후 자동 입력)</span>}
-            </label>
-            <input
-              type="number" min="0" value={form.area_m2}
-              onChange={set('area_m2')} placeholder="위치 검색 시 자동 입력"
-            />
-          </div>
+        <div className="form-group">
+          <label>승계 방식</label>
+          <select value={form.succession_type} onChange={set('succession_type')}>
+            <option value="SALE">매도</option>
+            <option value="LEASE">임대</option>
+            <option value="JOINT">공동경영</option>
+            <option value="MENTORING">멘토후독립</option>
+          </select>
         </div>
 
+        <div className="farm-step-actions">
+          <button type="button" className="btn btn-secondary" onClick={moveToPreviousStep}>이전</button>
+          <button type="button" className="btn btn-primary" onClick={moveToNextStep}>다음</button>
+        </div>
+        </section>}
+
+        {currentStep === 3 && <section className="farm-step" aria-labelledby="farm-step-optional">
+        <div className="farm-step-heading">
+          <h2 id="farm-step-optional">추가 정보가 있나요?</h2>
+          <p>건너뛰어도 리포트를 받을 수 있어요.</p>
+        </div>
         {/* ── 선택 입력: 시설·판로·매출 (영업권·시설 잔존가 정밀화) ── */}
         <div style={{ marginTop: '.25rem' }}>
           <button
@@ -408,9 +461,13 @@ export default function FarmerPage() {
           )}
         </div>
 
-        <button type="submit" className="btn btn-primary" style={{ marginTop: '1.5rem' }} disabled={loading}>
-          {loading ? <span className="spinner" /> : '인수 검토 리포트 산출'}
-        </button>
+        <div className="farm-step-actions">
+          <button type="button" className="btn btn-secondary" onClick={moveToPreviousStep}>이전</button>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? <span className="spinner" /> : '인수 검토 리포트 보기'}
+          </button>
+        </div>
+        </section>}
       </form>
 
       {result && (

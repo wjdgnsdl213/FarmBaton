@@ -164,6 +164,24 @@ select {
 textarea { resize: vertical; min-height: 60px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
 
+/* 농장주 등록은 한 번에 한 가지 정보만 입력하는 3단계 흐름으로 안내한다. */
+.farm-stepper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 1.6rem; }
+.farm-stepper-item { min-width: 0; color: var(--gray); text-align: center; }
+.farm-stepper-item span {
+  display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;
+  margin: 0 auto 6px; border: 1px solid var(--border); border-radius: 50%; font-size: 13px; font-weight: 800;
+}
+.farm-stepper-item b { display: block; overflow: hidden; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; }
+.farm-stepper-item.active, .farm-stepper-item.done { color: var(--green-deep); }
+.farm-stepper-item.active span { color: #fff; background: var(--green-deep); border-color: var(--green-deep); }
+.farm-stepper-item.done span { color: var(--green); border-color: var(--green); background: var(--green-light); }
+.farm-step-heading { margin-bottom: 1.4rem; }
+.farm-step-heading h2 { color: var(--green-deep); font-size: clamp(21px, 5vw, 26px); letter-spacing: -.025em; }
+.farm-step-heading p { margin-top: 7px; color: var(--gray); font-size: 15px; line-height: 1.5; }
+.farm-step-actions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 10px; margin-top: 1.5rem; }
+.farm-step-actions-next { grid-template-columns: minmax(0, 1.35fr); justify-content: end; }
+.farm-step-actions-next .btn { max-width: 240px; justify-self: end; }
+
 /* ════════ 버튼 ════════ */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
@@ -176,6 +194,8 @@ textarea { resize: vertical; min-height: 60px; }
 .btn-primary { background: var(--green-deep); color: #fff; }
 .btn-primary:hover:not(:disabled) { background: var(--green); }
 .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+.btn-secondary { color: var(--green-deep); background: #fff; border: 1px solid var(--border); }
+.btn-secondary:hover:not(:disabled) { background: var(--green-light); border-color: var(--green-mid); }
 
 /* ════════ 가치평가 결과 ════════ */
 .valuation-header {
