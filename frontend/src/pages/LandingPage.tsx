@@ -162,25 +162,18 @@ export default function LandingPage() {
       <section className="lp-role-entry" aria-labelledby="entry-choice-title">
         <div className="lp-wrap lp-role-entry-inner">
           <div className="lp-role-chooser-head">
-            <span className="lp-role-chooser-eyebrow">팜바톤 시작하기</span>
             <h2 id="entry-choice-title">무엇을 도와드릴까요?</h2>
-            <p>농장을 정리하는 일도, 새 농장을 시작하는 일도<br />각자에게 맞는 방식으로 도와드려요.</p>
           </div>
           <div className="lp-role-cards">
             <Link className="lp-role-card lp-role-card-farmer" to="/farmer" onClick={() => rememberEntry('FARMER')}>
-              <span className="lp-role-card-index" aria-hidden="true">01</span>
-              <strong>내 농장을 정리하고 싶어요</strong>
-              <span>농장 등록 · 인수 검토가 확인</span>
+              <strong>내 농장 정리</strong>
               <b>농장주로 시작하기 <i aria-hidden="true">→</i></b>
             </Link>
             <Link className="lp-role-card lp-role-card-young" to="/young" onClick={() => rememberEntry('YOUNG')}>
-              <span className="lp-role-card-index" aria-hidden="true">02</span>
-              <strong>이어받을 농장을 찾고 있어요</strong>
-              <span>희망 조건 입력 · 맞춤 농장 추천</span>
+              <strong>이어받을 농장 찾기</strong>
               <b>청년농으로 시작하기 <i aria-hidden="true">→</i></b>
             </Link>
           </div>
-          <p className="lp-role-chooser-note">선택은 언제든 바꿀 수 있어요.</p>
         </div>
       </section>
 

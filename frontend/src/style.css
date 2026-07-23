@@ -675,27 +675,20 @@ textarea { resize: vertical; min-height: 60px; }
 /* 역할 선택은 사진을 가리지 않고, 히어로 다음의 브랜드 색상 영역에서 안내한다. */
 .lp-role-entry { background: var(--green-deep); color: #fff; border-top: 1px solid rgba(255,255,255,.1); }
 .lp-role-entry-inner { padding: clamp(42px, 7vw, 70px) 0; }
-.lp-role-chooser-head { max-width: 36rem; margin-bottom: 24px; }
-.lp-role-chooser-eyebrow { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 800; letter-spacing: .05em; color: var(--lime); }
+.lp-role-chooser-head { max-width: 36rem; margin-bottom: 20px; }
 .lp-role-chooser-head h2 { font-size: clamp(28px, 4.5vw, 38px); line-height: 1.2; letter-spacing: -.03em; }
-.lp-role-chooser-head p { margin-top: 10px; color: rgba(255,255,255,.72); font-size: 16px; line-height: 1.6; }
 .lp-role-cards { display: grid; gap: 12px; }
 .lp-role-card {
-  position: relative; display: grid; grid-template-columns: auto 1fr; column-gap: 12px; row-gap: 3px;
-  min-height: 142px; padding: 20px; border: 1px solid rgba(255,255,255,.24); border-radius: 12px;
+  display: flex; min-height: 112px; padding: 20px; border: 1px solid rgba(255,255,255,.2); border-radius: 10px;
+  flex-direction: column; align-items: flex-start; justify-content: space-between;
   color: #fff; background: rgba(255,255,255,.07); text-decoration: none;
   transition: transform .16s ease, background .16s ease, border-color .16s ease;
 }
-.lp-role-card:hover { transform: translateY(-3px); background: rgba(255,255,255,.13); }
+.lp-role-card:hover { transform: translateY(-2px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.4); }
 .lp-role-card:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
-.lp-role-card-farmer { border-left: 4px solid #87b56f; }
-.lp-role-card-young { border-left: 4px solid var(--lime); }
-.lp-role-card-index { grid-row: span 2; font-size: 22px; line-height: 1; font-weight: 850; color: var(--lime); }
-.lp-role-card strong { align-self: end; font-size: 20px; line-height: 1.2; letter-spacing: -.025em; }
-.lp-role-card > span:not(.lp-role-card-index) { grid-column: 2; color: rgba(255,255,255,.7); font-size: 14px; line-height: 1.42; }
-.lp-role-card b { grid-column: 1 / -1; margin-top: 9px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.16); font-size: 15px; color: var(--lime); }
+.lp-role-card strong { font-size: 21px; line-height: 1.2; letter-spacing: -.025em; }
+.lp-role-card b { margin-top: 14px; font-size: 15px; color: var(--lime); }
 .lp-role-card b i { font-style: normal; margin-left: 4px; }
-.lp-role-chooser-note { margin-top: 16px; color: rgba(255,255,255,.58); font-size: 13px; }
 
 .lp-features { padding: clamp(48px, 8vw, 84px) 0; scroll-margin-top: 64px; }
 .lp-steps { scroll-margin-top: 64px; }
@@ -770,7 +763,6 @@ textarea { resize: vertical; min-height: 60px; }
   .lp-role-entry-inner { display: grid; grid-template-columns: minmax(240px, .82fr) minmax(520px, 1.18fr); column-gap: clamp(40px, 7vw, 96px); align-items: center; }
   .lp-role-chooser-head { margin: 0; }
   .lp-role-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lp-role-chooser-note { grid-column: 2; margin: 12px 0 0; }
   .lp-feat-cards { grid-template-columns: repeat(3, 1fr); gap: 44px; }
   .lp-step { grid-template-columns: 1.1fr 1fr; gap: 40px; padding: 38px; }
   .lp-step.flip .lp-step-vis { order: -1; }
