@@ -631,9 +631,9 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-hero-text > *:nth-child(3) { animation-delay: .27s; }
 .lp-hero-text > *:nth-child(4) { animation-delay: .4s; }
 .lp-hero-text > *:nth-child(5) { animation-delay: .52s; }
-.lp-glass { opacity: 0; animation: lp-fade-up .7s ease forwards; animation-delay: .5s; }
+.lp-diag { opacity: 0; animation: lp-fade-up .7s ease forwards; animation-delay: .5s; }
 @media (prefers-reduced-motion: reduce) {
-  .lp-hero-text > *, .lp-glass { opacity: 1; animation: none; }
+  .lp-hero-text > *, .lp-diag { opacity: 1; animation: none; }
 }
 
 .lp-intro {
@@ -675,13 +675,31 @@ textarea { resize: vertical; min-height: 60px; }
 @media (prefers-reduced-motion: reduce) {
   .lp-intro { display: none; }
 }
-.lp-glass {
-  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
-  border-radius: 12px; padding: 20px 22px; backdrop-filter: blur(12px); max-width: 320px;
+/* 히어로 진단 카드 — 주소 입력 → 무료 진단 (첫 화면에서 바로 핵심 행동) */
+.lp-diag {
+  background: #fff; border-radius: 16px; padding: 24px 22px;
+  box-shadow: 0 8px 32px rgba(21,53,31,.25);
+  width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 12px;
 }
-.lp-glass h4 { font-size: 15px; color: var(--lime); margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
-.lp-glass h4 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); display: inline-block; flex: none; }
-.lp-glass p { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,.88); }
+.lp-diag-eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--accent); }
+.lp-diag h4 { font-size: 19px; line-height: 1.4; color: var(--green-deep); letter-spacing: -.01em; }
+.lp-diag input {
+  width: 100%; padding: 13px 14px; font-size: 16px; font-family: inherit;
+  border: 1.5px solid var(--border, #d8ddd4); border-radius: 10px; color: var(--ink);
+}
+.lp-diag input:focus { outline: none; border-color: var(--accent); }
+.lp-diag-btn {
+  width: 100%; padding: 14px; font-size: 16px; font-weight: 700; font-family: inherit;
+  background: var(--accent); color: #fff; border: none; border-radius: 10px; cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+.lp-diag-btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
+.lp-diag-chips { display: flex; gap: 8px; }
+.lp-diag-chips span {
+  font-size: 13px; font-weight: 600; color: var(--green); background: var(--green-light);
+  padding: 4px 12px; border-radius: 999px;
+}
+.lp-diag-note { font-size: 12px; color: var(--gray); }
 
 .lp-features { padding: clamp(48px, 8vw, 84px) 0; scroll-margin-top: 64px; }
 .lp-steps { scroll-margin-top: 64px; }

@@ -67,6 +67,16 @@ export default function FarmerPage() {
     api.facilities().then(setFacilityOptions).catch(() => setFacilityOptions([]))
   }, [])
 
+  // 랜딩 진단 카드에서 입력한 주소 자동 입력 + 위치 검색 (LandingPage와 공유 키)
+  useEffect(() => {
+    const prefill = sessionStorage.getItem('fb_prefill_address')
+    if (!prefill) return
+    sessionStorage.removeItem('fb_prefill_address')
+    setForm(f => ({ ...f, address: prefill }))
+    handleGeocode(prefill)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const addAsset = () =>
     setAssets(a => [...a, { facility_code: '', area_m2: '', installed_year: '', condition_grade: 'B' }])
   const removeAsset = (i: number) => setAssets(a => a.filter((_, idx) => idx !== i))
@@ -76,15 +86,16 @@ export default function FarmerPage() {
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
-  const handleGeocode = async () => {
-    if (!form.address.trim()) return
+  const handleGeocode = async (addressOverride?: string) => {
+    const address = (addressOverride ?? form.address).trim()
+    if (!address) return
     setGeocoding(true)
     setGeocodeError(null)
     setGeocodeWarning(null)
     setParcelInfo(null)
     setBoundary(null)
     try {
-      const res = await api.geocode(form.address, form.crop_code)
+      const res = await api.geocode(address, form.crop_code)
       setMapPos([res.lat, res.lon])
       setBoundary(res.boundary ?? null)
       // 면적 자동 취득
@@ -201,7 +212,7 @@ export default function FarmerPage() {
               type="button"
               className="btn btn-primary"
               style={{ width: 'auto', padding: '.6rem 1rem', whiteSpace: 'nowrap' }}
-              onClick={handleGeocode}
+              onClick={() => handleGeocode()}
               disabled={geocoding || !form.address.trim()}
             >
               {geocoding ? <span className="spinner" /> : '위치 검색'}
@@ -340,12 +351,12 @@ export default function FarmerPage() {
                     </select>
                     <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
                       <input
-                        type="number" min="0" placeholder="면적 ㎡" value={a.area_m2}
+                        type="number" min="0" placeholder="면적 ㎡ (예: 50)" value={a.area_m2}
                         onChange={e => updateAsset(i, 'area_m2', e.target.value)}
                         style={{ flex: '1 1 80px', minWidth: 0 }}
                       />
                       <input
-                        type="number" min="1980" max="2026" placeholder="설치연도" value={a.installed_year}
+                        type="number" min="1980" max="2026" placeholder="설치연도 (예: 2015)" value={a.installed_year}
                         onChange={e => updateAsset(i, 'installed_year', e.target.value)}
                         style={{ flex: '1 1 80px', minWidth: 0 }}
                       />

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { api, setToken, setRole } from '../api'
 
 type Role = 'FARMER' | 'YOUNG'
@@ -23,7 +23,11 @@ export default function LoginPage() {
   const setP = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setProf(p => ({ ...p, [k]: e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value }))
 
-  const routeByRole = (r: string) => navigate(r === 'YOUNG' ? '/young' : '/dashboard')
+  // RequireAuth가 튕겨보낸 원래 목적지 — 있으면 로그인 후 그리로 복귀
+  // (예: 랜딩 진단 카드 → /farmer → 로그인 → 다시 /farmer, 주소 프리필 유지)
+  const nextPath = (useLocation().state as { next?: string } | null)?.next
+  const routeByRole = (r: string) =>
+    navigate(nextPath ?? (r === 'YOUNG' ? '/young' : '/dashboard'))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

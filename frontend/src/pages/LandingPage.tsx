@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import heroFarm from '../assets/hero-farm.jpg'
 import stepInput from '../assets/step-1-input.png'
@@ -7,10 +7,11 @@ import stepMatch from '../assets/step-3-match.png'
 import logoFull from '../assets/logo_full.png'
 
 const INTRO_SESSION_KEY = 'fb_intro_shown'
+// 랜딩 진단 카드에서 입력한 주소 → 로그인 거쳐 농가 등록 폼에 자동 입력 (FarmerPage와 공유 키)
+const PREFILL_ADDRESS_KEY = 'fb_prefill_address'
 
-// 인트로는 자동으로 넘어가지 않는다.
-// 마우스를 누른 채 위로 끌면 끌리는 만큼 실시간으로 따라 올라오고(다시 내리면 따라 내려옴),
-// 충분히(THRESHOLD) 끌어올린 채 손을 떼면 닫힌다. 휠·터치·키는 즉시 닫는다.
+// 인트로: 드래그·휠·터치·키 외에 탭(클릭) 한 번으로도 닫히고,
+// 조작이 없어도 2.6초 뒤 자동으로 넘어간다 (고령 사용자가 갇히지 않도록).
 function useIntro() {
   const [show, setShow] = useState(() => !sessionStorage.getItem(INTRO_SESSION_KEY))
   const ref = useRef<HTMLDivElement>(null)
@@ -55,6 +56,8 @@ function useIntro() {
     }
 
     const opts: AddEventListenerOptions = { passive: true }
+    const timer = window.setTimeout(finish, 2600) // 조작 없이도 자동 진입
+    window.addEventListener('click', finish, opts) // 탭 한 번으로 즉시 진입
     window.addEventListener('wheel', finish, opts)
     window.addEventListener('touchmove', finish, opts)
     window.addEventListener('scroll', finish, opts)
@@ -63,6 +66,8 @@ function useIntro() {
     window.addEventListener('mousemove', onMove, opts)
     window.addEventListener('mouseup', onUp, opts)
     return () => {
+      window.clearTimeout(timer)
+      window.removeEventListener('click', finish)
       window.removeEventListener('wheel', finish)
       window.removeEventListener('touchmove', finish)
       window.removeEventListener('scroll', finish)
@@ -110,6 +115,16 @@ export default function LandingPage() {
   const rootRef = useScrollReveal()
   const intro = useIntro()
   useHashScroll()
+  const navigate = useNavigate()
+  const [diagAddress, setDiagAddress] = useState('')
+
+  // 주소를 세션에 보관 후 농가 등록으로 이동 — 로그인을 거쳐도 폼에 자동 입력된다.
+  const startDiagnosis = (e: React.FormEvent) => {
+    e.preventDefault()
+    const addr = diagAddress.trim()
+    if (addr) sessionStorage.setItem(PREFILL_ADDRESS_KEY, addr)
+    navigate('/farmer')
+  }
   return (
     <div ref={rootRef}>
       {intro.show && (
@@ -126,7 +141,7 @@ export default function LandingPage() {
             <p className="lime">경험은 남기고, 청년의 꿈은 자라납니다.</p>
           </div>
           <div className="lp-intro-hint">
-            <span>끌어올리거나 스크롤</span>
+            <span>화면을 누르면 바로 시작합니다</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9" />
               <polyline points="6 14 12 20 18 14" />
@@ -152,10 +167,22 @@ export default function LandingPage() {
                 <Link className="lp-pill lp-pill-ghost-light" to="/young">청년농으로 시작</Link>
               </div>
             </div>
-            <div className="lp-glass">
-              <h4>우리의 미션</h4>
-              <p>고령화로 멈추는 농장이 다음 세대로 이어지도록, 가치 산정부터 매칭까지 데이터로 돕습니다.</p>
-            </div>
+            <form className="lp-diag" onSubmit={startDiagnosis}>
+              <span className="lp-diag-eyebrow">농장 승계 진단</span>
+              <h4>내 농장의 승계 가능성을<br />지금 확인해 보세요</h4>
+              <input
+                type="text"
+                value={diagAddress}
+                onChange={e => setDiagAddress(e.target.value)}
+                placeholder="농장 주소를 입력해 보세요"
+                aria-label="농장 주소"
+              />
+              <button type="submit" className="lp-diag-btn">무료 진단 시작하기</button>
+              <div className="lp-diag-chips">
+                <span>사과</span><span>복숭아</span><span>포도</span>
+              </div>
+              <p className="lp-diag-note">충북·경북·충남 과수 농가 대상 서비스</p>
+            </form>
           </div>
         </div>
       </header>
