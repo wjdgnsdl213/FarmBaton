@@ -148,6 +148,13 @@ export interface GeocodeResult {
   warning?: string
 }
 
+export interface ReverseGeocodeResult {
+  address: string
+  lon: number
+  lat: number
+  source: 'vworld' | 'static'
+}
+
 export interface AssetSummary {
   facility_code: string
   facility_name: string
@@ -295,6 +302,9 @@ export interface SupportProgramListResult {
 export const api = {
   geocode: (address: string, crop_code = 'APPLE') =>
     client.get<GeocodeResult>('/geocode', { params: { address, crop_code } }).then(r => r.data),
+
+  reverseGeocode: (lat: number, lon: number) =>
+    client.get<ReverseGeocodeResult>('/reverse-geocode', { params: { lat, lon } }).then(r => r.data),
 
   reportPdfUrl: (farmId: number, audience: 'farmer' | 'young' = 'farmer') =>
     `${API_BASE_URL}/farms/${farmId}/report.pdf?audience=${audience}`,

@@ -82,3 +82,35 @@ def geocode(
         raise HTTPException(502, f"V-World HTTPError {e.code}")
     except Exception as e:  # noqa: BLE001  데모 안정성 우선, 원인 메시지만 전달
         raise HTTPException(502, f"V-World call failed: {e!r}")
+
+
+@app.get("/reverse")
+def reverse_geocode(
+    lon: float = Query(..., ge=-180, le=180),
+    lat: float = Query(..., ge=-90, le=90),
+    authorization: str | None = Header(default=None),
+):
+    """좌표 → 주소 V-World getaddress 호출 후 원본 JSON을 반환한다."""
+    token = os.getenv("VWORLD_PROXY_TOKEN", "")
+    if not token:
+        raise HTTPException(503, "VWORLD_PROXY_TOKEN not configured on proxy host")
+    if authorization != f"Bearer {token}":
+        raise HTTPException(401, "unauthorized")
+
+    key = os.getenv("VWORLD_API_KEY", "")
+    if not key:
+        raise HTTPException(503, "VWORLD_API_KEY not configured on proxy host")
+
+    params = urllib.parse.urlencode({
+        "service": "address", "request": "getaddress", "version": "2.0",
+        "crs": "epsg:4326", "point": f"{lon},{lat}", "type": "both",
+        "zipcode": "false", "simple": "false", "format": "json", "key": key,
+    })
+    try:
+        with urllib.request.urlopen(f"{_VWORLD_URL}?{params}", timeout=8) as resp:
+            body = resp.read()
+        return Response(content=body, media_type="application/json")
+    except urllib.error.HTTPError as e:
+        raise HTTPException(502, f"V-World HTTPError {e.code}")
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(502, f"V-World call failed: {e!r}")

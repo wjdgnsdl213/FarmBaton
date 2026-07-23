@@ -45,6 +45,7 @@ export default function FarmerPage() {
   const [mapPos, setMapPos] = useState<[number, number] | null>(null)
   const [boundary, setBoundary] = useState<GeoJSON.Geometry | null>(null)
   const [geocoding, setGeocoding] = useState(false)
+  const [locating, setLocating] = useState(false)
   const [geocodeError, setGeocodeError] = useState<string | null>(null)
   const [geocodeWarning, setGeocodeWarning] = useState<string | null>(null)
   const [parcelInfo, setParcelInfo] = useState<{ area_m2?: number; sigungu?: string } | null>(null)
@@ -115,6 +116,38 @@ export default function FarmerPage() {
 
   const handleAddressKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') { e.preventDefault(); handleGeocode() }
+  }
+
+  const handleCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setGeocodeError('이 기기에서는 현재 위치를 사용할 수 없습니다. 주소를 직접 입력해주세요.')
+      return
+    }
+    setLocating(true)
+    setGeocodeError(null)
+    setGeocodeWarning(null)
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        const position: [number, number] = [coords.latitude, coords.longitude]
+        setMapPos(position)
+        setBoundary(null)
+        setParcelInfo(null)
+        try {
+          const res = await api.reverseGeocode(coords.latitude, coords.longitude)
+          setForm(f => ({ ...f, address: res.address }))
+          setGeocodeWarning('현재 위치를 주소에 반영했어요. 지도 위치가 농장과 맞는지 확인해주세요.')
+        } catch {
+          setGeocodeWarning('현재 위치는 지도에 표시했어요. 주소는 직접 입력해주세요.')
+        } finally {
+          setLocating(false)
+        }
+      },
+      () => {
+        setLocating(false)
+        setGeocodeError('현재 위치를 가져오지 못했습니다. 위치 권한을 허용하거나 주소를 직접 입력해주세요.')
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+    )
   }
 
   const moveToNextStep = () => {
@@ -252,6 +285,14 @@ export default function FarmerPage() {
               {geocoding ? <span className="spinner" /> : '위치 검색'}
             </button>
           </div>
+          <button
+            type="button"
+            className="farm-current-location"
+            onClick={handleCurrentLocation}
+            disabled={locating}
+          >
+            {locating ? <span className="spinner" /> : '◎ 현재 위치로 주소 입력'}
+          </button>
           {geocodeError && (
             <p style={{ fontSize: '.78rem', color: '#b91c1c', marginTop: '.3rem' }}>{geocodeError}</p>
           )}

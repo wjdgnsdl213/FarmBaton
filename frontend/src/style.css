@@ -181,6 +181,12 @@ textarea { resize: vertical; min-height: 60px; }
 .farm-step-actions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 10px; margin-top: 1.5rem; }
 .farm-step-actions-next { grid-template-columns: minmax(0, 1.35fr); justify-content: end; }
 .farm-step-actions-next .btn { max-width: 240px; justify-self: end; }
+.farm-current-location {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 4px 0;
+  border: 0; background: transparent; color: var(--green); font: 700 14px/1.4 inherit; cursor: pointer;
+}
+.farm-current-location:hover:not(:disabled) { color: var(--green-deep); text-decoration: underline; }
+.farm-current-location:disabled { opacity: .55; cursor: wait; }
 
 /* ════════ 버튼 ════════ */
 .btn {

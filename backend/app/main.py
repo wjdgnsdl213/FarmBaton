@@ -7,6 +7,7 @@ load_dotenv(override=True)  # .env 우선 (외부 환경변수 따옴표 오염 
 
 import csv
 import json
+import math
 import os
 import urllib.error
 import urllib.parse
@@ -60,6 +61,56 @@ def _build_vworld_request(
         "format": "json", "simple": "false",
     })
     return urllib.request.Request(f"https://api.vworld.kr/req/address?{params}")
+
+
+def _build_vworld_reverse_request(
+    lon: float, lat: float, key: str, proxy_url: str, proxy_token: str
+) -> urllib.request.Request:
+    """현재 좌표를 주소로 바꾸는 V-World 요청을 만든다.
+
+    프록시가 설정된 경우에는 같은 프록시의 /reverse 엔드포인트를 사용한다.
+    키가 없더라도 정적 데모 좌표 폴백은 이후 단계에서 시도한다.
+    """
+    if proxy_url:
+        base_url = proxy_url.rstrip("/").rsplit("/", 1)[0]
+        params = urllib.parse.urlencode({"lon": lon, "lat": lat})
+        req = urllib.request.Request(f"{base_url}/reverse?{params}")
+        if proxy_token:
+            req.add_header("Authorization", f"Bearer {proxy_token}")
+        return req
+    params = urllib.parse.urlencode({
+        "service": "address", "request": "getaddress", "version": "2.0",
+        "crs": "epsg:4326", "point": f"{lon},{lat}", "type": "both",
+        "zipcode": "false", "simple": "false", "format": "json", "key": key,
+    })
+    return urllib.request.Request(f"https://api.vworld.kr/req/address?{params}")
+
+
+def _extract_reverse_address(data: dict) -> str | None:
+    """V-World getaddress 응답의 후보 주소에서 사람이 읽을 수 있는 주소를 꺼낸다."""
+    result = data.get("response", {}).get("result", [])
+    candidates = result if isinstance(result, list) else [result]
+    for candidate in candidates:
+        if isinstance(candidate, dict):
+            text = candidate.get("text") or candidate.get("address")
+            if isinstance(text, str) and text.strip():
+                return " ".join(text.split())
+    return None
+
+
+def _find_static_reverse_address(lon: float, lat: float, max_distance_m: float = 120) -> str | None:
+    """데모 주소 좌표와 120m 이내일 때만 정적 주소 폴백을 반환한다.
+
+    임의 위치에 가까운 주소를 채우지 않도록 작은 반경만 허용한다.
+    """
+    nearest: tuple[str, float] | None = None
+    lat_scale = 111_320
+    lon_scale = lat_scale * math.cos(math.radians(lat))
+    for address, (fb_lon, fb_lat) in _GEOCODE_FALLBACK.items():
+        distance_m = math.hypot((fb_lon - lon) * lon_scale, (fb_lat - lat) * lat_scale)
+        if nearest is None or distance_m < nearest[1]:
+            nearest = (address, distance_m)
+    return nearest[0] if nearest and nearest[1] <= max_distance_m else None
 
 app = FastAPI(
     title="팜바톤 API",
@@ -200,6 +251,45 @@ def geocode(address: str, crop_code: str = "APPLE", conn=Depends(get_db)):
         conn.rollback()  # 필지 취득 실패해도 좌표는 반환
 
     return result
+
+
+@app.get("/api/reverse-geocode")
+def reverse_geocode(lat: float, lon: float):
+    """현재 좌표를 농장 주소 입력란에 넣을 수 있는 주소로 변환한다.
+
+    브라우저의 위치 권한은 사용자가 버튼을 누른 경우에만 요청한다. V-World 또는
+    국내 프록시를 우선 사용하고, 데모 CSV 좌표와 120m 이내일 때만 정적 폴백을
+    허용한다. 그 외 실패 시 임의 주소를 채우지 않고 수동 입력을 안내한다.
+    """
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        raise HTTPException(422, "위치 좌표 형식이 올바르지 않습니다.")
+
+    key = os.getenv("VWORLD_API_KEY", "")
+    proxy_url = os.getenv("VWORLD_PROXY_URL", "").strip()
+    proxy_token = os.getenv("VWORLD_PROXY_TOKEN", "").strip()
+    address = None
+    source = ""
+
+    if key or proxy_url:
+        try:
+            req = _build_vworld_reverse_request(lon, lat, key, proxy_url, proxy_token)
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                data = json.loads(resp.read())
+            if data.get("response", {}).get("status") == "OK":
+                address = _extract_reverse_address(data)
+                source = "vworld"
+        except Exception as exc:  # noqa: BLE001 - 수동 주소 입력 경로로 안전하게 폴백
+            print(f"[reverse-geocode] V-World call failed err={exc!r}")
+
+    if not address:
+        address = _find_static_reverse_address(lon, lat)
+        if address:
+            source = "static"
+
+    if not address:
+        raise HTTPException(404, "현재 위치의 주소를 찾지 못했습니다. 주소를 직접 입력해주세요.")
+
+    return {"address": address, "lat": lat, "lon": lon, "source": source}
 
 
 def _extract_sido_from_address(address: str) -> str | None:
