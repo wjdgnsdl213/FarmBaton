@@ -629,9 +629,8 @@ textarea { resize: vertical; min-height: 60px; }
 .lp-hero-text > *:nth-child(2) { animation-delay: .15s; }
 .lp-hero-text > *:nth-child(3) { animation-delay: .27s; }
 .lp-hero-text > *:nth-child(4) { animation-delay: .4s; }
-.lp-role-chooser { opacity: 0; animation: lp-fade-up .7s ease forwards; animation-delay: .5s; }
 @media (prefers-reduced-motion: reduce) {
-  .lp-hero-text > *, .lp-role-chooser { opacity: 1; animation: none; }
+  .lp-hero-text > * { opacity: 1; animation: none; }
 }
 
 .lp-intro {
@@ -673,32 +672,30 @@ textarea { resize: vertical; min-height: 60px; }
 @media (prefers-reduced-motion: reduce) {
   .lp-intro { display: none; }
 }
-/* 히어로 역할 선택 — 역할을 나이가 아닌 사용 목적 기준으로 고르게 한다. */
-.lp-role-chooser {
-  width: 100%; max-width: 390px; padding: 22px;
-  border: 1px solid rgba(255,255,255,.22); border-radius: 18px;
-  background: rgba(255,255,255,.96); box-shadow: 0 12px 36px rgba(11,28,17,.28);
-}
-.lp-role-chooser-head { margin-bottom: 14px; }
-.lp-role-chooser-eyebrow { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 800; letter-spacing: .04em; color: var(--accent); }
-.lp-role-chooser h2 { color: var(--green-deep); font-size: 21px; line-height: 1.32; letter-spacing: -.025em; }
-.lp-role-cards { display: grid; gap: 10px; }
+/* 역할 선택은 사진을 가리지 않고, 히어로 다음의 브랜드 색상 영역에서 안내한다. */
+.lp-role-entry { background: var(--green-deep); color: #fff; border-top: 1px solid rgba(255,255,255,.1); }
+.lp-role-entry-inner { padding: clamp(42px, 7vw, 70px) 0; }
+.lp-role-chooser-head { max-width: 36rem; margin-bottom: 24px; }
+.lp-role-chooser-eyebrow { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 800; letter-spacing: .05em; color: var(--lime); }
+.lp-role-chooser-head h2 { font-size: clamp(28px, 4.5vw, 38px); line-height: 1.2; letter-spacing: -.03em; }
+.lp-role-chooser-head p { margin-top: 10px; color: rgba(255,255,255,.72); font-size: 16px; line-height: 1.6; }
+.lp-role-cards { display: grid; gap: 12px; }
 .lp-role-card {
   position: relative; display: grid; grid-template-columns: auto 1fr; column-gap: 12px; row-gap: 3px;
-  min-height: 128px; padding: 16px; border: 1.5px solid var(--border, #d8ddd4); border-radius: 12px;
-  color: var(--green-deep); background: #fff; text-decoration: none;
-  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  min-height: 142px; padding: 20px; border: 1px solid rgba(255,255,255,.24); border-radius: 12px;
+  color: #fff; background: rgba(255,255,255,.07); text-decoration: none;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease;
 }
-.lp-role-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(21,53,31,.12); }
+.lp-role-card:hover { transform: translateY(-3px); background: rgba(255,255,255,.13); }
 .lp-role-card:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
-.lp-role-card-farmer { border-color: rgba(47,102,84,.46); background: #f8fcf7; }
-.lp-role-card-young { border-color: rgba(168,198,108,.8); background: #fcfdf8; }
-.lp-role-card-index { grid-row: span 2; font-size: 23px; line-height: 1; font-weight: 850; color: var(--green); }
-.lp-role-card strong { align-self: end; font-size: 18px; line-height: 1.2; letter-spacing: -.025em; }
-.lp-role-card > span:not(.lp-role-card-index) { grid-column: 2; color: var(--gray); font-size: 14px; line-height: 1.42; }
-.lp-role-card b { grid-column: 1 / -1; margin-top: 7px; padding-top: 10px; border-top: 1px solid rgba(21,53,31,.1); font-size: 15px; color: var(--green); }
+.lp-role-card-farmer { border-left: 4px solid #87b56f; }
+.lp-role-card-young { border-left: 4px solid var(--lime); }
+.lp-role-card-index { grid-row: span 2; font-size: 22px; line-height: 1; font-weight: 850; color: var(--lime); }
+.lp-role-card strong { align-self: end; font-size: 20px; line-height: 1.2; letter-spacing: -.025em; }
+.lp-role-card > span:not(.lp-role-card-index) { grid-column: 2; color: rgba(255,255,255,.7); font-size: 14px; line-height: 1.42; }
+.lp-role-card b { grid-column: 1 / -1; margin-top: 9px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.16); font-size: 15px; color: var(--lime); }
 .lp-role-card b i { font-style: normal; margin-left: 4px; }
-.lp-role-chooser-note { margin-top: 12px; color: var(--gray); font-size: 13px; text-align: center; }
+.lp-role-chooser-note { margin-top: 16px; color: rgba(255,255,255,.58); font-size: 13px; }
 
 .lp-features { padding: clamp(48px, 8vw, 84px) 0; scroll-margin-top: 64px; }
 .lp-steps { scroll-margin-top: 64px; }
@@ -768,8 +765,12 @@ textarea { resize: vertical; min-height: 60px; }
   .lp-nav-burger, .lp-nav-mobile-panel { display: none; }
   .valuation-grid { grid-template-columns: repeat(4, 1fr); }
   .lp-hero { min-height: clamp(560px, 78vh, 760px); }
-  .lp-hero-content { padding: 56px 0 68px; flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 32px; }
-  .lp-hero-content .lp-hero-text { max-width: 56%; }
+  .lp-hero-content { padding: 56px 0 68px; }
+  .lp-hero-content .lp-hero-text { max-width: 62%; }
+  .lp-role-entry-inner { display: grid; grid-template-columns: minmax(240px, .82fr) minmax(520px, 1.18fr); column-gap: clamp(40px, 7vw, 96px); align-items: center; }
+  .lp-role-chooser-head { margin: 0; }
+  .lp-role-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lp-role-chooser-note { grid-column: 2; margin: 12px 0 0; }
   .lp-feat-cards { grid-template-columns: repeat(3, 1fr); gap: 44px; }
   .lp-step { grid-template-columns: 1.1fr 1fr; gap: 40px; padding: 38px; }
   .lp-step.flip .lp-step-vis { order: -1; }
