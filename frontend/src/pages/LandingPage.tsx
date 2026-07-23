@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import heroFarm from '../assets/hero-farm.jpg'
 import stepInput from '../assets/step-1-input.png'
@@ -7,8 +7,7 @@ import stepMatch from '../assets/step-3-match.png'
 import logoFull from '../assets/logo_full.png'
 
 const INTRO_SESSION_KEY = 'fb_intro_shown'
-// 랜딩 진단 카드에서 입력한 주소 → 로그인 거쳐 농가 등록 폼에 자동 입력 (FarmerPage와 공유 키)
-const PREFILL_ADDRESS_KEY = 'fb_prefill_address'
+const ENTRY_PREFERENCE_KEY = 'fb_entry_preference'
 
 // 인트로: 드래그·휠·터치·키 외에 탭(클릭) 한 번으로도 닫히고,
 // 조작이 없어도 2.6초 뒤 자동으로 넘어간다 (고령 사용자가 갇히지 않도록).
@@ -115,15 +114,8 @@ export default function LandingPage() {
   const rootRef = useScrollReveal()
   const intro = useIntro()
   useHashScroll()
-  const navigate = useNavigate()
-  const [diagAddress, setDiagAddress] = useState('')
-
-  // 주소를 세션에 보관 후 농가 등록으로 이동 — 로그인을 거쳐도 폼에 자동 입력된다.
-  const startDiagnosis = (e: React.FormEvent) => {
-    e.preventDefault()
-    const addr = diagAddress.trim()
-    if (addr) sessionStorage.setItem(PREFILL_ADDRESS_KEY, addr)
-    navigate('/farmer')
+  const rememberEntry = (entry: 'FARMER' | 'YOUNG') => {
+    localStorage.setItem(ENTRY_PREFERENCE_KEY, entry)
   }
   return (
     <div ref={rootRef}>
@@ -162,27 +154,28 @@ export default function LandingPage() {
               <h1>떠나는 농장과<br />시작하는 청년을 잇다</h1>
               <p className="lp-hero-tagline">고령 농가의 농장을 청년농에게 잇는 승계 진단·매칭 서비스</p>
               <p className="lp-hero-lead">주소만 입력하면 농장의 인수 검토가 범위를 산출하고, 조건에 맞는 청년농과 연결합니다. 승계의 첫 숫자를 팜바톤에서.</p>
-              <div className="lp-hero-actions">
-                <Link className="lp-pill lp-pill-warm" to="/farmer">농가 등록하기 →</Link>
-                <Link className="lp-pill lp-pill-ghost-light" to="/young">청년농으로 시작</Link>
-              </div>
             </div>
-            <form className="lp-diag" onSubmit={startDiagnosis}>
-              <span className="lp-diag-eyebrow">농장 승계 진단</span>
-              <h4>내 농장의 승계 가능성을<br />지금 확인해 보세요</h4>
-              <input
-                type="text"
-                value={diagAddress}
-                onChange={e => setDiagAddress(e.target.value)}
-                placeholder="농장 주소를 입력해 보세요"
-                aria-label="농장 주소"
-              />
-              <button type="submit" className="lp-diag-btn">무료 진단 시작하기</button>
-              <div className="lp-diag-chips">
-                <span>사과</span><span>복숭아</span><span>포도</span>
+            <section className="lp-role-chooser" aria-labelledby="entry-choice-title">
+              <div className="lp-role-chooser-head">
+                <span className="lp-role-chooser-eyebrow">어떤 도움을 원하시나요?</span>
+                <h2 id="entry-choice-title">나에게 맞는 방식으로<br />시작해 보세요</h2>
               </div>
-              <p className="lp-diag-note">충북·경북·충남 과수 농가 대상 서비스</p>
-            </form>
+              <div className="lp-role-cards">
+                <Link className="lp-role-card lp-role-card-farmer" to="/farmer" onClick={() => rememberEntry('FARMER')}>
+                  <span className="lp-role-card-index" aria-hidden="true">01</span>
+                  <strong>내 농장을<br />정리하고 싶어요</strong>
+                  <span>농장 등록과 인수 검토 결과 확인</span>
+                  <b>농장주로 시작하기 <i aria-hidden="true">→</i></b>
+                </Link>
+                <Link className="lp-role-card lp-role-card-young" to="/young" onClick={() => rememberEntry('YOUNG')}>
+                  <span className="lp-role-card-index" aria-hidden="true">02</span>
+                  <strong>이어받을 농장을<br />찾고 있어요</strong>
+                  <span>희망 조건에 맞는 농장 추천</span>
+                  <b>청년농으로 시작하기 <i aria-hidden="true">→</i></b>
+                </Link>
+              </div>
+              <p className="lp-role-chooser-note">선택은 언제든 바꿀 수 있어요.</p>
+            </section>
           </div>
         </div>
       </header>

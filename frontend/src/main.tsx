@@ -131,7 +131,7 @@ function Nav() {
           <NavLinks loc={loc} activeSection={activeSection} loggedIn={loggedIn} role={role} onLogout={logout} />
         </div>
         <div className="lp-nav-right">
-          {!loggedIn && <Link className="lp-pill lp-pill-warm" to="/farmer">시작하기 →</Link>}
+          {!loggedIn && <Link className="lp-pill lp-pill-warm" to="/">시작하기 →</Link>}
           <button
             className="lp-nav-burger"
             aria-label="메뉴"
