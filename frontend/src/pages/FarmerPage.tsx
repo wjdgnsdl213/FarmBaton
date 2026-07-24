@@ -12,7 +12,15 @@ L.Icon.Default.mergeOptions({
 })
 
 const GRADE_DESC: Record<string, string> = {
-  A: '실사 기반 추정', B: '농가 제출자료 기반', C: '사전 검토용 추정', D: '참고용 자동 추정',
+  A: '현장 확인까지 마친 결과', B: '제출한 자료로 계산한 결과', C: '입력한 내용으로 계산한 결과', D: '간단한 정보로 계산한 결과',
+}
+
+const SQM_PER_PYEONG = 3.305785
+
+function formatPyeong(area: number | string | undefined) {
+  const areaM2 = typeof area === 'number' ? area : Number(area)
+  if (!Number.isFinite(areaM2) || areaM2 <= 0) return null
+  return Math.round(areaM2 / SQM_PER_PYEONG).toLocaleString('ko-KR')
 }
 
 // V-World 항공영상 배경 — 키 미설정 시 OSM으로 자동 폴백(데모가 죽지 않도록)
@@ -207,7 +215,7 @@ export default function FarmerPage() {
         setPublishState('idle')
         setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
       } else {
-        setError(res.warning || '가치평가를 산출하지 못했습니다.')
+        setError(res.warning || '결과를 계산하지 못했습니다.')
       }
     } catch (err: unknown) {
       const e = err as { response?: { data?: { detail?: string } } }
@@ -236,17 +244,17 @@ export default function FarmerPage() {
         <img src={heroFarmer} alt="" className="hero-photo" />
         <div className="hero-overlay" />
         <div className="hero-inner">
-          <span className="hero-eyebrow">농가 승계 진단</span>
-          <h1>내 농장의 인수 검토가<br />범위로 정리됩니다</h1>
-          <p>주소와 작목만 입력하면 예상 소득·토지·시설 가치를 한눈에 확인할 수 있습니다.</p>
+          <span className="hero-eyebrow">내 농장 알아보기</span>
+          <h1>내 농장, 넘기기 전에<br />참고할 금액을 알아보세요</h1>
+          <p>주소와 키우는 과일을 알려주시면 소득·토지·시설을 살펴 금액 범위로 알려드려요.</p>
         </div>
       </header>
 
       <div className="page-wrap">
       <form className="card" onSubmit={handleSubmit}>
-        <div className="card-title">농장 정보 입력</div>
+        <div className="card-title">내 농장 알려주기</div>
         <div className="farm-stepper" aria-label="농장 정보 입력 단계">
-          {['농장 위치', '농장 정보', '추가 정보'].map((label, index) => {
+          {['농장 위치', '농장 정보', '아는 정보'].map((label, index) => {
             const step = index + 1
             return (
               <div key={label} className={`farm-stepper-item ${step === currentStep ? 'active' : step < currentStep ? 'done' : ''}`}>
@@ -304,7 +312,7 @@ export default function FarmerPage() {
               위치 확인됨
               {parcelInfo?.sigungu ? ` — ${parcelInfo.sigungu}` : ''}
               {parcelInfo?.area_m2
-                ? ` · 필지 면적 ${parcelInfo.area_m2.toLocaleString('ko-KR')}㎡ 자동 적용`
+                ? ` · 농장 면적 ${parcelInfo.area_m2.toLocaleString('ko-KR')}㎡ (약 ${formatPyeong(parcelInfo.area_m2)}평) 자동 입력`
                 : ' — 면적을 직접 입력해주세요'}
             </p>
           )}
@@ -327,15 +335,18 @@ export default function FarmerPage() {
 
         <div className="form-group">
           <label>
-            농장 면적 ㎡
+            농장 면적
             {parcelInfo?.area_m2
               ? <span style={{ color: 'var(--green)', fontWeight: 400 }}> (자동 입력됨)</span>
               : <span style={{ color: 'var(--gray)', fontWeight: 400 }}> (직접 입력 가능)</span>}
           </label>
-          <input
-            type="number" min="0" value={form.area_m2}
-            onChange={set('area_m2')} placeholder="위치 검색 시 자동 입력"
-          />
+          <div className="farm-area-input">
+            <input
+              type="number" min="0" value={form.area_m2}
+              onChange={set('area_m2')} placeholder="위치 검색 시 자동 입력"
+            />
+            <span>㎡{formatPyeong(form.area_m2) ? ` · 약 ${formatPyeong(form.area_m2)}평` : ''}</span>
+          </div>
         </div>
         <div className="farm-step-actions farm-step-actions-next">
           <button type="button" className="btn btn-primary" onClick={moveToNextStep}>다음</button>
@@ -344,12 +355,12 @@ export default function FarmerPage() {
 
         {currentStep === 2 && <section className="farm-step" aria-labelledby="farm-step-basic">
         <div className="farm-step-heading">
-          <h2 id="farm-step-basic">농장 정보를 알려주세요</h2>
-          <p>인수 검토에 필요한 기본 정보입니다.</p>
+          <h2 id="farm-step-basic">농장에 대해 알려주세요</h2>
+          <p>키우는 과일과 나무 나이, 넘기는 방법을 알려주세요.</p>
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label>작목 *</label>
+            <label>어떤 과일을 키우시나요? *</label>
             <select value={form.crop_code} onChange={set('crop_code')}>
               <option value="APPLE">사과</option>
               <option value="PEACH">복숭아</option>
@@ -357,18 +368,18 @@ export default function FarmerPage() {
             </select>
           </div>
           <div className="form-group">
-            <label>주요 수령 (년)</label>
+            <label>나무를 심은 지 몇 년 됐나요?</label>
             <input type="number" min="0" max="99" value={form.tree_age} onChange={set('tree_age')} />
           </div>
         </div>
 
         <div className="form-group">
-          <label>승계 방식</label>
+          <label>농장을 어떻게 넘기고 싶으신가요?</label>
           <select value={form.succession_type} onChange={set('succession_type')}>
-            <option value="SALE">매도</option>
-            <option value="LEASE">임대</option>
-            <option value="JOINT">공동경영</option>
-            <option value="MENTORING">멘토후독립</option>
+            <option value="SALE">팔기</option>
+            <option value="LEASE">빌려주기</option>
+            <option value="JOINT">함께 농사짓기</option>
+            <option value="MENTORING">일을 가르친 뒤 넘기기</option>
           </select>
         </div>
 
@@ -380,8 +391,8 @@ export default function FarmerPage() {
 
         {currentStep === 3 && <section className="farm-step" aria-labelledby="farm-step-optional">
         <div className="farm-step-heading">
-          <h2 id="farm-step-optional">추가 정보가 있나요?</h2>
-          <p>건너뛰어도 리포트를 받을 수 있어요.</p>
+          <h2 id="farm-step-optional">더 알려주실 내용이 있나요?</h2>
+          <p>건너뛰어도 알려드릴게요.</p>
         </div>
         {/* ── 선택 입력: 시설·판로·매출 (영업권·시설 잔존가 정밀화) ── */}
         <div style={{ marginTop: '.25rem' }}>
@@ -407,10 +418,10 @@ export default function FarmerPage() {
             </span>
             <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '.1rem' }}>
               <span style={{ fontWeight: 700, fontSize: '.92rem', color: 'var(--green-deep)' }}>
-                시설·판로 정보 추가 <span style={{ fontWeight: 500, color: 'var(--gray)' }}>(선택)</span>
+                시설과 판매 정보 적기 <span style={{ fontWeight: 500, color: 'var(--gray)' }}>(선택)</span>
               </span>
               <span style={{ fontSize: '.76rem', color: 'var(--gray)' }}>
-                입력하면 영업권·시설 가치까지 반영돼 더 정확해져요
+                알고 계신 만큼만 적어주세요
               </span>
             </span>
             <span style={{ flex: '0 0 auto', color: 'var(--green)', fontSize: '.8rem' }}>
@@ -425,10 +436,10 @@ export default function FarmerPage() {
             }}>
               {/* 시설 목록 */}
               <div>
-                <label style={{ fontWeight: 600, fontSize: '.85rem' }}>보유 시설</label>
+                <label style={{ fontWeight: 600, fontSize: '.85rem' }}>농장에 있는 시설</label>
                 {assets.length === 0 && (
                   <p style={{ fontSize: '.78rem', color: 'var(--gray)', margin: '.3rem 0' }}>
-                    저온저장고·비닐하우스 등을 추가하면 시설 잔존가가 평가에 반영됩니다.
+                    저온저장고·비닐하우스 등이 있으면 시설 값도 함께 계산해드려요.
                   </p>
                 )}
                 {assets.map((a, i) => (
@@ -450,7 +461,7 @@ export default function FarmerPage() {
                         style={{ flex: '1 1 80px', minWidth: 0 }}
                       />
                       <input
-                        type="number" min="1980" max="2026" placeholder="설치연도 (예: 2015)" value={a.installed_year}
+                        type="number" min="1980" max="2026" placeholder="설치한 해 (예: 2015)" value={a.installed_year}
                         onChange={e => updateAsset(i, 'installed_year', e.target.value)}
                         style={{ flex: '1 1 80px', minWidth: 0 }}
                       />
@@ -459,9 +470,9 @@ export default function FarmerPage() {
                         onChange={e => updateAsset(i, 'condition_grade', e.target.value)}
                         style={{ flex: '1 1 90px', minWidth: 0 }}
                       >
-                        <option value="A">상태 상(A)</option>
-                        <option value="B">상태 중(B)</option>
-                        <option value="C">상태 하(C)</option>
+                        <option value="A">상태 좋음</option>
+                        <option value="B">상태 보통</option>
+                        <option value="C">수리가 필요함</option>
                       </select>
                       <button
                         type="button" onClick={() => removeAsset(i)} className="btn"
@@ -479,14 +490,14 @@ export default function FarmerPage() {
               {/* 판로·매출 */}
               <div className="form-row">
                 <div className="form-group">
-                  <label>연 매출 (만원)</label>
+                  <label>한 해 매출 (만원)</label>
                   <input
                     type="number" min="0" placeholder="예: 5000" value={annualRevenue}
                     onChange={e => setAnnualRevenue(e.target.value)}
                   />
                 </div>
                 <div className="form-group">
-                  <label>주 판로</label>
+                  <label>주로 어디에 파시나요?</label>
                   <select value={salesChannel} onChange={e => setSalesChannel(e.target.value)}>
                     <option value="">선택 안 함</option>
                     <option value="계약재배">계약재배</option>
@@ -496,7 +507,7 @@ export default function FarmerPage() {
                 </div>
               </div>
               <p style={{ fontSize: '.75rem', color: 'var(--gray)' }}>
-                매출·판로를 입력하면 영업권이 반영되고 신뢰등급이 올라갑니다. (자료 제출·실사 시 정밀화)
+                매출과 판매처를 적으면 농장 운영 가치도 함께 계산해드려요.
               </p>
             </div>
           )}
@@ -505,7 +516,7 @@ export default function FarmerPage() {
         <div className="farm-step-actions">
           <button type="button" className="btn btn-secondary" onClick={moveToPreviousStep}>이전</button>
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? <span className="spinner" /> : '인수 검토 리포트 보기'}
+            {loading ? <span className="spinner" /> : '내 농장 결과 보기'}
           </button>
         </div>
         </section>}
@@ -516,7 +527,7 @@ export default function FarmerPage() {
           <div className="card-title">
             인수 검토가 범위(참고용 추정)&nbsp;
             <span className="grade-badge">
-              {result.confidence_grade}등급 — {GRADE_DESC[result.confidence_grade]}
+              {GRADE_DESC[result.confidence_grade]}
             </span>
           </div>
 
@@ -535,15 +546,15 @@ export default function FarmerPage() {
               </div>
             </div>
             <div className="val-item">
-              <div className="val-item-label">토지 기준가</div>
+              <div className="val-item-label">토지 기준 금액</div>
               <div className="val-item-value">{fmt(result.land_value_point)}만원</div>
             </div>
             <div className="val-item">
-              <div className="val-item-label">시설 잔존가</div>
+              <div className="val-item-label">시설의 현재 가치</div>
               <div className="val-item-value">{fmt(result.facility_value)}만원</div>
             </div>
             <div className="val-item">
-              <div className="val-item-label">영업권</div>
+              <div className="val-item-label">매출·판매처 가치</div>
               <div className="val-item-value">
                 {result.goodwill_min === 0
                   ? '해당 없음'
@@ -556,7 +567,7 @@ export default function FarmerPage() {
 
           {publishState === 'published' ? (
             <div className="consult-success" style={{ marginTop: '.8rem' }}>
-              ✓ 매칭 풀에 공개되었습니다 — 이제 청년농 매칭 리스트에 노출됩니다.
+              ✓ 농장이 청년농에게 공개되었습니다.
             </div>
           ) : (
             <button
@@ -566,14 +577,14 @@ export default function FarmerPage() {
               onClick={handlePublish}
               disabled={publishState === 'publishing'}
             >
-              {publishState === 'publishing' ? <span className="spinner" /> : '매칭 풀에 공개하기'}
+              {publishState === 'publishing' ? <span className="spinner" /> : '청년농에게 농장 공개하기'}
             </button>
           )}
           {publishState === 'error' && (
-            <div className="error-box" style={{ marginTop: '.5rem' }}>공개 처리에 실패했습니다. 다시 시도해주세요.</div>
+            <div className="error-box" style={{ marginTop: '.5rem' }}>농장 공개에 실패했습니다. 다시 눌러주세요.</div>
           )}
           <p style={{ fontSize: '.78rem', color: 'var(--gray)', margin: '.4rem 0 0' }}>
-            공개하지 않아도 등록은 완료되며, 리포트는 아래에서 언제든 다시 받을 수 있습니다.
+            지금 공개하지 않아도 저장됩니다. 결과는 언제든 다시 볼 수 있어요.
           </p>
 
           <a
@@ -583,7 +594,7 @@ export default function FarmerPage() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            PDF 리포트 다운로드
+            결과표 PDF로 받기
           </a>
         </div>
       )}
