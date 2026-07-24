@@ -301,6 +301,26 @@ textarea { resize: vertical; min-height: 60px; }
   padding: .25rem .65rem; border-radius: 999px;
   background: var(--green-light); color: var(--green); margin-right: .35rem; margin-top: .3rem;
 }
+.other-crop-section {
+  margin-top: 1.25rem; border: 1px solid var(--border); border-radius: 8px;
+  overflow: hidden; background: #fff;
+}
+.other-crop-toggle {
+  width: 100%; border: 0; background: #f7faf8; color: var(--green-deep);
+  padding: 1rem 1.1rem; display: flex; align-items: center;
+  justify-content: space-between; gap: 1rem; text-align: left;
+  font: inherit; font-weight: 800; cursor: pointer;
+}
+.other-crop-toggle:hover { background: var(--green-light); }
+.other-crop-toggle small {
+  display: inline-block; margin-left: .45rem; padding: .12rem .45rem;
+  border-radius: 999px; background: #fff; color: var(--green);
+  font-size: .72rem; vertical-align: middle;
+}
+.other-crop-results { padding: 1rem; border-top: 1px solid var(--border); }
+.other-crop-results > p {
+  margin: 0 0 .85rem; color: var(--gray); font-size: .84rem; line-height: 1.55;
+}
 
 /* ── 매칭 카드 상세: 팝업 모달 ── */
 .modal-backdrop {

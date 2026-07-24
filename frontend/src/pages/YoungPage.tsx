@@ -231,6 +231,9 @@ export default function YoungPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [matches, setMatches] = useState<MatchItem[] | null>(null)
+  const [otherCropMatches, setOtherCropMatches] = useState<MatchItem[]>([])
+  const [showOtherCrops, setShowOtherCrops] = useState(false)
+  const [resultCrop, setResultCrop] = useState<string | null>(null)
   const [yfId, setYfId] = useState<number | null>(null)
   const [account, setAccount] = useState<Account | null>(null)
   const resultRef = useRef<HTMLDivElement>(null)
@@ -276,6 +279,9 @@ export default function YoungPage() {
       })
       setYfId(res.young_farmer_id || null)   // 본인 실제 프로필 id (상담용)
       setMatches(res.matches)
+      setOtherCropMatches(res.other_crop_matches ?? [])
+      setShowOtherCrops(false)
+      setResultCrop(form.pref_crop || null)
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
     } catch (err: any) {
       setError(err.response?.data?.detail || '서버 오류가 발생했습니다.')
@@ -369,13 +375,17 @@ export default function YoungPage() {
       {matches !== null && (
         <div className="scroll-anchor" ref={resultRef}>
           <p className="section-title">
-            매칭 결과 {matches.length}개
+            {resultCrop
+              ? `희망 작목 · ${CROP_NAMES[resultCrop]} 농장 ${matches.length}개`
+              : `매칭 결과 ${matches.length}개`}
             {yfId && <span style={{ fontSize: '.8rem', color: 'var(--gray)', fontWeight: 400, marginLeft: '.5rem' }}>ID #{yfId}</span>}
           </p>
 
           {matches.length === 0 ? (
             <div className="empty">
-              조건에 맞는 농장이 없습니다.
+              {resultCrop
+                ? `현재 등록된 ${CROP_NAMES[resultCrop]} 농장이 없습니다.`
+                : '조건에 맞는 농장이 없습니다.'}
             </div>
           ) : (
             <div className="match-grid">
@@ -383,9 +393,44 @@ export default function YoungPage() {
             </div>
           )}
 
-          {matches.length > 0 && (
+          {resultCrop && otherCropMatches.length > 0 && (
+            <div className="other-crop-section">
+              <button
+                type="button"
+                className="other-crop-toggle"
+                aria-expanded={showOtherCrops}
+                onClick={() => setShowOtherCrops(open => !open)}
+              >
+                <span>
+                  추천할 만한 다른 작목 농장 보기
+                  <small>{otherCropMatches.length}개</small>
+                </span>
+                <span aria-hidden="true">{showOtherCrops ? '접기 ↑' : '보기 ↓'}</span>
+              </button>
+              {showOtherCrops && (
+                <div className="other-crop-results">
+                  <p>
+                    희망 작목과는 다르지만 지역·자본·승계 조건의 매칭 점수가 높은 농장입니다.
+                  </p>
+                  <div className="match-grid">
+                    {otherCropMatches.map((m, i) => (
+                      <MatchCard
+                        key={m.farm_id}
+                        item={m}
+                        rank={i + 1}
+                        yfId={yfId}
+                        account={account}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {(matches.length > 0 || otherCropMatches.length > 0) && (
             <div className="disclaimer" style={{ marginTop: '.5rem' }}>
-              {matches[0].disclaimer}
+              {(matches[0] ?? otherCropMatches[0]).disclaimer}
             </div>
           )}
         </div>

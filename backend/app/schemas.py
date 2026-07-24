@@ -301,6 +301,7 @@ class MatchItem(BaseModel):
 class MatchListResponse(BaseModel):
     young_farmer_id: int
     matches: list[MatchItem]
+    other_crop_matches: list[MatchItem] = Field(default_factory=list)
 
 
 class FarmMatchItem(BaseModel):

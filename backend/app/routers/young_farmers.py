@@ -43,6 +43,7 @@ from backend.app.services.valuation import (
 router = APIRouter(prefix="/api/young-farmers", tags=["young-farmers"])
 
 TOP_N = 10  # 매칭 리스트 최대 반환 수
+OTHER_CROP_TOP_N = 3  # 희망 작목 외 탐색용 추천 수
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -79,6 +80,23 @@ def _upsert_match_score(farm_id: int, yf_id: int, result, explanation: Optional[
             result.experience_score, result.succession_score,
             result.policy_score, result.risk_penalty, explanation,
         ))
+
+
+def _partition_matches(
+    matches: list[MatchItem], pref_crop: Optional[str]
+) -> tuple[list[MatchItem], list[MatchItem]]:
+    """희망 작목 농장을 본 목록으로, 다른 작목은 별도 탐색 목록으로 분리.
+
+    작목 상관없음(None)이면 기존처럼 전체 농장을 점수순으로 합쳐 반환한다.
+    각 그룹 내부 정렬은 기존 결정론적 매칭 점수를 그대로 사용한다.
+    """
+    ranked = sorted(matches, key=lambda item: item.total_score, reverse=True)
+    if pref_crop is None:
+        return ranked[:TOP_N], []
+
+    preferred = [item for item in ranked if item.crop_code == pref_crop]
+    other = [item for item in ranked if item.crop_code != pref_crop]
+    return preferred[:TOP_N], other[:OTHER_CROP_TOP_N]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -190,7 +208,7 @@ def my_consult_requests(conn=Depends(get_db), user=Depends(get_current_user_opti
 
 
 def _score_farms(young: YoungFarmerInput, conn) -> list[MatchItem]:
-    """검색 조건(young)으로 ACTIVE 농장을 점수화해 상위 TOP_N 반환 (미저장)."""
+    """검색 조건(young)으로 ACTIVE 농장을 모두 점수화해 점수순 반환 (미저장)."""
     with conn.cursor() as cur:
         cur.execute("""
             SELECT id, address, sido, crop_code::TEXT, tree_age,
@@ -231,7 +249,7 @@ def _score_farms(young: YoungFarmerInput, conn) -> list[MatchItem]:
             explanation=explanation,
         )))
     items.sort(key=lambda x: x[0], reverse=True)
-    return [item for _, item in items[:TOP_N]]
+    return [item for _, item in items]
 
 
 @router.post("/match-search", response_model=MatchListResponse)
@@ -252,14 +270,19 @@ def match_search(
         experience_years=int(data.experience_years),
         policy_fund=bool(data.policy_fund), pref_succession=data.pref_succession,
     )
-    matches = _score_farms(young, conn)
+    scored = _score_farms(young, conn)
+    matches, other_crop_matches = _partition_matches(scored, data.pref_crop)
     with conn.cursor() as cur:
         cur.execute(
             "SELECT id FROM young_farmer_profile WHERE user_id = %s ORDER BY id LIMIT 1",
             (user_id,),
         )
         row = cur.fetchone()
-    return MatchListResponse(young_farmer_id=(row[0] if row else 0), matches=matches)
+    return MatchListResponse(
+        young_farmer_id=(row[0] if row else 0),
+        matches=matches,
+        other_crop_matches=other_crop_matches,
+    )
 
 
 @router.get("/{yf_id}/support-programs", response_model=SupportProgramListResponse)

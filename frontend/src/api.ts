@@ -95,6 +95,7 @@ export interface MatchItem {
 export interface MatchListResult {
   young_farmer_id: number
   matches: MatchItem[]
+  other_crop_matches: MatchItem[]
 }
 
 export interface FarmMatchItem {
