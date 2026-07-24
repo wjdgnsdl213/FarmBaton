@@ -47,9 +47,11 @@ from backend.app.services.report_ai import (
 )
 from backend.app.services.valuation import (
     HIGH_DIFFICULTY_CROPS,
+    OFFICIAL_TO_MARKET,
     FarmProfileForMatch,
     YoungFarmerInput,
     calc_match_score,
+    calc_asset_residual,
     calc_total_value,
     derive_risk_flags,
     grade_reasons,
@@ -802,6 +804,128 @@ def _eok(manwon: int) -> str:
     return f"{manwon:,}만원"
 
 
+def _format_krw_per_m2(value: float) -> str:
+    """원/㎡ 단가를 보고서용 만원 또는 원 단위로 표시."""
+    if abs(value) >= 10_000:
+        return f"{value / 10_000:,.0f}만원/㎡"
+    return f"{value:,.0f}원/㎡"
+
+
+def _build_calculation_detail(farm_input, result) -> tuple[dict, list[dict], dict]:
+    """엔진 산출값을 실제 적용 입력과 하한·상한 연결표로 재구성한다.
+
+    새로운 평가 숫자를 만들지 않고 calc_total_value와 동일 구성요소를 만원으로
+    반올림한다. 할인액은 각 구성요소 합계와 최종 결과의 차이로 역산해 표의
+    덧셈이 최종 범위와 정확히 일치하도록 한다.
+    """
+    land_unit = (
+        farm_input.land.deal_price_m2
+        if farm_input.land.deal_price_m2 is not None
+        else farm_input.land.official_price_m2 / OFFICIAL_TO_MARKET
+    )
+    land_source = (
+        f"인근 실거래가 {farm_input.land.deal_sample_cnt}건"
+        if farm_input.land.deal_price_m2 is not None
+        else "공시지가 기반 환산"
+    )
+
+    if farm_input.annual_revenue is None or farm_input.revenue_years == 0:
+        revenue_evidence = "미제출"
+        revenue_adjustment = "미적용 (작목 평균 기준)"
+    else:
+        revenue_evidence = (
+            "최근 3년 평균 매출" if farm_input.revenue_years >= 3 else "최근 1년 매출"
+        )
+        adjustment_pct = round((result.income_adjustment - 1.0) * 100)
+        sign = "+" if adjustment_pct > 0 else ""
+        revenue_adjustment = f"소득 {sign}{adjustment_pct}% 보정"
+        if result.revenue_cap_applied:
+            revenue_adjustment += " (보수적 상한 적용)"
+
+    applied_inputs = {
+        "income_10a": f"{_to_만원(farm_input.income_10a):,}만원",
+        "area_10a": f"{farm_input.area_m2 / 1_000:.2f}",
+        "age_coef": f"{farm_input.age_coef:.2f}",
+        "trend_index": f"{farm_input.trend_index:.2f}",
+        "revenue_evidence": revenue_evidence,
+        "revenue_adjustment": revenue_adjustment,
+        "land_unit_source": land_source,
+        "land_unit_price": _format_krw_per_m2(land_unit),
+        "official_price": _format_krw_per_m2(farm_input.land.official_price_m2),
+        "annual_revenue": (
+            _eok(_to_만원(farm_input.annual_revenue))
+            if farm_input.annual_revenue is not None else "미제출"
+        ),
+        "sales_evidence": " · ".join(
+            label for enabled, label in (
+                (farm_input.has_contract, "계약재배"),
+                (farm_input.has_direct_sales, "직거래"),
+            ) if enabled
+        ) or "별도 판로 증빙 없음",
+        "income_point": _eok(_to_만원(result.income_point)),
+        "goodwill_range": (
+            "미반영"
+            if result.goodwill_min == 0 and result.goodwill_max == 0
+            else f"{_eok(_to_만원(result.goodwill_min))} ~ "
+                 f"{_eok(_to_만원(result.goodwill_max))}"
+        ),
+    }
+
+    facility_details = []
+    for asset in farm_input.assets:
+        residual_krw = calc_asset_residual(asset, CURRENT_YEAR)
+        facility_details.append({
+            "name": asset.facility_name or asset.facility_code,
+            "area": f"{asset.area_m2:,.0f}㎡",
+            "installed_year": (
+                f"{asset.installed_year}년" if asset.installed_year is not None else "미상"
+            ),
+            "condition": asset.condition_grade,
+            "standard_cost": _format_krw_per_m2(asset.std_unit_cost_krw),
+            "residual_value": (
+                "1만원 미만" if 0 < residual_krw < 10_000
+                else _eok(_to_만원(residual_krw))
+            ),
+            "residual_value_manwon": _to_만원(residual_krw),
+        })
+
+    land_lower = _to_만원(result.land_value_point * 0.90)
+    land_upper = _to_만원(result.land_value_point * 1.10)
+    facility_lower = _to_만원(result.facility_value * 0.85)
+    facility_upper = _to_만원(result.facility_value * 1.05)
+    goodwill_lower = _to_만원(result.goodwill_min)
+    goodwill_upper = _to_만원(result.goodwill_max)
+    value_lower = _to_만원(result.est_value_min)
+    value_upper = _to_만원(result.est_value_max)
+    lower_discount = land_lower + facility_lower + goodwill_lower - value_lower
+    upper_discount = land_upper + facility_upper + goodwill_upper - value_upper
+
+    calculation_trace = {
+        "lower": {
+            "land_manwon": land_lower,
+            "facility_manwon": facility_lower,
+            "goodwill_manwon": goodwill_lower,
+            "discount_manwon": lower_discount,
+            "result_manwon": value_lower,
+        },
+        "upper": {
+            "land_manwon": land_upper,
+            "facility_manwon": facility_upper,
+            "goodwill_manwon": goodwill_upper,
+            "discount_manwon": upper_discount,
+            "result_manwon": value_upper,
+        },
+    }
+    for side in calculation_trace.values():
+        side["land"] = _eok(side["land_manwon"])
+        side["facility"] = _eok(side["facility_manwon"])
+        side["goodwill"] = _eok(side["goodwill_manwon"])
+        side["discount"] = _eok(side["discount_manwon"])
+        side["result"] = _eok(side["result_manwon"])
+
+    return applied_inputs, facility_details, calculation_trace
+
+
 def _get_or_create_narrative(farm_id: int, audience: str, ctx: ReportContext, conn):
     """(farm_id, audience)별 설명문 캐시 조회 — 없으면 1회 생성 후 저장.
 
@@ -878,6 +1002,29 @@ def _build_report_context(
         {"label": "적극적 (상한)", "value": f"{v_max:,}만원", "income": f"{i_max:,}만원"},
     ]
 
+    applied_inputs, facility_details, calculation_trace = _build_calculation_detail(
+        farm_input, result
+    )
+    if aud == "FARMER":
+        decision_title = "검토가를 높이기 위한 증빙 준비"
+        decision_items = [
+            (
+                f"매출자료: {applied_inputs['revenue_evidence']} 상태입니다. "
+                "최근 3년 매출·비용 자료를 같은 기준으로 정리합니다."
+            ),
+            "시설 설치연도, 취득·수리 영수증과 현재 가동 사진을 시설별로 준비합니다.",
+            "계약재배·직거래 등 기존 판로의 계약서와 승계 가능 여부를 확인합니다.",
+            "소유권·임차권 등 농장을 등록할 권리가 있음을 확인할 서류를 준비합니다.",
+        ]
+    else:
+        decision_title = "인수 전 검증 순서"
+        decision_items = [
+            "등기·임대차 자료로 농장 등록자와 실제 소유·사용 권리 관계를 먼저 확인합니다.",
+            "현장 방문에서 수목 생육, 관개, 저장시설의 가동 여부와 추가 수리비를 확인합니다.",
+            "제시된 매출자료와 판로 계약이 실제로 승계 가능한지 원본 자료로 확인합니다.",
+            "최종 계약 전 공인중개사·감정평가사 등 전문가의 별도 검토를 받습니다.",
+        ]
+
     return {
         "audience_label": _AUDIENCE_LABEL.get(aud, "농장주"),
         "sido": sido or "",
@@ -908,12 +1055,17 @@ def _build_report_context(
         "value_total": _eok(land_w + fac_w + gw_min_w),
         "normal_year_text": normal_year_text,
         "scenarios": scenarios,
+        "applied_inputs": applied_inputs,
+        "facility_details": facility_details,
+        "calculation_trace": calculation_trace,
         "ai_risk_notes": ai_risk_notes,
         "risk_confirmed": [f for f in risk_flags if "경제수령" in f],
         "risk_missing": reasons["downgrades"],
         "risk_onsite": _ONSITE_CHECKS,
         "advice_title": "매도·승계 준비 조언" if aud == "FARMER" else "인수 검토 조언",
         "advice_items": ai_advice_items,
+        "decision_title": decision_title,
+        "decision_items": decision_items,
         "methodology": _METHODOLOGY,
         "sources": _SOURCES,
         "disclaimer": DISCLAIMER,

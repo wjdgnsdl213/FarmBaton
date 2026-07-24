@@ -107,3 +107,65 @@ def test_risk_categories_present():
     assert len(ctx["risk_onsite"]) >= 3
     # 정보 부족(하향 사유)이 채워짐
     assert len(ctx["risk_missing"]) == 2
+
+
+def test_calculation_trace_reconciles_to_final_range():
+    """구성요소 하한·상한과 할인 합계가 최종 검토가에 정확히 연결된다."""
+    fi = _make_input(deal=130_000, deal_cnt=5, installed=2017)
+    result, ctx = _ctx_for(fi)
+
+    trace = ctx["calculation_trace"]
+    assert trace["lower"]["result_manwon"] == round(result.est_value_min / 10000)
+    assert trace["upper"]["result_manwon"] == round(result.est_value_max / 10000)
+    assert (
+        trace["lower"]["land_manwon"]
+        + trace["lower"]["facility_manwon"]
+        + trace["lower"]["goodwill_manwon"]
+        - trace["lower"]["discount_manwon"]
+        == trace["lower"]["result_manwon"]
+    )
+    assert (
+        trace["upper"]["land_manwon"]
+        + trace["upper"]["facility_manwon"]
+        + trace["upper"]["goodwill_manwon"]
+        - trace["upper"]["discount_manwon"]
+        == trace["upper"]["result_manwon"]
+    )
+
+
+def test_applied_inputs_and_facility_details_are_exposed():
+    """일반식뿐 아니라 실제 적용 단가·계수·시설별 결과가 보고서에 제공된다."""
+    fi = _make_input(deal=130_000, deal_cnt=5, installed=2017)
+    fi.annual_revenue = 150_000_000
+    fi.revenue_years = 3
+    fi.gross_revenue_10a = 8_000_000
+    _, ctx = _ctx_for(fi)
+
+    assert ctx["applied_inputs"]["income_10a"] == "400만원"
+    assert ctx["applied_inputs"]["area_10a"] == "5.00"
+    assert ctx["applied_inputs"]["age_coef"] == "1.00"
+    assert ctx["applied_inputs"]["trend_index"] == "0.93"
+    assert ctx["applied_inputs"]["revenue_evidence"] == "최근 3년 평균 매출"
+    assert "보정" in ctx["applied_inputs"]["revenue_adjustment"]
+    assert ctx["applied_inputs"]["land_unit_source"] == "인근 실거래가 5건"
+    assert ctx["applied_inputs"]["land_unit_price"] == "13만원/㎡"
+
+    assert len(ctx["facility_details"]) == 1
+    facility = ctx["facility_details"][0]
+    assert facility["area"] == "60㎡"
+    assert facility["installed_year"] == "2017년"
+    assert facility["condition"] == "B"
+    assert facility["residual_value_manwon"] >= 0
+
+
+def test_audience_specific_sections_are_distinct():
+    """동일 계산 결과라도 농장주와 청년농의 다음 행동은 명확히 달라야 한다."""
+    fi = _make_input(deal=130_000, deal_cnt=5, installed=2017)
+    _, farmer = _ctx_for(fi, audience="FARMER")
+    _, young = _ctx_for(fi, audience="YOUNG")
+
+    assert farmer["decision_title"] == "검토가를 높이기 위한 증빙 준비"
+    assert young["decision_title"] == "인수 전 검증 순서"
+    assert farmer["decision_items"] != young["decision_items"]
+    assert any("매출" in item for item in farmer["decision_items"])
+    assert any("현장" in item for item in young["decision_items"])

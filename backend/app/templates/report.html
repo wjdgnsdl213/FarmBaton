@@ -79,6 +79,15 @@
   .tbl tr:last-child td { border-bottom: none; }
   .tbl-note { font-size: 9.5px; color: #6b7280; margin-top: 7px; line-height: 1.5; }
   .tbl-src .src-k { font-weight: 700; color: #374151; width: 90px; }
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
+  .input-item { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid #f0f1ee; padding: 3px 0; }
+  .input-k { color: #6b7280; font-size: 9.5px; }
+  .input-v { color: #27352c; font-size: 9.8px; font-weight: 700; text-align: right; }
+  .formula-line { margin-top: 8px; padding: 7px 9px; border-radius: 5px; background: #f7faf8; color: #31523c; font-size: 9.5px; }
+  .trace-result td { font-weight: 800; color: #15351f; background: #f7faf8; border-top: 1px solid #d8e2da; }
+  .minus { color: #b4452f; }
+  .facility-empty { font-size: 9.5px; color: #6b7280; }
+  .role-box { background: #f8fbf8; }
 
   /* ── 리스크 3분류 ── */
   .risk-lead { font-size: 10px; color: #6b7280; margin-bottom: 8px; }
@@ -178,18 +187,60 @@
       <div class="comp-total">토지·시설·영업권 합계 {{ value_total }}</div>
     </div>
 
-    <!-- ScenarioTable (페이지1로 이동 — 인수 판단 핵심) -->
+    <!-- AppliedInputs -->
     <div class="card">
-      <div class="card-h">시나리오</div>
+      <div class="card-h">이번 리포트에 실제 적용된 값</div>
+      <div class="input-grid">
+        <div class="input-item"><span class="input-k">10a당 평균소득</span><span class="input-v">{{ applied_inputs.income_10a }}</span></div>
+        <div class="input-item"><span class="input-k">재배면적(10a)</span><span class="input-v">{{ applied_inputs.area_10a }}</span></div>
+        <div class="input-item"><span class="input-k">수령계수</span><span class="input-v">{{ applied_inputs.age_coef }}</span></div>
+        <div class="input-item"><span class="input-k">시세보정</span><span class="input-v">{{ applied_inputs.trend_index }}</span></div>
+        <div class="input-item"><span class="input-k">제출 매출</span><span class="input-v">{{ applied_inputs.annual_revenue }} · {{ applied_inputs.revenue_evidence }}</span></div>
+        <div class="input-item"><span class="input-k">매출 반영</span><span class="input-v">{{ applied_inputs.revenue_adjustment }}</span></div>
+        <div class="input-item"><span class="input-k">토지 단가</span><span class="input-v">{{ applied_inputs.land_unit_price }}</span></div>
+        <div class="input-item"><span class="input-k">단가 근거</span><span class="input-v">{{ applied_inputs.land_unit_source }}</span></div>
+        <div class="input-item"><span class="input-k">판로 증빙</span><span class="input-v">{{ applied_inputs.sales_evidence }}</span></div>
+        <div class="input-item"><span class="input-k">영업권 반영</span><span class="input-v">{{ applied_inputs.goodwill_range }}</span></div>
+      </div>
+      <div class="formula-line">
+        예상 연소득 {{ applied_inputs.income_point }} =
+        10a당 평균소득 × {{ applied_inputs.area_10a }} × 수령계수 {{ applied_inputs.age_coef }}
+        × 시세보정 {{ applied_inputs.trend_index }} × 매출 보정
+      </div>
+    </div>
+
+    <!-- CalculationTrace -->
+    <div class="card">
+      <div class="card-h">가격 산출 연결표</div>
       <table class="tbl">
-        <thead><tr><th>구분</th><th>인수 검토가</th><th>예상 연소득</th></tr></thead>
+        <thead><tr><th>구성요소</th><th>하한 계산</th><th>상한 계산</th></tr></thead>
         <tbody>
-          {% for s in scenarios %}
-          <tr><td>{{ s.label }}</td><td>{{ s.value }}</td><td>{{ s.income }}</td></tr>
+          <tr><td>토지 기준가</td><td>{{ calculation_trace.lower.land }}</td><td>{{ calculation_trace.upper.land }}</td></tr>
+          <tr><td>시설 잔존가</td><td>{{ calculation_trace.lower.facility }}</td><td>{{ calculation_trace.upper.facility }}</td></tr>
+          <tr><td>영업권</td><td>{{ calculation_trace.lower.goodwill }}</td><td>{{ calculation_trace.upper.goodwill }}</td></tr>
+          <tr><td class="minus">리스크 할인</td><td class="minus">- {{ calculation_trace.lower.discount }}</td><td class="minus">- {{ calculation_trace.upper.discount }}</td></tr>
+          <tr class="trace-result"><td>인수 검토가 범위</td><td>{{ calculation_trace.lower.result }}</td><td>{{ calculation_trace.upper.result }}</td></tr>
+        </tbody>
+      </table>
+      <div class="tbl-note">토지는 기준가의 90~110%, 시설은 잔존가의 85~105% 범위를 적용했습니다. 정보 부족과 경제수령 위험이 있으면 리스크 할인이 반영됩니다.</div>
+    </div>
+
+    <!-- FacilityDetails -->
+    <div class="card">
+      <div class="card-h">시설별 잔존가 근거</div>
+      {% if facility_details %}
+      <table class="tbl">
+        <thead><tr><th>시설</th><th>면적</th><th>설치연도</th><th>상태</th><th>적용 표준단가</th><th>잔존가</th></tr></thead>
+        <tbody>
+          {% for f in facility_details %}
+          <tr><td>{{ f.name }}</td><td>{{ f.area }}</td><td>{{ f.installed_year }}</td><td>{{ f.condition }}</td><td>{{ f.standard_cost }}</td><td>{{ f.residual_value }}</td></tr>
           {% endfor %}
         </tbody>
       </table>
-      <div class="tbl-note">시세 참고 — {{ normal_year_text }}</div>
+      <div class="tbl-note">시설 잔존가 = 시설 기준표의 표준 신축비 × 경과연수에 따른 잔존율 × 상태등급. 설치연도 미상은 보수적으로 반영됩니다.</div>
+      {% else %}
+      <div class="facility-empty">등록된 시설이 없어 시설 잔존가는 반영되지 않았습니다.</div>
+      {% endif %}
     </div>
 
     <!-- RiskChecklist -->
@@ -216,11 +267,11 @@
       </div>
     </div>
 
-    <!-- Advice action items -->
-    <div class="card">
-      <div class="card-h">{{ advice_title }}</div>
+    <!-- AudienceDecisionGuide -->
+    <div class="card role-box">
+      <div class="card-h">{{ decision_title }}</div>
       <ol class="actions">
-        {% for a in advice_items %}<li>{{ a }}</li>{% endfor %}
+        {% for item in decision_items %}<li>{{ item }}</li>{% endfor %}
       </ol>
     </div>
 

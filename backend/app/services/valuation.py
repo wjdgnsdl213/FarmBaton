@@ -57,6 +57,7 @@ class AssetData:
     std_unit_cost_krw: float       # facility_std.std_unit_cost_krw
     useful_life_years: int         # facility_std.useful_life_years
     salvage_rate: float            # facility_std.salvage_rate
+    facility_name: Optional[str] = None
 
 
 @dataclass

@@ -156,6 +156,7 @@ def _load_assets(cur, farm_id: int) -> list[AssetData]:
     cur.execute("""
         SELECT
             fa.facility_code,
+            fs.facility_name,
             fa.area_m2,
             fa.installed_year,
             COALESCE(fa.condition_grade, 'B') AS condition_grade,
@@ -169,7 +170,10 @@ def _load_assets(cur, farm_id: int) -> list[AssetData]:
 
     assets = []
     for row in cur.fetchall():
-        code, area_m2, installed_year, condition_grade, new_cost, useful_life, salvage_rate = row
+        (
+            code, facility_name, area_m2, installed_year, condition_grade,
+            new_cost, useful_life, salvage_rate,
+        ) = row
         area_f = float(area_m2)
         nc = float(new_cost) if new_cost is not None else 0.0
         # effective per-m2 단가 = fn_facility_new_cost / area_m2
@@ -182,5 +186,6 @@ def _load_assets(cur, farm_id: int) -> list[AssetData]:
             std_unit_cost_krw=std_unit,
             useful_life_years=int(useful_life),
             salvage_rate=float(salvage_rate),
+            facility_name=facility_name,
         ))
     return assets
