@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { api, getToken, getRole, type FarmDetail, type MatchItem, type SupportProgramItem } from '../api'
-import { formatArea } from '../format'
+import { formatArea, formatManwonRange } from '../format'
 import heroYoung from '../assets/hero-young.jpg'
 
 interface Account { name: string; phone: string | null }
@@ -26,7 +26,6 @@ function ScoreBar({ label, value, max }: ScoreBarProps) {
 }
 
 function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: number; yfId: number | null; account: Account | null }) {
-  const fmt = (n: number) => n.toLocaleString('ko-KR')
   const score = Math.round(item.total_score)
   const circleColor = score >= 70 ? 'var(--green)' : score >= 40 ? '#f59e0b' : '#9ca3af'
 
@@ -94,7 +93,7 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
             {item.succession_type && <span className="tag">{SUCC_NAMES[item.succession_type]}</span>}
           </div>
           <div className="value-range-small">
-            인수 검토가: {fmt(item.est_value_min)} ~ {fmt(item.est_value_max)}만원
+            인수 검토가: {formatManwonRange(item.est_value_min, item.est_value_max)}
           </div>
           {item.risk_penalty > 0 && (
             <span className="penalty-badge">리스크 -{item.risk_penalty}점</span>
@@ -130,7 +129,7 @@ function MatchCard({ item, rank, yfId, account }: { item: MatchItem; rank: numbe
             </div>
             <div className="match-farm-meta">{item.address}</div>
             <div className="value-range-small" style={{ marginBottom: '1rem' }}>
-              인수 검토가: {fmt(item.est_value_min)} ~ {fmt(item.est_value_max)}만원
+              인수 검토가: {formatManwonRange(item.est_value_min, item.est_value_max)}
             </div>
 
             {detailLoading && <div className="match-farm-meta">상세 정보 불러오는 중...</div>}

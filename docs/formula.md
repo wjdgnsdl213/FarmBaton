@@ -34,9 +34,19 @@ skill_adj   = 숙련도 보정 (아래)
 est_income_point = base_income × age_coef × trend × skill_adj
 ```
 
-**숙련도 보정 `skill_adj`** — 개별 농가 기술·품질 편차 반영. 매출 자료 유무로 결정:
+**숙련도 보정 `skill_adj`** — 개별 농가 기술·품질 편차 반영. 사용자가 입력하는
+값은 조수입(매출)이고 기준값은 농업소득이므로, 작목별 평균 소득률로 같은 단위로
+환산한 뒤 비교한다.
+
+```
+income_rate     = income_coef.avg_income_10a / income_coef.avg_gross_10a
+observed_income = annual_revenue × income_rate
+skill_adj       = clamp(observed_income / base_income, 0.7, 1.3)
+```
+
+- `avg_gross_10a`가 없으면 매출 보정을 적용하지 않고 `1.0`을 사용한다.
 - 매출 미제출: `1.0` 고정 (평균 가정)
-- 매출 제출: `clamp(annual_revenue_기반_실측소득 / base_income, 0.7, 1.3)` — 평균 대비 ±30% 이내로 제한(과신 방지)
+- 매출 제출: 평균 대비 ±30% 이내로 제한한다(과신 방지).
 
 **범위 산출** — 점추정에 불확실성 밴드 적용:
 ```
@@ -133,7 +143,10 @@ value_min = MAX(value_min, land_min)   -- 하한은 최소 토지가(나무·시
 | C | 공공데이터+기본 설문(수령·시설 입력) | 사전 검토용 추정 |
 | D | 주소·면적만 | 참고용 자동 추정 |
 
-MVP 시드/데모는 대부분 C. 하향 트리거: 실거래 표본<3, installed_year 결측, 공시지가만 존재 → 한 단계씩 down(최저 D).
+자동 산출은 B부터 시작하며, `매출자료 + 설치연도가 확인된 시설목록`이 모두
+있으면 B, 그 외 기본 설문은 C로 둔다. A는 사진·권리관계·현장 실사가 모두
+필요하므로 자동 부여하지 않는다. 하향 트리거: 실거래 표본<3,
+installed_year 결측, 공시지가만 존재 → 한 단계씩 down(최저 D).
 
 ---
 
@@ -184,4 +197,4 @@ valuation.py 구현 **전에** 아래를 테스트로 고정한다.
 - [ ] `official_to_market` 0.65 — 3개 도 실거래/공시지가 비율 실측으로 보정
 - [ ] 영업권 multiple 상한 2.0 — 농업 사업양수도 관행 확인
 - [ ] 정책자금 한도 상수 — RAG 연계 시 동적화
-- [ ] skill_adj 매출→실측소득 환산식 — 소득조사 경영비율 적용 정밀화
+- [x] skill_adj 매출→실측소득 환산식 — 소득조사의 작목별 평균 소득률 적용

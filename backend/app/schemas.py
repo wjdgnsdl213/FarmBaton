@@ -1,7 +1,7 @@
 """Pydantic v2 요청/응답 스키마."""
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -68,6 +68,7 @@ class FarmCreate(BaseModel):
         default=None, pattern="^(NOW|WITHIN_1Y|WITHIN_3Y|WITHIN_5Y)$"
     )
     annual_revenue: Optional[float] = Field(default=None, ge=0)
+    revenue_years: Optional[Literal[1, 3]] = None
     sales_channel: Optional[str] = None   # 계약재배/직거래/공판장
     assets: list[AssetCreate] = []
     is_demo: bool = False
@@ -90,8 +91,11 @@ class ValuationResponse(BaseModel):
     est_value_min: int        # 만원 반올림 (인수 검토가 범위 하한)
     est_value_max: int        # 만원 반올림 (인수 검토가 범위 상한)
     income_point: int
+    income_adjustment_pct: int
+    revenue_cap_applied: bool
     land_value_point: int
     facility_value: int
+    facility_value_krw: int
     goodwill_min: int
     goodwill_max: int
     label: str = "인수 검토가 범위(참고용 추정)"

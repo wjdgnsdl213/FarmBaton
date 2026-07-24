@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, GeoJSON, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { api, type ValuationResult, type FacilityOption } from '../api'
+import { formatManwon, formatManwonRange } from '../format'
 import heroFarmer from '../assets/hero-farmer.jpg'
 
 delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -69,6 +70,7 @@ export default function FarmerPage() {
   const [facilityOptions, setFacilityOptions] = useState<FacilityOption[]>([])
   const [assets, setAssets] = useState<AssetRow[]>([])
   const [annualRevenue, setAnnualRevenue] = useState('')   // 만원 단위 입력
+  const [revenueYears, setRevenueYears] = useState<'1' | '3'>('1')
   const [salesChannel, setSalesChannel] = useState('')     // '' | 계약재배 | 직거래 | 공판장
   const [currentStep, setCurrentStep] = useState(1)
 
@@ -205,6 +207,7 @@ export default function FarmerPage() {
         area_m2: form.area_m2 ? parseFloat(form.area_m2) : undefined,
         // 만원 입력 → 원 단위로 변환해 전송
         annual_revenue: annualRevenue ? Math.round(parseFloat(annualRevenue) * 10000) : undefined,
+        revenue_years: annualRevenue ? Number(revenueYears) as 1 | 3 : undefined,
         sales_channel: salesChannel || undefined,
         assets: validAssets.length ? validAssets : undefined,
       }
@@ -235,8 +238,6 @@ export default function FarmerPage() {
       setPublishState('error')
     }
   }
-
-  const fmt = (n: number) => n.toLocaleString('ko-KR')
 
   return (
     <div className="page page-farmer">
@@ -497,6 +498,17 @@ export default function FarmerPage() {
                   />
                 </div>
                 <div className="form-group">
+                  <label>매출 자료 기간</label>
+                  <select
+                    value={revenueYears}
+                    onChange={e => setRevenueYears(e.target.value as '1' | '3')}
+                    disabled={!annualRevenue}
+                  >
+                    <option value="1">최근 1년</option>
+                    <option value="3">최근 3년 평균</option>
+                  </select>
+                </div>
+                <div className="form-group">
                   <label>주로 어디에 파시나요?</label>
                   <select value={salesChannel} onChange={e => setSalesChannel(e.target.value)}>
                     <option value="">선택 안 함</option>
@@ -533,7 +545,7 @@ export default function FarmerPage() {
 
           <div className="valuation-header">
             <div className="valuation-range">
-              {fmt(result.est_value_min)}만원 ~ {fmt(result.est_value_max)}만원
+              {formatManwonRange(result.est_value_min, result.est_value_max)}
             </div>
             <div className="valuation-sublabel">{result.label}</div>
           </div>
@@ -542,23 +554,34 @@ export default function FarmerPage() {
             <div className="val-item">
               <div className="val-item-label">예상 연소득</div>
               <div className="val-item-value">
-                {fmt(result.est_income_min)} ~ {fmt(result.est_income_max)}만원
+                {formatManwonRange(result.est_income_min, result.est_income_max)}
               </div>
+              {annualRevenue && (
+                <div className="valuation-sublabel">
+                  매출자료 보정 {result.income_adjustment_pct >= 0 ? '+' : ''}
+                  {result.income_adjustment_pct}%
+                  {result.revenue_cap_applied ? ' · 보수적 상한 적용' : ''}
+                </div>
+              )}
             </div>
             <div className="val-item">
               <div className="val-item-label">토지 기준 금액</div>
-              <div className="val-item-value">{fmt(result.land_value_point)}만원</div>
+              <div className="val-item-value">{formatManwon(result.land_value_point)}</div>
             </div>
             <div className="val-item">
               <div className="val-item-label">시설의 현재 가치</div>
-              <div className="val-item-value">{fmt(result.facility_value)}만원</div>
+              <div className="val-item-value">
+                {result.facility_value === 0 && result.facility_value_krw > 0
+                  ? '1만원 미만'
+                  : formatManwon(result.facility_value)}
+              </div>
             </div>
             <div className="val-item">
               <div className="val-item-label">매출·판매처 가치</div>
               <div className="val-item-value">
                 {result.goodwill_min === 0
                   ? '해당 없음'
-                  : `${fmt(result.goodwill_min)} ~ ${fmt(result.goodwill_max)}만원`}
+                  : formatManwonRange(result.goodwill_min, result.goodwill_max)}
               </div>
             </div>
           </div>

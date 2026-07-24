@@ -35,6 +35,7 @@ export interface FarmCreatePayload {
   succession_type?: string
   timing?: string
   annual_revenue?: number          // 원 단위 (선택) — 영업권·숙련도 보정
+  revenue_years?: 1 | 3            // 제출한 매출 자료 기간
   sales_channel?: string           // 계약재배 / 직거래 / 공판장 (선택)
   assets?: { facility_code: string; area_m2: number; installed_year?: number; condition_grade: string }[]
 }
@@ -52,8 +53,11 @@ export interface ValuationResult {
   est_value_min: number
   est_value_max: number
   income_point: number
+  income_adjustment_pct: number
+  revenue_cap_applied: boolean
   land_value_point: number
   facility_value: number
+  facility_value_krw: number
   goodwill_min: number
   goodwill_max: number
   label: string

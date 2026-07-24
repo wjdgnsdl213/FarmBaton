@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, type ConsultRequestDetail, type FarmMatchItem, type FarmSummary } from '../api'
-import { formatArea } from '../format'
+import { formatArea, formatManwon, formatManwonRange } from '../format'
 
 const CROP_NAMES: Record<string, string> = { APPLE: '사과', PEACH: '복숭아', GRAPE: '포도' }
 const SUCC_NAMES: Record<string, string> = { SALE: '매도', LEASE: '임대', JOINT: '공동경영', MENTORING: '멘토후독립' }
@@ -62,7 +62,7 @@ function MatchedYoungFarmers({ farmId }: { farmId: number }) {
                   <span className="tag">{m.pref_sido || '지역 무관'}</span>
                   <span className="tag">{m.pref_crop ? CROP_NAMES[m.pref_crop] : '작목 무관'}</span>
                   <span className="tag">{SUCC_NAMES[m.pref_succession]}</span>
-                  <span className="tag">자본 {m.available_capital.toLocaleString('ko-KR')}만원</span>
+                  <span className="tag">자본 {formatManwon(m.available_capital)}</span>
                   <span className="tag">경력 {m.experience_years}년</span>
                 </div>
               </div>
@@ -138,7 +138,7 @@ function ConsultInbox({ farmId, onFarmStatusChange }: { farmId: number; onFarmSt
                   <span className="tag">{r.pref_sido || '지역 무관'}</span>
                   <span className="tag">{r.pref_crop ? CROP_NAMES[r.pref_crop] : '작목 무관'}</span>
                   <span className="tag">{SUCC_NAMES[r.pref_succession]}</span>
-                  <span className="tag">자본 {r.available_capital.toLocaleString('ko-KR')}만원</span>
+                  <span className="tag">자본 {formatManwon(r.available_capital)}</span>
                   <span className="tag">경력 {r.experience_years}년</span>
                 </div>
                 {r.intro && <p style={{ fontSize: '.82rem', margin: '.45rem 0 0', color: 'var(--green-deep)' }}>“{r.intro}”</p>}
@@ -179,7 +179,6 @@ function FarmCard({ farm }: { farm: FarmSummary }) {
   const [candidatesOpen, setCandidatesOpen] = useState(false)
   const [status, setStatus] = useState(farm.status)
   const [publishing, setPublishing] = useState(false)
-  const fmt = (n: number | null) => n === null ? '-' : n.toLocaleString('ko-KR')
 
   const toggleStatus = async () => {
     const next = status === 'ACTIVE' ? 'DRAFT' : 'ACTIVE'
@@ -201,7 +200,11 @@ function FarmCard({ farm }: { farm: FarmSummary }) {
       </div>
       <div className="match-farm-meta">{farm.address}</div>
       <div className="value-range-small">
-        인수 검토가: {fmt(farm.est_value_min)} ~ {fmt(farm.est_value_max)}만원 · <span className="tag">{FARM_STATUS_NAMES[status] || status}</span>
+        인수 검토가: {
+          farm.est_value_min === null || farm.est_value_max === null
+            ? '-'
+            : formatManwonRange(farm.est_value_min, farm.est_value_max)
+        } · <span className="tag">{FARM_STATUS_NAMES[status] || status}</span>
       </div>
 
       {(status === 'ACTIVE' || status === 'DRAFT') && (

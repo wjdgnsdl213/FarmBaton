@@ -178,6 +178,68 @@ def test_T1_value_min_ge_land_min(apple_7y):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 매출 보정 회귀 테스트
+#     사용자가 입력하는 값은 조수입(매출), income_10a는 농업소득이므로
+#     같은 단위로 환산한 뒤 비교해야 한다.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_revenue_adjustment_converts_gross_revenue_to_income(std_land_5000):
+    """평균 조수입과 같은 매출이면 숙련도 보정은 1.0이어야 한다."""
+    farm = FarmInput(
+        crop_code="APPLE",
+        tree_age=7,
+        area_m2=1_000.0,
+        income_10a=4_000_000.0,
+        gross_revenue_10a=10_000_000.0,
+        age_coef=1.0,
+        trend_index=1.0,
+        land=LandData(
+            area_m2=1_000.0,
+            official_price_m2=30_000.0,
+            deal_price_m2=55_000.0,
+            deal_sample_cnt=5,
+        ),
+        assets=[],
+        annual_revenue=10_000_000.0,
+        revenue_years=1,
+    )
+
+    # 매출 1,000만원 × 평균 소득률 40% = 실측 추정소득 400만원.
+    # 기준소득도 400만원이므로 skill_adj=1.0, point=400만원이어야 한다.
+    result = calc_income(farm)
+    assert result.point == pytest.approx(4_000_000.0)
+    assert result.adjustment == pytest.approx(1.0)
+    assert result.cap_applied is False
+
+
+def test_revenue_adjustment_still_applies_conservative_cap():
+    """매출 환산 후에도 과신 방지 상한 1.3은 유지한다."""
+    farm = FarmInput(
+        crop_code="APPLE",
+        tree_age=7,
+        area_m2=1_000.0,
+        income_10a=4_000_000.0,
+        gross_revenue_10a=10_000_000.0,
+        age_coef=1.0,
+        trend_index=1.0,
+        land=LandData(
+            area_m2=1_000.0,
+            official_price_m2=30_000.0,
+            deal_price_m2=55_000.0,
+            deal_sample_cnt=5,
+        ),
+        assets=[],
+        annual_revenue=20_000_000.0,
+        revenue_years=1,
+    )
+
+    result = calc_income(farm)
+    assert result.point == pytest.approx(4_000_000.0 * 1.3)
+    assert result.adjustment == pytest.approx(1.3)
+    assert result.cap_applied is True
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # T2  사과 3년생 vs 7년생 동일조건
 #     기대: 3년생 income·value < 7년생
 # ─────────────────────────────────────────────────────────────────────────────
@@ -325,6 +387,35 @@ def test_T6_missing_year_downgrades_grade():
     farm_with_year = make_farm(2020)
     order = ["A", "B", "C", "D"]
     assert order.index(grade_confidence(farm_no_year)) > order.index(grade_confidence(farm_with_year))
+
+
+def test_revenue_and_complete_facility_data_improves_grade_to_B(std_land_5000):
+    """매출 일부+설치연도 있는 시설자료가 있으면 B등급으로 상향한다."""
+    farm = FarmInput(
+        crop_code="APPLE",
+        tree_age=7,
+        area_m2=5_000.0,
+        income_10a=APPLE_INCOME_10A,
+        gross_revenue_10a=12_000_000.0,
+        age_coef=APPLE_7Y_COEF,
+        trend_index=1.0,
+        land=std_land_5000,
+        assets=[
+            AssetData(
+                facility_code="COLD_STORAGE_SMALL",
+                area_m2=33.0,
+                installed_year=2020,
+                condition_grade="B",
+                std_unit_cost_krw=850_000.0,
+                useful_life_years=10,
+                salvage_rate=0.1,
+            )
+        ],
+        annual_revenue=50_000_000.0,
+        revenue_years=1,
+    )
+
+    assert grade_confidence(farm) == "B"
 
 
 # ─────────────────────────────────────────────────────────────────────────────

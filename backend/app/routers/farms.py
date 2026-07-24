@@ -82,8 +82,11 @@ def _build_valuation_response(farm_id: int, result) -> ValuationResponse:
         est_value_min=_to_만원(result.est_value_min),
         est_value_max=_to_만원(result.est_value_max),
         income_point=_to_만원(result.income_point),
+        income_adjustment_pct=round((result.income_adjustment - 1.0) * 100),
+        revenue_cap_applied=result.revenue_cap_applied,
         land_value_point=_to_만원(result.land_value_point),
         facility_value=_to_만원(result.facility_value),
+        facility_value_krw=round(result.facility_value),
         goodwill_min=_to_만원(result.goodwill_min),
         goodwill_max=_to_만원(result.goodwill_max),
     )
@@ -120,8 +123,8 @@ def _insert_farm(data: FarmCreate, parcel_id: Optional[int],
             INSERT INTO farm (
                 address, sido, sigungu, bjd_cd, area_m2, crop_code,
                 tree_age, succession_type, timing, annual_revenue,
-                sales_channel, parcel_id, owner_id, status, is_demo
-            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'DRAFT',%s)
+                revenue_years, sales_channel, parcel_id, owner_id, status, is_demo
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'DRAFT',%s)
             RETURNING id
         """, (
             data.address,
@@ -134,6 +137,11 @@ def _insert_farm(data: FarmCreate, parcel_id: Optional[int],
             data.succession_type,
             data.timing,
             data.annual_revenue,
+            (
+                data.revenue_years or 1
+                if data.annual_revenue is not None
+                else 0
+            ),
             data.sales_channel,
             parcel_id,
             owner_id,

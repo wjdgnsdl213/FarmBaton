@@ -21,22 +21,27 @@ def load_farm_input(farm_id: int, conn) -> FarmInput:
         # ── 1. 농장 기본 행 ──────────────────────────────────────────
         cur.execute("""
             SELECT crop_code::TEXT, tree_age, area_m2, bjd_cd, sido,
-                   annual_revenue, sales_channel
+                   annual_revenue, revenue_years, sales_channel
             FROM farm
             WHERE id = %s
         """, (farm_id,))
         row = cur.fetchone()
         if row is None:
             raise ValueError(f"farm id={farm_id} not found")
-        crop_code, tree_age, area_m2, bjd_cd, sido, annual_revenue, sales_channel = row
+        (
+            crop_code, tree_age, area_m2, bjd_cd, sido,
+            annual_revenue, revenue_years, sales_channel,
+        ) = row
 
         # ── 2. 10a당 소득 ─────────────────────────────────────────────
         cur.execute(
-            "SELECT avg_income_10a FROM income_coef WHERE crop_code = %s",
+            "SELECT avg_income_10a, avg_gross_10a "
+            "FROM income_coef WHERE crop_code = %s",
             (crop_code,),
         )
         ic = cur.fetchone()
         income_10a = float(ic[0]) if ic else 0.0
+        gross_revenue_10a = float(ic[1]) if (ic and ic[1] is not None) else None
 
         # ── 3. 수령계수 (DB 곡선 함수) ──────────────────────────────
         cur.execute(
@@ -61,7 +66,7 @@ def load_farm_input(farm_id: int, conn) -> FarmInput:
         assets = _load_assets(cur, farm_id)
 
         # ── 7. 판로·영업권 파생 ───────────────────────────────────────
-        revenue_years = 1 if annual_revenue is not None else 0
+        revenue_years = int(revenue_years or 0) if annual_revenue is not None else 0
         has_contract = (sales_channel == "계약재배") if sales_channel else False
         has_direct_sales = (sales_channel == "직거래") if sales_channel else False
 
@@ -74,6 +79,7 @@ def load_farm_input(farm_id: int, conn) -> FarmInput:
             trend_index=trend_index,
             land=land,
             assets=assets,
+            gross_revenue_10a=gross_revenue_10a,
             annual_revenue=float(annual_revenue) if annual_revenue is not None else None,
             revenue_years=revenue_years,
             has_contract=has_contract,

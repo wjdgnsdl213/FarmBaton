@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, type MyConsultRequest } from '../api'
+import { formatManwonRange } from '../format'
 
 const STATUS_NAMES: Record<string, string> = { REQUESTED: '대기중', ACCEPTED: '수락됨', DECLINED: '거절됨' }
 
 export default function MyRequestsPage() {
   const [requests, setRequests] = useState<MyConsultRequest[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const fmt = (n: number | null) => n === null ? '-' : n.toLocaleString('ko-KR')
 
   useEffect(() => {
     api.getMyConsultRequests()
@@ -32,7 +32,11 @@ export default function MyRequestsPage() {
             <div className="card-title" style={{ marginBottom: '.5rem' }}>{r.farm_label}</div>
             <div className="match-farm-meta">{r.address}</div>
             <div className="value-range-small">
-              인수 검토가: {fmt(r.est_value_min)} ~ {fmt(r.est_value_max)}만원 ·{' '}
+              인수 검토가: {
+                r.est_value_min === null || r.est_value_max === null
+                  ? '-'
+                  : formatManwonRange(r.est_value_min, r.est_value_max)
+              } ·{' '}
               <span className="tag">{STATUS_NAMES[r.status] || r.status}</span>
             </div>
 

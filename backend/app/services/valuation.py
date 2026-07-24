@@ -70,6 +70,7 @@ class FarmInput:
     trend_index: float             # price_trend.trend_index (평년=1.0)
     land: LandData
     assets: list[AssetData] = field(default_factory=list)
+    gross_revenue_10a: Optional[float] = None  # income_coef.avg_gross_10a
     # 영업권 입력 (선택)
     annual_revenue: Optional[float] = None
     revenue_years: int = 0         # 0: 미제출, 1: 1년, 3: 3년
@@ -105,6 +106,8 @@ class IncomeResult:
     point: float
     min: float
     max: float
+    adjustment: float = 1.0
+    cap_applied: bool = False
 
 
 class LandValueResult(NamedTuple):
@@ -126,6 +129,8 @@ class ValuationResult:
     facility_value: float = 0.0
     goodwill_min: float = 0.0
     goodwill_max: float = 0.0
+    income_adjustment: float = 1.0
+    revenue_cap_applied: bool = False
 
 
 @dataclass
@@ -151,12 +156,18 @@ def _clamp(value: float, lo: float, hi: float) -> float:
 def grade_confidence(farm: FarmInput) -> str:
     """신뢰도 등급 (formula.md §6).
 
-    MVP 기본 'C'에서 시작. 하향 트리거 1건당 1단계 down, 최저 D.
+    매출자료와 설치연도가 확인된 시설자료가 모두 있으면 B, 아니면 C에서 시작.
+    A는 사진·권리관계·현장 실사까지 필요한 단계라 현재 자동 산출하지 않는다.
+    하향 트리거 1건당 1단계 down, 최저 D.
     - 실거래 부실 (공시지가만 OR 표본<3): 한 단계 down
     - installed_year 결측 자산 존재: 한 단계 down
     """
     _GRADES = ["A", "B", "C", "D"]
-    idx = 2  # C
+    has_revenue_evidence = farm.annual_revenue is not None and farm.revenue_years >= 1
+    has_complete_facility_data = bool(farm.assets) and all(
+        a.installed_year is not None for a in farm.assets
+    )
+    idx = 1 if (has_revenue_evidence and has_complete_facility_data) else 2
 
     if farm.land.deal_price_m2 is None or (farm.land.deal_sample_cnt or 0) < 3:
         idx += 1
@@ -218,9 +229,21 @@ def calc_income(farm: FarmInput) -> IncomeResult:
         return IncomeResult(point=0.0, min=0.0, max=0.0)
 
     base_income = farm.income_10a * (farm.area_m2 / 1_000.0)
+    cap_applied = False
 
-    if farm.annual_revenue is not None and base_income > 0:
-        skill_adj = _clamp(farm.annual_revenue / base_income, 0.7, 1.3)
+    if (
+        farm.annual_revenue is not None
+        and farm.gross_revenue_10a is not None
+        and farm.gross_revenue_10a > 0
+        and base_income > 0
+    ):
+        # 사용자가 입력하는 값은 매출(조수입), base_income은 농업소득이므로
+        # 작목별 평균 소득률을 적용해 동일 단위로 환산한 뒤 비교한다.
+        income_rate = farm.income_10a / farm.gross_revenue_10a
+        observed_income = farm.annual_revenue * income_rate
+        raw_adj = observed_income / base_income
+        skill_adj = _clamp(raw_adj, 0.7, 1.3)
+        cap_applied = raw_adj < 0.7 or raw_adj > 1.3
     else:
         skill_adj = 1.0
 
@@ -231,6 +254,8 @@ def calc_income(farm: FarmInput) -> IncomeResult:
         point=point,
         min=point * (1.0 - band),
         max=point * (1.0 + band),
+        adjustment=skill_adj,
+        cap_applied=cap_applied,
     )
 
 
@@ -357,6 +382,8 @@ def calc_total_value(farm: FarmInput, current_year: int) -> ValuationResult:
         facility_value=fac_total,
         goodwill_min=gw_min,
         goodwill_max=gw_max,
+        income_adjustment=income_res.adjustment,
+        revenue_cap_applied=income_res.cap_applied,
     )
 
 
